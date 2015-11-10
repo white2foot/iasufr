@@ -9,7 +9,7 @@ Usr.Form.Create = function(opt) {
     var gGroups;
     var firstRun=true;
     var dhxLayout;
-
+    // Test
     if (iasufr.pFunc("grpView") && !(opt.selectUser || opt.selectMulti))
         dhxLayout = new dhtmlXLayoutObject(t.owner, "3L");
     else

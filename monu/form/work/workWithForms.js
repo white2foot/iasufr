@@ -398,27 +398,34 @@ Frm.WorkWithForms.Create = function(opt) {
         var date1Zvit=y+m+"01";
 
         //2)выполнить проверку (з помилками=2)
+        var strStatus=" (за статусом - усi)";
+        if (paramCheck.param.idStatus==4) strStatus=" (за статусом - прийнятi)"
+        else if (paramCheck.param.idStatus==2) strStatus=" (за статусом - вiдправленi)"
+        else if (paramCheck.param.idStatus==3) strStatus=" (за статусом - пiдтвердженi)"
+
         if (paramCheck.param.typeCheck==undefined){
             var paramFiltrs=[["idOrg","idZvit","date1Zvit","idStatus","typeCheck"],[ID_ORG,selRow,date1Zvit,paramCheck.param.idStatus,2]];
             iasufr.ajax({
                 url: "base.Simple.cls",
                 data: {func: "init",idDoc:"CheckOrgReports",idLayout:"T1",param:JSON.stringify(paramFiltrs)},
                 success: function (data) {
+
                     var json = JSON.parse(data);
                     var countError=json.retMess;
                     if (countError==-1){
-                        iasufr.alert("Вибачте, але обрані звіти не беруть участь в жодній перевірці");
+                        iasufr.alert("Вибачте, але обрані звіти не беруть участь в жодній перевірці"+strStatus);
                     }
                     else {
+
                         var mess=[{type: "settings", position: "label-right"},{type: "label", label:"Переглянути результати?"}];
-                        var messErr="Виконання перевiрок завершилось без помилок";
+                        var messErr="Виконання перевiрок завершилось без помилок"+strStatus;
                         if (countError>0){
-                            messErr="Виконання перевiрок завершилось з помилками : "+countError+" звiтiв";
+                            messErr="Виконання перевiрок завершилось з помилками : "+countError+" звiтiв"+strStatus;
                             mess.push({type: "radio", name:"typeCheck",value:2, label: "З помилками"});
                         }
                         mess.push({type: "radio", name:"typeCheck",value:3, label: "Без помилок"});
                         //mess.push({type: "radio", name:"typeCheck",value:1, label: "Усi"});
-                        iasufr.loadForm("Confirm", {title: messErr,mess:mess,onSelect:check,param:{idStatus:paramCheck.param.idStatus},modal:true,width:430,height:150});
+                        iasufr.loadForm("Confirm", {title: messErr,mess:mess,onSelect:check,param:{idStatus:paramCheck.param.idStatus},modal:true,width:560,height:150});
                     }
 
                 }

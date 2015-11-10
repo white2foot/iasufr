@@ -399,9 +399,6 @@ Frm.WorkWithForms.Create = function(opt) {
 
         //2)выполнить проверку (з помилками=2)
         var strStatus=" (за статусом - усi)";
-        if (paramCheck.param.idStatus==4) strStatus=" (за статусом - прийнятi)"
-        else if (paramCheck.param.idStatus==2) strStatus=" (за статусом - вiдправленi)"
-        else if (paramCheck.param.idStatus==3) strStatus=" (за статусом - пiдтвердженi)"
 
         if (paramCheck.param.typeCheck==undefined){
             var paramFiltrs=[["idOrg","idZvit","date1Zvit","idStatus","typeCheck"],[ID_ORG,selRow,date1Zvit,paramCheck.param.idStatus,2]];

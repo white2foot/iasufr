@@ -84,30 +84,30 @@ Frm.WorkWithForms.Create = function(opt) {
     toolbar.addSeparator("sep1", null);
 
     /*var menu = dhxLayout.cells("c").attachMenu();
-    menu.addNewSibling(null, "obj", "Додатковi дії", false,"/images/icons/16/lightning.png");
+     menu.addNewSibling(null, "obj", "Додатковi дії", false,"/images/icons/16/lightning.png");
 
-    menu.addNewChild("obj", 0, "delete", iasufr.lang.ui.delete, false);
-    if (iasufr.pFunc("zvCanRestore")) menu.addNewChild("obj", 1, "undelete", "Востановити", false);
-    menu.addNewSeparator("undelete",2);
-    if (iasufr.pFunc("zvCanCommit"))   menu.addNewChild("obj", 3, "commit", "Пiдтвердити", false);
-    if (iasufr.pFunc("zvCanUncommit")) menu.addNewChild("obj", 4, "uncommit", "Зняти підтвердження", false);
-    if (iasufr.pFunc("zvCanSend"))     menu.addNewChild("obj", 5, "send", "Вiдправити", false);
-    if (iasufr.pFunc("zvCanReturn"))   menu.addNewChild("obj", 6, "unsend", "Повернути до НЗ", false);
-    if (iasufr.pFunc("zvCanAccept"))   menu.addNewChild("obj", 7, "accept", "Прийняти", false);
-    if (iasufr.pFunc("zvCanUnaccept")) menu.addNewChild("obj", 8, "unaccept", "Не приймати", false);
-    menu.addNewSeparator("unaccept",9);
-    menu.addNewChild("obj", 10, "check", "Перевiрити", false);
-        menu.addNewChild("check", 11, "check_3", "Пiдтвердженi", false);
-        menu.addNewChild("check", 15, "check_2", "Вiдправленi", false);
-        menu.addNewChild("check", 19, "check_4", "Прийнятi", false);
-        menu.addNewChild("check", 23, "check_0", "Усi звiти", false);
+     menu.addNewChild("obj", 0, "delete", iasufr.lang.ui.delete, false);
+     if (iasufr.pFunc("zvCanRestore")) menu.addNewChild("obj", 1, "undelete", "Востановити", false);
+     menu.addNewSeparator("undelete",2);
+     if (iasufr.pFunc("zvCanCommit"))   menu.addNewChild("obj", 3, "commit", "Пiдтвердити", false);
+     if (iasufr.pFunc("zvCanUncommit")) menu.addNewChild("obj", 4, "uncommit", "Зняти підтвердження", false);
+     if (iasufr.pFunc("zvCanSend"))     menu.addNewChild("obj", 5, "send", "Вiдправити", false);
+     if (iasufr.pFunc("zvCanReturn"))   menu.addNewChild("obj", 6, "unsend", "Повернути до НЗ", false);
+     if (iasufr.pFunc("zvCanAccept"))   menu.addNewChild("obj", 7, "accept", "Прийняти", false);
+     if (iasufr.pFunc("zvCanUnaccept")) menu.addNewChild("obj", 8, "unaccept", "Не приймати", false);
+     menu.addNewSeparator("unaccept",9);
+     menu.addNewChild("obj", 10, "check", "Перевiрити", false);
+     menu.addNewChild("check", 11, "check_3", "Пiдтвердженi", false);
+     menu.addNewChild("check", 15, "check_2", "Вiдправленi", false);
+     menu.addNewChild("check", 19, "check_4", "Прийнятi", false);
+     menu.addNewChild("check", 23, "check_0", "Усi звiти", false);
 
-    menu.addNewChild("obj", 30, "recalc", "Перерахувати", false);
-    menu.addNewChild("obj", 31, "printsettings", "Параметри друку", false);
+     menu.addNewChild("obj", 30, "recalc", "Перерахувати", false);
+     menu.addNewChild("obj", 31, "printsettings", "Параметри друку", false);
 
-    menu.attachEvent("onStateChange", onToolbarStateChange);
-    menu.attachEvent("onClick", onUserToolbarClick);
-*/
+     menu.attachEvent("onStateChange", onToolbarStateChange);
+     menu.attachEvent("onClick", onUserToolbarClick);
+     */
     actionsList = [];
     actionsList.push(['check_4', 'obj', 'Прийнятi', '']);
     actionsList.push(['check_2', 'obj', 'Вiдправленi', '']);
@@ -164,9 +164,9 @@ Frm.WorkWithForms.Create = function(opt) {
 
     //var toolbar2 = dhxLayout.cells("a").attachToolbar();
     //toolbar2.addButton("edit2", null, iasufr.lang.ui.edit, "32/page_white_edit.png", "");
-   /* toolbar2.setIconPath(iasufr.const.ICO_PATH);
-    toolbar2.setIconSize(32);
-    toolbar2.addInput("orgView",null,"("+iasufr.user.orgCode+")"+iasufr.user.orgName,200);*/
+    /* toolbar2.setIconPath(iasufr.const.ICO_PATH);
+     toolbar2.setIconSize(32);
+     toolbar2.addInput("orgView",null,"("+iasufr.user.orgCode+")"+iasufr.user.orgName,200);*/
 
     var grid = dhxLayout.cells("b").attachGrid();
     grid.setColumnIds("sel,idZvit,status,prog,code,fond,type,form,isDel,isZved,lastchange");
@@ -204,15 +204,15 @@ Frm.WorkWithForms.Create = function(opt) {
 
 
 
-   /* var myContextMenu1 = new dhtmlXMenuObject({
-        parent: "contextZone_A",
-        icons_path: "../common/imgs/",
-        context: true
-    });
-    myContextMenu1.addNewChild(myContextMenu1.topId, 0, "open", "Open", false, "open.gif");
-    myContextMenu1.addNewChild(myContextMenu1.topId, 1, "save", "Save", false, "save.gif");
-    myContextMenu1.addNewChild(myContextMenu1.topId, 3, "close", "Close", false, "close.gif");
-*/
+    /* var myContextMenu1 = new dhtmlXMenuObject({
+     parent: "contextZone_A",
+     icons_path: "../common/imgs/",
+     context: true
+     });
+     myContextMenu1.addNewChild(myContextMenu1.topId, 0, "open", "Open", false, "open.gif");
+     myContextMenu1.addNewChild(myContextMenu1.topId, 1, "save", "Save", false, "save.gif");
+     myContextMenu1.addNewChild(myContextMenu1.topId, 3, "close", "Close", false, "close.gif");
+     */
     /////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////Function////////////////////////////////////////////////
@@ -360,7 +360,7 @@ Frm.WorkWithForms.Create = function(opt) {
 
         if ($.isArray(rows)) {
             //iasufr.confirm("Востановити звiти?", function() {
-                iasufr.ajax({ url: "frm.Work.cls", data: {func: "SetState", status: status, action: action, ids: JSON.stringify(rows) }, success: RefreshGrid })
+            iasufr.ajax({ url: "frm.Work.cls", data: {func: "SetState", status: status, action: action, ids: JSON.stringify(rows) }, success: RefreshGrid })
             //});
         } else iasufr.alert("Спочатку оберить звiти");
     }
@@ -399,6 +399,9 @@ Frm.WorkWithForms.Create = function(opt) {
 
         //2)выполнить проверку (з помилками=2)
         var strStatus=" (за статусом - усi)";
+        if (paramCheck.param.idStatus==4) strStatus=" (за статусом - прийнятi)"
+        else if (paramCheck.param.idStatus==2) strStatus=" (за статусом - вiдправленi)"
+        else if (paramCheck.param.idStatus==3) strStatus=" (за статусом - пiдтвердженi)"
 
         if (paramCheck.param.typeCheck==undefined){
             var paramFiltrs=[["idOrg","idZvit","date1Zvit","idStatus","typeCheck"],[ID_ORG,selRow,date1Zvit,paramCheck.param.idStatus,2]];
@@ -431,7 +434,7 @@ Frm.WorkWithForms.Create = function(opt) {
         //3)открыть проверку
         else {
             iasufr.loadForm("CheckOrgReports",{ param:[["idOrg","idZvit","date1Zvit","idStatus","typeCheck"],[ID_ORG,selRow,date1Zvit,paramCheck.param.idStatus,paramCheck.param.typeCheck]]});
-            }
+        }
     }
     //сформировать дод23
     function d23(){
@@ -576,9 +579,9 @@ Frm.WorkWithForms.Create = function(opt) {
         switch (name) {
 
             /*case "test": {
-                myContextMenu1.showContextMenu(100,100);
-                break;
-            }*/
+             myContextMenu1.showContextMenu(100,100);
+             break;
+             }*/
             case "settings": {
                 var selRow = grid.getSelectedRowId();
                 if (selRow == undefined || selRow == null) {
@@ -689,8 +692,8 @@ Frm.WorkWithForms.Create = function(opt) {
             }
             case "recalc":
             {
-            Recalc();
-            break;
+                Recalc();
+                break;
             }
             case "import":
             {
@@ -713,10 +716,10 @@ Frm.WorkWithForms.Create = function(opt) {
             }
             case "1":case "2":case "3":case "4":case "5":case "6":
             case "7":case "8":case "9":case "10":case "11":case "12":{
-                iasufr.storeSet("wwfMonth", name);
-                RefreshGrid();
-                break;
-            }
+            iasufr.storeSet("wwfMonth", name);
+            RefreshGrid();
+            break;
+        }
             default:
             {
                 //iasufr.alert(name);

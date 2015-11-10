@@ -1,0 +1,376 @@
+html, body {
+    width:100%;
+    height:100%;
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+}
+
+/* Стили для окошек message */
+.dhtmlx-error{
+    font-weight:bold;
+    color:white;
+    background-color:red;
+}
+.dhtmlx-success{
+    background-color: #aaffaa;
+    font-weight:bold;
+    border-color: #454544;
+}
+
+/* картинка в тулбаре 16х16 вместо 18х18 */
+.dhx_toolbar_base_18_dhx_skyblue div.dhx_toolbar_btn img {
+    /*margin-right: -3px;*/
+    width: 16px;!important;
+    height: 16px;!important;
+}
+
+/* картинка выбора из справочника. испольуется на полях ввода */
+.img-sprav-sel {
+    background-image: url("/images/icons/btn-select.png");
+    background-repeat: no-repeat;
+    width: 19px;
+    height: 19px;
+    /*position: absolute;
+    top: 0px;*/
+    position: absolute;
+    margin-top: -20px;
+    cursor: pointer;
+}
+
+.dhx_toolbar_btn .img-sprav-sel {
+    background-position: 5px 5px;
+    width: 29px;
+    min-height: 30px;
+}
+
+/* этот фикс нужен чтобы в стиле sly_blue поля фильтрации грида были по центру */
+div.gridbox_dhx_skyblue table.hdr td div.hdrcell {
+    padding-left: 0px;
+    text-align: center;
+}
+
+/* Сузить по вертикали заголовок грида */
+div.gridbox table.hdr td {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+/*********************** сетка в грде ***************************/
+div.gridbox_dhx_skyblue table.obj.row20px tr td {
+    border: solid 1px #eee;
+    border-top: 0px;
+    border-left: 0px;
+}
+div.gridbox_dhx_skyblue table.obj tr td {
+    border: solid 1px #eee;
+    border-top: 0px;
+    border-left: 0px;
+}
+
+/* сделать нечетные строки не такими яркими */
+div.gridbox_dhx_skyblue .odd_dhx_skyblue {
+    background-color: #FCFDFF;
+}
+
+/* выровнять заголовки столбцов по центру по вертикале */
+div.gridbox_dhx_skyblue table.hdr td {
+    vertical-align: middle;
+}
+
+/* сделать поля фильтрации в заголовки грида более узкими по высоте */
+div.gridbox_dhx_skyblue table.hdr td input {
+     height: 10px;
+     font-family: Tahoma;
+     font-size: 10px;
+}
+div.gridbox_dhx_skyblue table.hdr td select {
+    height: 17px;
+    font-family: Tahoma;
+    font-size: 10px;
+}
+
+/* для выделения формул */
+.cell-formula-blue {
+    -webkit-box-shadow: inset 0px 0px 0px 2px rgba(0,13,255,1);
+    -moz-box-shadow: inset 0px 0px 0px 2px rgba(0,13,255,1);
+    box-shadow: inset 0px 0px 0px 2px rgba(0,13,255,1);
+}
+
+.cell-formula-red {
+    -webkit-box-shadow: inset 0px 0px 0px 2px rgba(191,0,0,1);
+    -moz-box-shadow: inset 0px 0px 0px 2px rgba(191,0,0,1);
+    box-shadow: inset 0px 0px 0px 2px rgba(191,0,0,1);
+}
+
+/* строка выделения записи в гриде, убрать картинку и сделать просто цветом. с учетом выбранной ячейки*/
+/* выделеная строка в обычном гриде */
+div.gridbox_dhx_skyblue table.obj.row20px tr.rowselected td {
+    background-image: url(/images/sky_blue_sel.png)
+}
+/* выделеная ячейка в обычном гриде */
+div.gridbox_dhx_skyblue table.obj.row20px tr.rowselected td.cellselected {
+    background-image: url(/images/sky_blue_selcell.png)
+}
+/* выделеная ячейка в multiline гриде */
+div.gridbox_dhx_skyblue table.obj tr.rowselected td.cellselected {
+    background: #93C0E7 none;
+    -webkit-box-shadow: inset 0px 0px 14px 12px rgba(147,192,231,0.5);
+    -moz-box-shadow: inset 0px 0px 14px 12px rgba(147,192,231,0.5);
+    box-shadow: inset 0px 0px 14px 12px rgba(147,192,231,0.5);
+}
+/* выделеная строка в multiline гриде */
+div.gridbox_dhx_skyblue table.obj tr.rowselected td {
+    background: #ddffdd none;
+}
+
+/* подогнать размер поля ввода в ячейки под всю ячейку и выровнять текст*/
+.gridbox_dhx_skyblue .dhx_combo_edit {
+    border: 1px solid #88f;
+    padding: 0px 0px 0px 4px;
+    margin-bottom: -3px;
+    outline: none;
+}
+
+div.gridbox_dhx_skyblue table.obj tr.rowselected td.cellselected.editable {
+    background: #ddffdd none;
+    padding: 0px 6px 0px 0px;
+}
+
+/* Стиль для подсеченных мышью строк в гриде */
+.grid-row-hover {
+    background-color: #FADA8A;
+}
+
+/* стиль для картинок в кнопках формы */
+.frm-btn-img {
+    vertical-align: middle;
+}
+.btn-span-left {
+    float: left;
+}
+
+/* стиль для картинок в label формы */
+.frm-lbl-img {
+    margin-left: -23px;
+    margin-top: 1px;
+    text-decoration: none; !important;
+    font-weight: normal; !important;
+    pointer-events: none; !important;
+}
+
+/* стиль для label в формах, чтобы отделить секцию */
+.form-section {
+    text-align: center;
+    margin-left: -4px;
+    margin-top: -1px;
+    height: 24px;
+    background-image: url('/js/dhtmlxw/imgs/dhx_skyblue/bg_top.png');
+}
+
+/* Стиль для btn2state */
+/* enabled, not checked */
+.dhxform_obj_dhx_skyblue div.dhxform_img.btn2state_0 {
+    background-image: url("/images/btn_twostate.png");
+    background-repeat: repeat-y;
+    width: 21px;
+    height: 21px;
+    cursor: pointer;
+}
+/* enabled, checked */
+.dhxform_obj_dhx_skyblue div.dhxform_img.btn2state_1 {
+    background-image: url("/images/btn_twostate.png");
+    background-repeat: repeat-y;
+    background-position: 0px 63px;
+    width: 21px;
+    height: 21px;
+    cursor: pointer;
+}
+/* disabled, not checked */
+.dhxform_obj_dhx_skyblue div.disabled div.dhxform_img.btn2state_0 {
+    background-image: url("/images/btn_twostate.png");
+    background-repeat: repeat-y;
+    background-position: 0px 42px;
+    width: 21px;
+    height: 21px;
+}
+/* disabled, checked */
+.dhxform_obj_dhx_skyblue div.disabled div.dhxform_img.btn2state_1 {
+    background-image: url("/images/btn_twostate.png");
+    background-repeat: repeat-y;
+    background-position: 0px 21px;
+    width: 21px;
+    height: 21px;
+}
+
+/* Выровнять сообщения по центру экрана */
+.dhtmlx_message_area{
+    left:50%;
+    margin-left:-125px;
+}
+
+/* игнорировать щелчки по блоку выделения в гриде */
+.dhtmlxGrid_selection {
+    pointer-events: none; !important;
+}
+
+/* Настройка колорпикера */
+.dhtmlxcolorpicker {
+    webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.dhtmlxcolorpicker .cs_SelectorDiv_Mini {
+    cursor: pointer;
+}
+.dhtmlxcolorpicker .cs_LumSelect_Mini {
+    cursor: pointer;
+}
+
+/* картинки в меню 16х16 */
+div.dhtmlxMenu_dhx_skyblue_SubLevelArea_Polygon table.dhtmlxMebu_SubLevelArea_Tbl td.sub_item_icon img.sub_icon {
+    width: 16px; !important;
+    height: 16px; !important;
+    padding-top: 2px;
+}
+
+/* сделать указатель мыши в меню в виде пальца */
+div.dhtmlxMenu_dhx_skyblue_SubLevelArea_Polygon table.dhtmlxMebu_SubLevelArea_Tbl td.sub_item_text {
+    cursor: pointer;
+}
+div.dhtmlxMenu_dhx_skyblue_TopLevel_Item_Normal, div.dhtmlxMenu_dhx_skyblue_TopLevel_Item_Disabled, div.dhtmlxMenu_dhx_skyblue_TopLevel_Item_Selected {
+    cursor: pointer;
+}
+
+/*Вернуть размер кнопок на тулбаре в редакторе при интеграции его в форму - 18x18 */
+.dhxform_item_template.dhxeditor_inside .dhx_toolbar_btn img {
+    width: 18px; !important;
+    height: 18px; !important;
+}
+/*
+
+.dropZone {
+    color: #555;
+    font-size: 18px;
+    text-align: center;
+
+    width: 400px;
+    padding: 15px 0;
+    margin: 4px auto;
+
+    background: #eee;
+    border: 1px solid #ccc;
+
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.dropZone.hover {
+    background: #ddd;
+    border-color: #aaa;
+}
+
+.dropZone.error {
+    background: #faa;
+    border-color: #f00;
+}
+
+.dropZone.drop {
+    background: #afa;
+    border-color: #0f0;
+}*/
+
+.dhx_toolbar_base_18_dhx_skyblue div.dhx_toolbar_btn .inp  {
+    height: 16px;
+    margin-top: -1px; !important;
+}
+
+.txtform-input {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #7E7E7E;
+    margin-bottom: 4px;
+    margin-left: 2px;
+    margin-right: 2px;
+    padding: 2px;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 1px 1px 2px 0px rgba(0,0,0,0.20);
+    -moz-box-shadow: inset 1px 1px 2px 0px rgba(0,0,0,0.20);
+    box-shadow: inset 1px 1px 2px 0px rgba(0,0,0,0.20);
+}
+
+.add-btn {
+    background-image: url('/images/icons/16/plus.png');
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    cursor: pointer;
+    margin-right: 4px;
+    vertical-align: top;
+    float: left;
+}
+
+
+.block_dhxform_item_label_top {
+    display: inherit;
+}
+
+.dhxform_base_nested .in_block {
+    display: inherit;
+}
+
+.btn-helper {
+    position: fixed;
+    /* bottom: 0px; */
+    /* right: 40px; */
+    z-index: 10;
+    background-color: #B9B9B9;
+    padding: 8px 14px;
+    border-color: #828282;
+    border-radius: 0px 0px 8px 8px;
+    color: white;
+    font-family: Arial;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+
+    border-width: 2px;
+    border-style: solid;
+    border-top: none;
+    -webkit-box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.4);
+    -moz-box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.4);
+    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.4);
+    top: opx;
+    /* transform: rotateZ(-90deg); */
+    right: 12px;
+}
+
+.btn-helper-user {
+    border-color:  #358235;
+    background-color: #36A936;
+}
+
+@keyframes moving {
+    from {background-color: #E25B5B; color: white; }
+    to {background-color: yellow; color: black; }
+}
+
+.btn-helper-actrive {
+    border-color:  #965656;
+    background-color: #E25B5B;
+    -webkit-animation: moving 1s infinite;
+    -moz-animation: moving 1s infinite;
+    animation: moving 1s infinite;
+    -webkit-animation-direction: alternate; /* Chrome, Safari, Opera */
+    animation-direction: alternate;
+}
+
+.btn-helper:hover {
+    padding-top:10px;
+}

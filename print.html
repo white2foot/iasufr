@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
+    <title>@media</title>
+    <style type="text/css">
+        @media print {
+            .toolbar {
+                display: none;
+            }
+        }
+        @media screen {
+            body {
+                background-color: rgb(219, 219, 219);
+                margin: 0px;
+            }
+
+            .page-break {
+                position: relative;
+                margin-top: 60px;
+                margin-bottom: 60px;
+                background-color: rgb(219, 219, 219);
+                padding: 10px;
+                margin-left: -20mm;
+                margin-right: -20mm;
+                -webkit-box-shadow: inset 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
+                -moz-box-shadow: inset 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
+                box-shadow: inset 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
+            }
+
+            .page-break::before {
+                content: "";
+                position: absolute;
+                background: rgb(219, 219, 219);
+                margin-top: -10px;
+                width: 5mm;
+                height: 20px;
+                margin-left: -10px;
+            }
+
+            .page-break::after {
+                content: "";
+                position: absolute;
+                background: rgb(219, 219, 219);
+                margin-top: -10px;
+                width: 10mm;
+                height: 20px;
+                margin-left: -19px;
+                left: 100%;
+            }
+
+            .container {
+                background-color: #FFF;
+                padding: 15mm;
+                -webkit-box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
+                -moz-box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
+                box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
+            }
+
+            .container:read-write:focus {
+                outline: none;
+            }
+
+            .page {
+                width: 200mm; /* 210 */
+                margin-left: auto;
+                margin-right: auto;
+                padding-top: 54px;
+                padding-bottom: 16px;
+            }
+        }
+        @page
+        {
+            size: auto;
+            margin: 15mm 15mm 15mm 20mm;
+        }
+
+        body {
+            text-align: justify;
+        }
+        table {
+            border-collapse: collapse;
+        }
+
+        button {
+            height: 36px;
+            padding-left: 16px;
+            padding-right: 16px;
+            margin-top: -2px;
+            cursor: pointer;
+            float: left;
+        }
+        .toolbar label {
+            float: left;
+            padding-left: 14px;
+            margin-top: 6px;
+        }
+        .toolbar select {
+            float: left;
+            height: 33px;
+            margin-left: 4px;
+        }
+        button > img {
+            float: left;
+        }
+        button > span {
+            margin-top: 6px;
+            float: left;
+            padding-left: 10px;
+        }
+        .toolbar {
+            background-color: dimgrey;
+            /* margin-top: 0px; */
+            padding: 4px;
+            height: 33px;
+            margin-bottom: 10px;
+            background-image: url('/js/dhtmlxw/imgs/dhxtoolbar_dhx_skyblue/dhxtoolbar_imgs.gif');
+            background-repeat: repeat-x;
+            background-position: 0px -636px;
+            position: fixed;
+            width: 100%;
+        }
+    </style>
+    <script src="/js/jquery-1.10.2.min.js"></script>
+
+    <!--<script src="/js/pdfmake.min.js"></script>
+    <script src="/js/vfs_fonts.js"></script>
+    <script src="/monu/form/printUtils.js"></script>-->
+
+   <script type="text/javascript">
+       var _data;
+
+        function showPageBreaks() {
+            $('div').filter(function() {
+                return $(this).css('page-break-after') == 'always';
+            }).addClass("page-break");
+        }
+
+        window.onload = function(){
+           /* pdfMake.fonts = {
+                times: {
+                    normal: 'times.ttf',
+                    bold: 'timesbd.ttf',
+                    italics: 'timesi.ttf',
+                    bolditalics: 'timesbi.ttf'
+                },
+                Roboto: {
+                    normal: 'times.ttf',
+                    bold: 'timesbd.ttf',
+                    italics: 'timesi.ttf',
+                    bolditalics: 'timesbi.ttf'
+                }
+            };*/
+            $("#selFont").on("change", function() {
+                var fnt = $("#selFont").val();
+                console.log(fnt);
+                $(document.body).css("font-family", fnt);
+            })
+
+            _data = decodeURI(window.location.hash.slice(1));
+            if (_data) $(".container").html(_data);
+            showPageBreaks();
+        }
+                /*
+       function downloadPdf() {
+           if (!_data) return;
+           var pu = new PrintUtils();
+           var dd = [];
+           var isPortrait = true;
+           pu.parseHtml(dd, _data);
+           pdfMake.createPdf({
+               content: dd,
+               pageSize: 'A4',
+               pageOrientation: isPortrait ? 'portrait' : 'landscape',
+               pageMargins: [15, 15, 15, 15]
+           }).download();
+
+       }*/
+   </script>
+</head>
+<body style="font-family: 'Times New Roman'" spellcheck="false">
+<div class="toolbar">
+    <button onclick="print();"><img src="/images/icons/32/printer_empty.png"><span>Друк</span></button>
+    <label>Шрифт</label>
+    <select id="selFont">
+        <option>Times New Roman</option>
+        <option>Arial</option>
+        <option>Calibri</option>
+        <option>Courier</option>
+        <option>Courier New</option>
+        <option>MS Sans Serif</option>
+        <option>Tahoma</option>
+        <option>Verdana</option>
+    </select>
+</div>
+<div class="page">
+    <div class="container" contenteditable="true" spellcheck="false"></div>
+</div>
+</body>
+</html>

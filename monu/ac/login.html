@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Вхiд у систему</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
+    <link rel="icon" type="image/png" href="/images/icons/coins.png" />
+    <link href="/js/dhtmlxw/dhtmlx.css" rel="stylesheet">
+    <link href="/css/iasufr.css" rel="stylesheet">
+    <script src="/js/dhtmlxw/dhtmlx.js"></script>
+
+    <script src="/js/jquery-1.10.2.min.js"></script>
+    <script src="/js/jquery.cookie.js"></script>
+    <script src="/js/iasufr.js"></script>
+    <script src="/js/iasufr_const.js"></script>
+    <script src="/js/iasufr_lang.js"></script>
+
+    <script language='javascript'>
+        //var dhxWins;
+        var wnd;
+
+        iasufr.ready = Init;
+
+        function Init() {
+            //dhxWins = new dhtmlXWindows();
+            //dhxWins.enableAutoViewport(true);
+            iasufr.wins.setImagePath("/images/icons/");
+            wnd = iasufr.wins.createWindow("wndLogin", $(document.body).width() / 2 - 170, 120, 280, 190);
+            wnd.setText("Вхiд у систему");
+            wnd.denyResize();
+            wnd.denyMove();
+            wnd.denyPark();
+            wnd.button("close").disable();
+            wnd.setIcon("coins.png");
+
+            wnd.appendObject("frmLogin");
+
+            $('#frmLogin').bind("keypress", function(e) {
+                if (e.keyCode == 13) {
+                    e.preventDefault();
+                    if ($("#Password").is(":focus")) DoLogin();
+                    if ($("#Login").is(":focus")) $("#Password").focus();
+                    return false;
+                }
+            });
+
+            $("#btnLogin").click(function() {DoLogin(); return false});
+            $("#Login").focus();
+        }
+
+        function DoLogin() {
+            wnd.progressOn();
+            iasufr.removeCookies();
+            iasufr.ajax({
+                url: "ac.CheckLogin.cls",
+                data: {action: "login", login: $("#Login").val(), password: $("#Password").val()},
+                success: onSuccess,
+                error: onError
+            });
+            return false;
+        }
+
+
+        function onSuccess(d, textStatus, jqXHR) {
+            wnd.progressOff();
+            var data = JSON.parse(d);
+            if (!data.error) {
+                /*if (data.changePass == 1) {
+                    iasufr.loadForm("ChangePass", {login: data.Username, onChange: function (){
+                        window.location="/index.html";
+                    }});
+                    return;
+                }*/
+                $("#frmLogin").submit();
+            }
+        }
+
+        function onError(data, textStatus, jqXHR) {
+            wnd.progressOff();
+        }
+    </script>
+</head>
+
+<body>
+<div style="text-align: center; font-weight: bold; font-size: 32px;padding-top: 75px; margin-left: -60px; color:#006699">ІАСУ МОНУ</div>
+<form id="frmLogin" action="/ac.CheckLogin.cls">
+    <img src="/images/icons/lock_closed.png" style="position: absolute;left: 5px;top: 25px;">
+    <div style="position: absolute;left: 60px;top: 4px;">
+        <input type="hidden" name="action" value="redirectToRoot">
+        <label>Логiн</label><br>
+        <input id="Login" type="text" name="Login" required="true"><br>
+        <label>Пароль</label><br>
+        <input id="Password" type="password" name="Password" required="true"><br>
+        <div style="text-align: center; padding-top: 6px">
+            <input id="btnLogin" type="button" value="Вхiд">
+        </div>
+        <input id="loginHidden" type="submit" value="Вхiд" style="visibility: hidden; display: none">
+    </div>
+</form>
+
+</body>
+</html>
+

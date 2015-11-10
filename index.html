@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Главная</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
+    <link rel="icon" type="image/png" href="/images/icons/coins.png" />
+
+    <link href="/js/dhtmlxw/dhtmlx.css" rel="stylesheet">
+    <link href="/css/dhtmlxcolorpicker.css" rel="stylesheet">
+    <link href="/css/iasufr.css" rel="stylesheet">
+
+    <script src="/js/dbf.js"></script>
+    <script src="/js/Blob.js"></script>
+    <script src="/js/FileSaver.min.js"></script>
+
+    <script src="/js/pdfmake.min.js"></script>
+    <script src="/js/vfs_fonts.js"></script>
+
+    <script src="/js/dhtmlxw/dhtmlx.js"></script>
+    <!--<script src="/js/dhtmlxw/dhtmlxgrid_keymap_access.js"></script>-->
+    <script src="/js/dhtmlxf/dhtmlxmenu.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxmenu_ext.js"></script>
+
+
+    <script src="/js/dhtmlxf/dhtmlxgrid.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_filter.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_mcol.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_hmenu.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_group.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_ssc.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_drag.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_rowspan.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_selection.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_nxml.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_json.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxgrid_splt.js"></script>
+    <script src="/js/dhtmlxf/dhtmlxgridcell.js"></script>
+
+    <script src="/js/dhtmlxf/dhtmlxtree.js"></script>
+    <script src="/js/dhtmlxf/dhtmlxtreegrid.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxtree_json.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxtree_ed.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxtreegrid_filter.js"></script>
+
+    <script src="/js/dhtmlxf/dhtmlxcombo.js"></script>
+    <script src="/js/dhtmlxf/dhtmlxform.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxform_dyn.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxform_item_calendar.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxform_item_colorpicker.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxform_item_combo.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxform_item_calendar.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxform_item_btn2state.js"></script>
+    <script src="/js/dhtmlxf/ext/dhtmlxform_item_editor.js"></script>
+
+    <script src="/js/dhtmlxw/dhtmlxgrid_keymap_excel.js"></script>
+    <script src="/js/dhtmlxf/dhtmlxvault.js"></script>
+    <script src="/js/dhtmlxf/swfobject.js"></script>
+    <!--
+    <script src="/js/dhtmlxf/testIra/dhtmlxgrid.js"></script>
+    <script src="/js/dhtmlxf/testIra/dhtmlxcommon.js"></script>
+    <script src="/js/dhtmlxf/testIra/dhtmlxgridcell.js"></script>
+    <script src="/js/dhtmlxf/testIra/dhtmlxtreegrid.js"></script>
+    <script src="/js/dhtmlxf/testIra/dhtmlxgrid.css"></script>-->
+
+    <script src="/js/jquery-1.10.2.min.js"></script>
+    <script src="/js/jquery.cookie.js"></script>
+    <script src="/js/iasufr.js"></script>
+    <script src="/js/iasufr_const.js"></script>
+    <script src="/js/iasufr_lang.js"></script>
+    <script src="/monu/menu/menu.js"></script>
+
+    <script language='javascript'>
+        var CKEDITOR_BASEPATH = "/js/ckeditor/";
+        dhtmlXLayoutObject.prototype.tplData["4L"] = '<layout><autosize hor="c;d" ver="a;b;d" rows="2" cols="3"/><table data="a,b,c;a,b,d"/><row><cell obj="a" wh="3,1" resize="hor" neighbors="a;b;c,d" rowspan="3"/><cell sep="ver" left="a" right="b;c,d" dblclick="a" rowspan="3"/><cell obj="b" wh="3,1" resize="hor" neighbors="a;b;c,d" rowspan="3"/><cell sep="ver" left="a;b" right="c,d" dblclick="b" rowspan="3"/><cell obj="c" wh="3,2" resize="ver" neighbors="c;d"/></row><row sep="true"><cell sep="hor" top="c" dblclick="c" bottom="d"/></row><row><cell obj="d" wh="c,2" resize="ver" neighbors="c;d"/></row></layout>';dhtmlXLayoutObject.prototype._availAutoSize["4L_hor"] = new Array("a", "b", "c;d");dhtmlXLayoutObject.prototype._availAutoSize["4L_ver"] = new Array("a;b;c", "a;b;d");
+
+        iasufr.ready = Init;
+        var helper;
+
+        function Init() {
+            // setup default fonts
+            pdfMake.fonts = {
+                times: {
+                    normal: 'times.ttf',
+                    bold: 'timesbd.ttf',
+                    italics: 'timesi.ttf',
+                    bolditalics: 'timesbi.ttf'
+                },
+                Roboto: {
+                    normal: 'times.ttf',
+                    bold: 'timesbd.ttf',
+                    italics: 'timesi.ttf',
+                    bolditalics: 'timesbi.ttf'
+                   /* normal: 'Roboto-Regular.ttf',
+                    bold: 'Roboto-Medium.ttf',
+                    italics: 'Roboto-Italic.ttf',
+                    bolditalics: 'Roboto-Italic.ttf'*/
+                }
+            };
+
+            var dhxLayout = new dhtmlXLayoutObject(document.body, '1C');
+            dhxLayout.cells('a').hideHeader();
+            iasufr.mainLayout = dhxLayout;
+            iasufr.mainCell = dhxLayout.cells('a');
+            //iasufr.wins.enableAutoViewport(false);
+            //iasufr.wins.attachViewportTo(iasufr.mainCell);
+            ///iasufr.wins.setViewport(0, 0, 0, 0, iasufr.mainCell);
+
+            /*CreateMenu(dhxLayout.cells('a'));
+            ShowContent();
+            return;*/
+            var form = iasufr.getParam("form") || "HomeStart";
+            if (form) {
+                $("#news").remove();
+                CreateMenu(dhxLayout.cells('a'));
+                iasufr.loadForm(form, {owner: dhxLayout.cells('a'), onAfterLoad: function(){
+                    history.replaceState({sprav:form}, "", "?form="+form);
+                    //history.pushState({sprav:form}, "", "?form="+form);
+                    ShowContent();
+                }});
+            } else {
+                CreateMenu(dhxLayout.cells('a'), ShowContent);
+                dhxLayout.cells('a').attachObject("news");
+            }
+
+            // Проверка на день рождения
+            if (iasufr.user.DOB) {
+                var parts = iasufr.user.DOB.split(".");
+                var d = new Date(Date.now());
+                if ((d.getMonth()+1 == parseInt(parts[1] || "-1")) && (d.getDate() == parseInt(parts[0] || "-1"))) {
+                    if (iasufr.storeGet("birthday." + d.toLocaleDateString()) != 1) {
+                        iasufr.storeSet("birthday." + d.toLocaleDateString(), 1);
+                        dhtmlx.alert({text: "<strong>Вітаємо з Днем народження!</strong><img src='http://boombob.ru/img/picture/Oct/10/143578314fae677b4aceb324c62149f9/8.jpg' style='width: 270px;'>"});
+                    }
+                }
+            }
+        }
+
+        function ShowContent() {
+            $("#loading").remove();
+            helper = $('<div class="btn-helper"></div>');
+            if (!iasufr.pGrp(1)) {
+                helper
+                        .addClass("btn-helper-user")
+                        .attr("title", "Задати запит")
+                        .text("?")
+
+            } else {
+                helper.attr("title", "Запити").text("0");
+                checkQuestions();
+            }
+            helper.click(onAskClick).prependTo(document.body);
+        }
+
+        function onAskClick() {
+            if (iasufr.pGrp(1)) {
+                iasufr.loadForm("HomeStart", { onlyZap: true });
+            } else iasufr.loadForm("HomeAskEdit", { idOrg: iasufr.user.orgId });
+        }
+
+        function checkQuestions() {
+            setTimeout(checkQuestions, 1000 * 60 * 5);
+
+            iasufr.ajax({
+                url: "fin.Home.cls",
+                data: {func: "getQuest"},
+                success: function(d, o) {
+                    if (!o) return;
+                    if (o.count != 0) {
+                        helper.addClass("btn-helper-actrive").text(o.count);
+                    } else {
+                        helper.removeClass("btn-helper-actrive").text(0);
+                    }
+                }
+            });
+        }
+
+        function deactivateHelper() {
+            helper.removeClass("btn-helper-actrive").text(0);
+        }
+    </script>
+
+</head>
+
+
+<body>
+<div id="loading" style="height: 100%; width: 100%; position: absolute; left: 0px; top: 0px; z-index: 10000; background-color: #FFFFFF">
+</div>
+
+<div id="news">
+</div>
+
+
+
+</body>
+
+<html>

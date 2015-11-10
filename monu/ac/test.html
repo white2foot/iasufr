@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Главная</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
+    <link rel="icon" type="image/png" href="/images/icons/coins.png" />
+
+    <link href="/js/dhtmlxw/dhtmlx.css" rel="stylesheet">
+    <link href="/css/iasufr.css" rel="stylesheet">
+    <script src="/js/dhtmlxw/dhtmlx.js"></script>
+    <script src="/js/dhtmlxw/dhtmlxgrid_keymap_access.js"></script>
+
+    <script src="/js/jquery-1.10.2.min.js"></script>
+    <script src="/js/jquery.cookie.js"></script>
+    <script src="/js/iasufr.js"></script>
+    <script src="/js/iasufr_const.js"></script>
+    <script src="/js/iasufr_lang.js"></script>
+    <script src="/monu/menu/menu.js"></script>
+
+    <script language='javascript'>
+
+        var sock;
+        var ws;
+        iasufr.ready = Init;
+
+        function Init() {
+
+            var dhxLayout = new dhtmlXLayoutObject(document.body, '1C');
+            //dhxLayout.cells('a').hideHeader();
+
+            sock = window['MozWebSocket'] ? MozWebSocket : window['WebSocket'] ? WebSocket : null;
+            if (sock) {
+                var url = ((window.location.protocol == 'https:') ? 'wss:' : 'ws:') + '//'  + window.location.host + "//" + 'base.Im.cls';
+                ws = new sock(url);
+
+                ws.onopen = function() {
+                    console.log('onopen\n\nreadyState: ',ws.readyState,'\nbinaryType: ',ws.binaryType,'\nbufferedAmount: ',ws.bufferedAmount);
+                    ws.send("test");
+                };
+
+                ws.onmessage = function(e) {
+                    console.log(e.data);
+                };
+
+
+                ws.onclose = function(e) {
+                    console.log('onclose\n\nwasClean: ',e.wasClean,'\ncode: ',e.code,'\nreason: ',e.reason);
+                    ws=null;
+                };
+
+                ws.onerror = function(e) {
+                    console.log('onerror');
+                };
+
+
+            }
+        }
+
+
+    </script>
+
+</head>
+
+
+<body>
+</body>
+
+<html>

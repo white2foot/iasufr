@@ -1,0 +1,52 @@
+.fd-txt-cspan {
+    background: url("/images/icons/16/cspan.png") no-repeat 1px 1px;
+    text-indent: 20px;
+}
+
+.fd-txt-rspan {
+    background: url("/images/icons/16/rspan.png") no-repeat 1px 1px;
+    text-indent: 18px;
+}
+
+.fd-txt-indent {
+    background: url("/images/icons/16/text_indent.png") no-repeat 1px 1px;
+    text-indent: 18px;
+}
+.fd-txt-font {
+    background: url("/images/icons/16/font.png") no-repeat 1px 1px;
+    text-indent: 18px;
+}
+.fd-txt-fill {
+    background: url("/images/icons/16/fill_color.png") no-repeat 1px 1px;
+    text-indent: 18px;
+}
+.fd-txt-type {
+    background: url("/images/icons/16/type.png") no-repeat 1px 1px;
+    text-indent: 18px;
+}
+
+.fm-uploader {
+    background-color: #ffa;
+    width:300px;
+    height: 100px;
+    padding: 8px;
+}
+.fm-uploader-over {
+    background-color: #afa;
+}
+
+.fm-formula-hl {
+    position: absolute;
+    z-index: 10000;
+    opacity: 0.8;
+    color: #000;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.fm-formula-hl2 {
+    box-shadow: inset 0 0 3px #000;
+    -webkit-box-shadow: inset 0 0 3px #000;
+    -moz-box-shadow: inset 0 0 3px #000;
+    background-color: rgb(245, 255, 0);
+}

@@ -118,6 +118,7 @@ Linear.Form.Create = function(opt) {
     g.attachHeader(str);
     if (opt.colSorting) g.setColSorting(opt.colSorting);
     g.setImagePath(iasufr.const.IMG_PATH);
+    g.enableMultiline(false);
     g.init();
     iasufr.enableRowselectMode(g);
     if (opt.select) {
@@ -197,6 +198,28 @@ Linear.Form.Create = function(opt) {
             g.sortRows(opt.sortCol, stype, sd);
             g.setSortImgState(true, opt.sortCol, sd);
         }
+
+        // Remove line breaks from cke fields
+        var parts = opt.colTypes.split(",");
+        parts.forEach(function(el, n) { if (el === "cke") {
+            for (var i = 0; i < g.getRowsNum(); i++) {
+                var cell = g.cells(g.getRowId(i), n);
+                if (cell) {
+                    var str = cell.getValue();
+                    var tit = str;
+
+                    var idx = str.indexOf("<br>");
+                    if (idx !== -1) {
+                        str = str.substr(0, idx);
+                        cell.setValue(str);
+                        cell.cell.innerHtml = str;
+                        cell.setAttribute("title", tit);
+                    }
+                }
+            }
+        }});
+
+
         if (opt.selectMulti) {
             g.insertColumn(0, "", "ch", 24, "", "center");
         }
@@ -205,6 +228,7 @@ Linear.Form.Create = function(opt) {
 
     function onToolbarClick(name) {
         switch (name) {
+            case "reload": RefreshGrid(); break;
             case "add": ShowAddForm(false); break;
             case "edit": ShowAddForm(true); break;
             case "del": DeleteRecord(); break;
@@ -247,4 +271,4 @@ Linear.Form.Create = function(opt) {
 
     return this;
 }
-//@ sourceURL=http://12-monu03.donnu.edu.ua:57772/monu/base/linear.js
+//@ sourceURL=/monu/base/linear.js

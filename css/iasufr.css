@@ -374,3 +374,37 @@ div.dhtmlxMenu_dhx_skyblue_TopLevel_Item_Normal, div.dhtmlxMenu_dhx_skyblue_TopL
 .btn-helper:hover {
     padding-top:10px;
 }
+
+.btn-instruct {
+    position: fixed;
+    /* bottom: 0px; */
+    /* right: 40px; */
+    z-index: 10;
+    background-color: #B9B9B9;
+    border-color: #828282;
+    border-radius: 0px 0px 8px 8px;
+    color: white;
+    font-family: Arial;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+
+    border-width: 2px;
+    border-style: solid;
+    border-top: none;
+    -webkit-box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.4);
+    -moz-box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.4);
+    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.4);
+    top: opx;
+    /* transform: rotateZ(-90deg); */
+    right: 60px;
+    width: 36px;
+    height: 32px;
+    background-image: url('/images/icons/32/ffh.png');
+    background-repeat: no-repeat;
+    background-position-x: 2px;
+}
+
+.btn-instruct:hover {
+    padding-top:3px;
+}

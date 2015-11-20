@@ -166,12 +166,12 @@ ac.MenuReports.Create = function (opt) {
 
         dhxGridInit.clearAll(true);
 
-        var paramLoad=""; if (param!=null) paramLoad=getParam(param,1,null);
+        var paramData="";if (param!=null) {paramData=getParam(param,1,null,null,1);}
 
         if (isData==null){
             iasufr.ajax({
                 url: "base.Simple.cls",
-                data: {func: "init",idDoc:_this.idDoc,idLayout:idLayout,param:paramLoad},
+                data: {func: "init",idDoc:_this.idDoc,idLayout:idLayout,param:paramData},
                 success: function (data) {//alert(data);
                     var json = JSON.parse(data);
                     initPropGrid(idLayout,json.data[0].prop);
@@ -236,6 +236,10 @@ ac.MenuReports.Create = function (opt) {
         if (dhxGridInit.type!="treeGrid") return
 
         //img tree
+        var imgGroup="16/folder.png";
+        var imgFile0="16/menu_item.png";
+        var imgFile1="16/bullet_key.png";
+
         var numbIsGroup=dhxGridInit.idCells.indexOf("urlMenu");
         dhxGridInit.expandAll();
         if (_this.idDoc=="FuncReports")  numbIsGroup=dhxGridInit.idCells.indexOf("idFunc");
@@ -248,7 +252,15 @@ ac.MenuReports.Create = function (opt) {
                     if (dhxGridInit.idCells[j].lastIndexOf("CHECK")>-1)$(dhxGridInit.cells2(i,j).cell).children().hide();
                 }
             }
-            else dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + imgFile);
+            else {
+                var id=dhxGridInit.cells2(i,0).getValue();
+                id=id.split(".");
+                if (id[4]==0)  dhxGridInit.setCellTextStyle(dhxGridInit.getRowId(i),2,"color:gray"); //dhxGridInit.setRowTextStyle(dhxGridInit.getRowId(i), "color:gray");
+                if (id[3]==0) dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + imgFile0);
+                else          dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + imgFile1);
+            }
+
+
 
         } //for
         dhxGridInit.collapseAll();
@@ -259,7 +271,7 @@ ac.MenuReports.Create = function (opt) {
     }
     ///////////////////////////////////////////////////
     //////////////////getParam////////////////////////
-    function getParam(listParam,isParam,idRowCheck,isString){
+    function getParam(listParam,isParam,idRowCheck,isString,isStringParam){
         //isString - строка из ячеек для удаления
         if (!listParam) return
 
@@ -346,7 +358,8 @@ ac.MenuReports.Create = function (opt) {
             var jsoDATA = [];
             jsoDATA.push(str1Obj); //[idOrg,idZvit]
             jsoDATA.push(str2Obj);//[12587,1587]
-            return {param:jsoDATA}
+            if (isStringParam) return JSON.stringify(jsoDATA)
+            else  return {param:jsoDATA}
         }
         if (isString==1) return str0Obj
         else             return JSON.parse("{"+str0Obj +"}")
@@ -357,6 +370,9 @@ ac.MenuReports.Create = function (opt) {
         var dhxGridInit;
         var str="dhxGridInit=dhxLayout"+idLayout; //dhxLayoutObj[numbLayout]; //dhxLayoutObj[numbLayout]; //dhxGrid;
         eval(str);
+
+        //dhxGridInit.saveOpenStates("idDoc:"+_this.idDoc+",idLayout:"+idLayout);
+        //dhxGridInit.expandAll();
 
         var jsoDATA = [];
         //1)1-ая строка - id
@@ -380,6 +396,9 @@ ac.MenuReports.Create = function (opt) {
                 }
             }
         }
+        //dhxGridInit.collapseAll();
+        //dhxGridInit.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:"+idLayout);
+
         return jsoDATA
 
     }
@@ -466,6 +485,10 @@ ac.MenuReports.Create = function (opt) {
         var keyI="";
         var keyParentI=""
         var indKey=dhxLayoutT1.idCells.indexOf("idKeysRowTemp");
+
+        //dhxLayoutT1.saveOpenStates("idDoc:"+_this.idDoc+",idLayout:T1");
+        //dhxLayoutT1.expandAll();
+
         for (var i = 0; i < dhxLayoutT1.getRowsNum() ;i++) { //dhxLayoutT1.getRowsNum();
             jsoT2.push([]);
             //id тек.строки
@@ -490,6 +513,9 @@ ac.MenuReports.Create = function (opt) {
 
         }
         var t=jsoT2;
+
+        //dhxLayoutT1.collapseAll();
+        //dhxLayoutT1.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:T1");
 
         iasufr.ajax({
             url: "ac.MenuReports.cls",

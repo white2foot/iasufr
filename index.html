@@ -177,6 +177,32 @@
         function deactivateHelper() {
             helper.removeClass("btn-helper-actrive").text(0);
         }
+        function loadInstuction(){
+
+            iasufr.ajax({
+                url: "ac.Menu.cls",
+                data: {func: "loadInstuction",sprav:iasufr.getCurrentSprav()},
+                success: function(data, o) {
+                    if (data==0) {iasufr.messageSuccess("За данним пунктом нема iнструкцii");return};
+                    var wnd = iasufr.wins.createWindow("up" + new Date().valueOf(), 0, 0, 460, 500);
+                    wnd.centerOnScreen();
+                    //wnd.denyPark();
+                    //wnd.denyResize();
+                    wnd.setText("Iнструкцiя");
+                    var idInstuctionBlock = "frm-instuction-block" + new Date().valueOf().toString();
+                    var idnstuction      = "uploader" + new Date().valueOf().toString();
+
+                    $(document.body).append('<div id="'+idInstuctionBlock+'" style="overflow:scroll;height:472px" >'+data+'</div>');
+                    wnd.attachObject(idInstuctionBlock);
+
+                    /*var mess=[
+                     { type:"settings" , position:"label-top", labelWidth:300, inputWidth:430, offsetLeft:5  },
+                     { type:"input" ,   name:"txt", label:"", value:data, rows:28, readonly:true }
+                     ];
+                     iasufr.loadForm("Confirm", {title: "Iнструкцiя",mess:mess,width:460,height:500});*/
+                }
+            });
+        }
     </script>
 
 </head>

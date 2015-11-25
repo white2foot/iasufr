@@ -17,8 +17,16 @@ Fin.DogPrintHelp.Create = function (opt) {
         success: function (data) {
             var jso=JSON.parse(data);
             var txt=jso.Text;
-            var form = t.owner.attachForm(formData);
-            form.setItemValue('txt',txt)
+            t.owner.attachHTMLString('<div id="objDiv">'+txt+'</div>');
+            $("#objDiv").css("height","100%");
+            $("#objDiv").css("overflow","scroll");
+            $("#objDiv").css("margin-left","10px");
+
+            $("#objDiv1").css("height","100%");
+            $("#objDiv1").css("overflow","scroll");
+            $("#objDiv1").css("margin-left","10px");
+            //var form = t.owner.attachForm(formData);
+            //form.setItemValue('txt',txt)
         }
     })
 

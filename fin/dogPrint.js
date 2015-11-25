@@ -46,8 +46,8 @@ Fin.DogPrint.Create = function (opt) {
         if (month>9) rikValue=rikValue*1 + 1;
         toolbar.addInput("rik", 10, rikValue,50);
         toolbar.addSeparator("sep2", 11);
-        toolbar.addButton("help", 12, "Інструкція", "16/web_template_editor.png", "");
-        toolbar.addSeparator("sep2", 13);
+        //toolbar.addButton("help", 12, "Інструкція", "16/web_template_editor.png", "");
+        //toolbar.addSeparator("sep2", 13);
         toolbar.addButton("close", 14, iasufr.lang.ui.close, "32/door.png", "");
 
         toolbar.attachEvent("onClick", function(id){

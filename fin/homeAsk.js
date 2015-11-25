@@ -113,10 +113,11 @@ Fin.HomeAsk.Create = function (opt) {
     function InitToolBar() {
         toolbar.setIconsPath(iasufr.const.ICO_PATH);
         toolbar.setIconSize(32);  // iasufr.lang.ui.print
-        toolbar.addButton("print", 2,iasufr.lang.ui.print , "32/printer_empty.png", "");
-        toolbar.addButton("add", 1, iasufr.lang.ui.add, "32/toolbar_add.png", "32/toolbar_add.png");
-        toolbar.addButton("edit", 3,iasufr.lang.ui.edit, "32/toolbar_edit.png", "32/toolbar_edit.png");
-        toolbar.addButton("del", 4, iasufr.lang.ui.delete, "32/toolbar_delete.png", "32/toolbar_delete.png");
+        toolbar.addButton("print", 1,iasufr.lang.ui.print , "32/printer_empty.png", "");
+        toolbar.addButton("addZ", 2, iasufr.lang.ui.add + ' заявку', "32/toolbar_add.png", "32/toolbar_add.png");
+        toolbar.addButton("add", 3, iasufr.lang.ui.add + ' питання', "32/toolbar_add.png", "32/toolbar_add.png");
+        toolbar.addButton("edit", 4,iasufr.lang.ui.edit, "32/toolbar_edit.png", "32/toolbar_edit.png");
+        toolbar.addButton("del", 5, iasufr.lang.ui.delete, "32/toolbar_delete.png", "32/toolbar_delete.png");
         //if (iasufr.pGrp(1))  { toolbar.addButton("sel", 5, "Oрганiзацii з запитаннями", "32/application_view_detail.png", "");
         toolbar.addButton("sel1", 6, "Усi питання", "32/manage_sources.png", "");
 
@@ -134,8 +135,12 @@ Fin.HomeAsk.Create = function (opt) {
             if ((id == "edit")||(id == "add")) {
                  if (id == "add") idRow=0;
                  if ( (id == "edit")&&(!idRow) ) { iasufr.message('Вкажiть строку !'); return; }
-                 var hei=420; if (id=="add") hei=250;
-                 iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:selOrg.id, idRow:idRow});
+                 var hei=420; if (id=="add") hei=280;
+                 iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:selOrg.id, idRow:idRow, addZ:"0"});
+            }
+            if (id == "addZ") {
+                idRow=0;
+                iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: 280, idOrg:selOrg.id, idRow:idRow, addZ:"1"});
             }
             if (id == "sel")    {  iasufr.loadForm("OrgSelector", {width:1000, height:800,  HomeAsk:1, onSelect: OrgSelectC } );  }
             if (id == 'print')  {  gD.printView();        }

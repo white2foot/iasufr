@@ -31,6 +31,7 @@ Fin.Dog.Create = function (opt) {
     var selOrgK=null; selOrgK = {};
     var selOrgP=null; selOrgP = {};
     var selKosht=null;  selKosht = {};
+    var selGrp=null;  selGrp = {};
     var SumI={};
 
     var dost=iasufr.pFunc("dogAdd");
@@ -205,7 +206,7 @@ Fin.Dog.Create = function (opt) {
         gD.attachFooter(",,,,Усього<br><span style='color:#cc0000'>не сплачено</span>,,,<div id='sumD'></div>,<div id='sumA'></div>,<div id='sumO'></div>",["text-align:right;"]);
             //gD.attachFooter("Итого по договорам,#cspan,#cspan,<div id='sumD'></div>","Итого по актам,#cspan,#cspan,<div id='sumA'></div>",["text-align:right;"]);
         //gD.splitAt(4);
-        gD.enableHeaderMenu("true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true");
+        gD.enableHeaderMenu("true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false");
         gD.attachEvent("onResizeEnd", function(obj){
             //var ind=gD.getColIndexById("sEDRP");
 
@@ -290,11 +291,10 @@ Fin.Dog.Create = function (opt) {
             iasufr.attachSelector(form.getInput("idOrg"), "OrgSelector",  { pDog:pDog,  onSelect: OrgSelect});
             iasufr.attachSelector(form.getInput("idOrgK"), "OrgSelector",  { onSelect: OrgSelectK});
             iasufr.attachSelector(form.getInput("idOrgP"), "OrgSelector",  { onSelect: OrgSelectP});
-
-            //iasufr.attachSelector(form.getInput("Kosht"), "DogKosht", {onSelect: KoshtSelect, idOrg:selOrg.id, orgName:orgName} );
+            iasufr.attachSelector(form.getInput("Grp"), "DogGrp", {onSelect: GrpSelect, idOrg:selOrg.id, orgName:orgName} );
 
             //form.attachEvent("onChange", function (id, value){ if ((id=='idKP')||(id=='Frm')) SelTable();  });
-            $(form.getInput("Kosht")).keydown(function(e){if (e.keyCode == 13) $(form.getInput("Kosht")).blur()  });
+            //$(form.getInput("Kosht")).keydown(function(e){if (e.keyCode == 13) $(form.getInput("Kosht")).blur()  });
 
             SelTable();
             mainB.setText(' ');
@@ -306,6 +306,9 @@ Fin.Dog.Create = function (opt) {
                                                             $txt.val(orgName);
                                         //if  ( (dost) && (!admin)  && (selOrg.id != idOrgUser) )   toolbar.disableItem("new");
                                         //else  toolbar.enableItem("new");
+                                        form.setItemValue("Grp",""); selGrp=null;  selGrp = {};
+                                        iasufr.updateSelectorParam(form.getInput("Grp"), { idOrg:selOrg.id, orgName:orgName } );
+
                                     }
         SelTable(); TitleWrite(); StanAkt();
     }
@@ -313,7 +316,7 @@ Fin.Dog.Create = function (opt) {
         TitleWrite()  }
     function OrgSelectP(o, $txt)   { selOrgP = o;    if ( o ) $txt.val("(" + o.code + ") " + o.name);
         TitleWrite() }
-    //function KoshtSelect(o, $txt)  { selKosht = o;   $txt.val(o.name);  }
+    function GrpSelect(o, $txt)  { selGrp = o;   $txt.val(o.name);  }
 
     function TitleWrite() {
         var data  = [selOrg,selOrgK,selOrgP];
@@ -370,6 +373,8 @@ Fin.Dog.Create = function (opt) {
         var idOrg="";  if (selOrg) idOrg=selOrg.id;
         var idOrgK=""; if (selOrgK) idOrgK=selOrgK.id;
         var idOrgP=""; if (selOrgP) idOrgP=selOrgP.id;
+        var idGrp=""; if (selGrp) idGrp=selGrp.id;
+        
         var zo=""; var zk=""; var zp=""; var zd="";
         form.forEachItem(function(id){
             if (id.indexOf('zo')!=-1) { if ((form.isItemChecked(id)) && (form.getItemValue('L1')))  zo+=form.getItemValue(id)+',';  }
@@ -396,7 +401,7 @@ Fin.Dog.Create = function (opt) {
                                         }
         }
         var speak=0; if (form.isItemChecked('Speak')) speak=1;
-        var json={idOrg:idOrg, idOrgK:idOrgK, idOrgP:idOrgP, Real:form.getItemValue('Real'), Kosht:form.getItemValue('Kosht'), DateN:dateN, DateK:dateK, ZO:zo, ZK:zk, ZP:zp, ZD:zd, dtOplN:dtOplN, dtOplK:dtOplK, dtIspN:dtIspN, dtIspK:dtIspK, speak:speak};
+        var json={idOrg:idOrg, idOrgK:idOrgK, idOrgP:idOrgP, Real:form.getItemValue('Real'), Kosht:form.getItemValue('Kosht'), DateN:dateN, DateK:dateK, ZO:zo, ZK:zk, ZP:zp, ZD:zd, dtOplN:dtOplN, dtOplK:dtOplK, dtIspN:dtIspN, dtIspK:dtIspK, speak:speak, idGrp:idGrp};
         iasufr.ajax({
             url:'fin.Dog.cls',
             data:{func:'DogSel', json: JSON.stringify(json) },

@@ -67,7 +67,9 @@ Fin.DogTxtEdit.Create = function (opt) {
 
         toolbar.attachEvent("onClick", function (id) {
             if (id == 'save')  { Save()   }
-			if (id == 'sel')   { SelTeg() }
+			if (id == 'sel')   { iasufr.loadForm("SelTag", { width: 500, height: 650} );
+                //SelTeg()
+            }
             if (id == 'del')   { iasufr.confirm("Пiдтвердiть видалення тексту договору ", Del);   }
 			if (id == 'print') { var pu = new PrintUtils();
 			                     var text= window.CKEDITOR.instances[idObj].getData();

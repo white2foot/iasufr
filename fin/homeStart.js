@@ -42,13 +42,15 @@ Fin.HomeStart.Create = function (opt) {
        var wid='200px';
        //var offs='400';
        //tb.setOffset(50);
-        var ask="Вашi питання та вiдповiдi";
-        if (iasufr.pGrp(1)) ask="Питання";
-       tb.addTab("a1", "Новини", wid);
-        tb.addTab("a2", "Контакти",  wid);
-        tb.addTab("a3", ask, wid);
-        tb.addTab("a4", "Вiдгуки", wid);
+        var ask="Вiдповiдi на питання";  // та заявки на регiстр.користувача";
+        if (iasufr.pGrp(3)) var ask="Вiдповiдi на питання та заявки на регiстр.користувача";
+        if (iasufr.pGrp(1)) ask="Питання та заявки на регiстрацiю користувача";
+       tb.addTab("a1", "Новини", '150px');
+        tb.addTab("a2", "Контакти",  '150px');
+        tb.addTab("a3", ask, '300px');
+        //tb.addTab("a4", "Вiдгуки", wid);
         tb.addTab("a5", "Типові(поширені) запитання", wid);
+
 
        if (!Zap) tb.setTabActive("a1");
        //tb.disableTab("a3");
@@ -112,7 +114,7 @@ Fin.HomeStart.Create = function (opt) {
                                         idRow=gZ.cells(ind,0).getValue(); hei=420;
                                         var org=gZ.cells(ind,6).getValue(); idRow=idRow+"!"+org;
                 }
-                iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:orgUser, idRow:idRow, home:1});
+                iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:orgUser, idRow:idRow, home:1,  addAsk:"1"});
             }
             if (id == 'print')  {  gZ.printView();        }
             if (id == 'reload') {  Reload(); }
@@ -141,11 +143,11 @@ Fin.HomeStart.Create = function (opt) {
             var ind=gZ.getRowId(gD.getRowIndex(gZ.getSelectedId()));
             var idRow=gZ.cells(ind,0).getValue(); var hei=420;
             var org=gZ.cells(ind,6).getValue(); idRow=idRow+"!"+org;
-            iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:orgUser, idRow:idRow, home:1});
+            iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:orgUser, idRow:idRow, home:1, addAsk:"1"});
         });
         LoadAsk();
         //-------------------  tb3
-
+        /*
         //------------------------ вiдгуки
         tb4 =tb.cells('a4').attachToolbar();
         tb4.setIconsPath(iasufr.const.ICO_PATH);
@@ -175,6 +177,7 @@ Fin.HomeStart.Create = function (opt) {
         gC.setColumnHidden(0,true);
         LoadComment();
         //-------------------  tb4
+        */
 
         //------------------------ F A Q
         var ww=$( document ).width(); ww=ww/3;

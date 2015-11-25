@@ -5,10 +5,11 @@ Fin.HomeAskEdit.Create = function (opt) {
     var t = iasufr.initForm(this, opt);
     var idRow=t.opt.idRow;
     var idOrg=t.opt.idOrg;
+    var addZ=t.opt.addZ;  // заявка
 	if (idOrg=="") idOrg=iasufr.user.orgId;
     var home=t.opt.home;
-    //t.owner.setModal(true);
-    //t.owner.button("park").disable();
+    t.owner.setModal(true);
+    t.owner.button("park").disable();
 
     var toolbar;
     var form;
@@ -36,7 +37,7 @@ Fin.HomeAskEdit.Create = function (opt) {
     LoadData();
 
    function LoadData() { 
-         iasufr.ajax({url:'fin.Home.cls', data: {func: "HomeAskEdit", json: JSON.stringify( {idRow:idRow, idOrg:idOrg, home:home} ) } ,
+         iasufr.ajax({url:'fin.Home.cls', data: {func: "HomeAskEdit", json: JSON.stringify( {idRow:idRow, idOrg:idOrg, home:home, addZ:addZ} ) } ,
              success: function (data) { 
              var jso = JSON.parse(data);
              var frm  = jso.form;
@@ -46,12 +47,16 @@ Fin.HomeAskEdit.Create = function (opt) {
              else $(form.getInput("Text")).focus();
              t.owner.progressOff();
              if (edit==0)  toolbar.disableItem("save");
+             //var obj=form.getItemsList()[2];
+             //$(obj).attr('title','Вiдмiтити, щоб введений текст мав статус заявки на реєстрацiю користувача у системi');
+             //console.log(obj+'-'+ $(obj).attr('title') );
           }
          });
     }
 
     function Save() {
-            if (!form.validate()) { iasufr.message("Перевiрте вiдмiченi строки !"); return; }
+            if ( (addZ==1) && (form.getItemValue("zFIO")=="") ) { iasufr.message("Перевiрте строки !"); return; }
+            if ( addZ!=1) { if (!form.validate()) { iasufr.message("Перевiрте вiдмiченi строки !"); return; }  }
             t.owner.progressOn();
             var dateN=iasufr.formatDateStr(form.getCalendar("DateN").getDate(true));
             var dateV=""; var textV="";
@@ -59,7 +64,8 @@ Fin.HomeAskEdit.Create = function (opt) {
                                              textV = form.getItemValue("TextV")
             }
             var pRead=0; if (form.isItemChecked('Read')) pRead=1;
-            var json = {idOrg: idOrg, idRow:idRow, DateN:dateN, DateV:dateV,  Text:form.getItemValue("Text"),  TextV:textV,home:home,Read:pRead};
+            var json = {idOrg: idOrg, idRow:idRow, DateN:dateN, DateV:dateV,  Text:form.getItemValue("Text"),  TextV:textV,home:home,Read:pRead,zFIO:form.getItemValue("zFIO"),zPos:form.getItemValue("zPos"),zTel:form.getItemValue("zTel")};
+            console.log(JSON.stringify(json));
             iasufr.ajax({
                 url: "fin.Home.cls",
                 data: {func: "HomeAskSave", json: JSON.stringify(json)},

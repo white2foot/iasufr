@@ -89,7 +89,7 @@ Fin.DogEdit.Create = function (opt) {
     }
     //-------------------------------------------
     var tlbb = main.cells("b").attachToolbar();
-    tlbb.addText("txt", 1, "Зобов`язання органiзацii:&nbsp;&nbsp;&nbsp;<b>" + orgName + "</b>");
+    //tlbb.addText("txt", 1, "Зобов`язання органiзацii:&nbsp;&nbsp;&nbsp;<b>" + orgName + "</b>");
     var tbb=InitTAB("b");
     // вкладки
 
@@ -304,6 +304,7 @@ Fin.DogEdit.Create = function (opt) {
 		form.setNote("idOrgOsn", { text:form.getItemValue('idOrgCity') , width:300 });
 		$(form.getInput('idOrgOsn')).css('font-size','10px');
 		$(form.getInput('idOrgOsn')).css('font-weight','bold');
+        tlbb.addText("txt", 1, "Зобов`язання органiзацii:&nbsp;&nbsp;&nbsp;<b>" + form.getItemValue("idOrgOsn") + "</b>");
 		// AddPlus();
 				
 		if ( (!admin) && (idDog==0) ) idOrg=form.getItemValue("idOrgOsnCode");
@@ -368,7 +369,7 @@ Fin.DogEdit.Create = function (opt) {
 
         if (dost) {
           iasufr.attachSelector(form.getInput("idOrgK"), "OrgSelector",  { width:1100,height:600, AddCode:true, accountAdd:true, bankOnly:false, isType:true, AddCode:true, onSelect: OrgSelectK});
-          iasufr.attachSelector(form.getInput("idOrgP"), "OrgSelector",  { width:1100,height:600,accountAdd:true,bankOnly:false,onSelect: OrgSelectP});
+          iasufr.attachSelector(form.getInput("idOrgP"), "OrgSelector",  { width:1100,height:600,AddCode:true,accountAdd:true,bankOnly:false,onSelect: OrgSelectP});
 
           iasufr.attachSelector(form.getInput("RRosn"), "OrgSelector", { width:1100,height:600,accountAdd:true,bankOnly:false, idOrg:idOrg, onSelect: OrgSelectR} );
           iasufr.attachSelector(form.getInput("RRkor"), "OrgSelector", { width:1100,height:600,accountAdd:true,bankOnly:false, idOrg:selOrgK.id,  ChangeOrg:true,  onSelect: OrgSelectRRkor} );

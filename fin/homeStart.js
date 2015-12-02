@@ -44,12 +44,12 @@ Fin.HomeStart.Create = function (opt) {
        //tb.setOffset(50);
         var ask="Вiдповiдi на питання";  // та заявки на регiстр.користувача";
         if (iasufr.pGrp(3)) var ask="Вiдповiдi на питання та заявки на регiстр.користувача";
-        if (iasufr.pGrp(1)) ask="Питання та заявки на регiстрацiю користувача";
+        if (iasufr.pGrp(1)) ask="Питання та заявки на реєстрацiю користувача";
        tb.addTab("a1", "Новини", '150px');
         tb.addTab("a2", "Контакти",  '150px');
         tb.addTab("a3", ask, '300px');
         //tb.addTab("a4", "Вiдгуки", wid);
-        tb.addTab("a5", "Типові(поширені) запитання", wid);
+        tb.addTab("a5", "Типові (поширені) запитання", wid);
 
 
        if (!Zap) tb.setTabActive("a1");

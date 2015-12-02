@@ -53,6 +53,12 @@ Frm.WorkWithFormsSettings.Create = function(opt) {
             value: iasufr.storeGet("print.customFooter" + t.formCode),
             rows: 4,
             inputWidth: 560
+        },
+        {
+            type: "input",
+            label: "Розмір шрифту при друці(для форми " + t.formCode + ")",
+            name: "customFontSize",
+            value: iasufr.storeGet("print.customFontSize" + t.formCode)
         }
 
     ];
@@ -70,6 +76,7 @@ Frm.WorkWithFormsSettings.Create = function(opt) {
         iasufr.storeSet("print.customDate" + t.formCode, t.form.getItemValue("customDate"));
         iasufr.storeSet("print.customDateFormat" + t.formCode, t.form.getItemValue("customDateFormat"));
         iasufr.storeSet("print.customFooter" + t.formCode, t.form.getItemValue("customFooter"));
+        iasufr.storeSet("print.customFontSize" + t.formCode, t.form.getItemValue("customFontSize"));
 
         iasufr.close(t);
     }

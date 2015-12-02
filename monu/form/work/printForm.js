@@ -322,6 +322,47 @@ Frm.PrintForm.Create = function(opt) {
         return p;
     }
 
+    function addRow(c, savedData) {
+        var ra = c.find(".row-adder");
+        var clone = ra.clone();
+        ra.removeClass("row-adder");
+
+        var inputs = clone.find(".txtform-input");
+        inputs.each(function(idx, input) {
+            var newAttr = $(input).attr("datafield").replace(/\d+/g, function(n){ return ++n });
+            $(input).attr("datafield", newAttr);
+            if (savedData[newAttr] !== undefined) $(input).text(savedData[newAttr]);
+        });
+
+        clone.insertAfter(ra);
+    }
+
+    function fillTextData(str, savedData) {
+        var el = document.createElement("div");
+        var html = $.parseHTML( str );
+        $(el).append(html);
+
+        var c = $(el);
+        var inputs = c.find(".txtform-input");
+        // Находим количество заполненых блоков
+        var max = 0;
+        for (var p in savedData) {
+            var v = parseInt(p.match(/\d+/)[0]);
+            if (v > max) max = v;
+        }
+        var cur = 0;
+        // Находим  сколько блоков задано в форме
+        inputs.each(function(idx, input){
+            var v = parseInt($(input).attr("datafield").match(/\d+/)[0]);
+            if (v > cur) cur = v;
+        });
+        // Колчиество блоков котрые нужно создать
+        var count = max - cur;
+        if (count > 0) for (var i = 0; i < count; i++) addRow(c, savedData);
+        c.find(".row-adder-button").remove();
+        c.remove();
+        return c.html();
+    }
 
     function onDataLoaded(d) {
         var o = JSON.parse(d);
@@ -329,10 +370,11 @@ Frm.PrintForm.Create = function(opt) {
         var isPortrait = false;
         var pageMargins = "";
         var emptyChar = iasufr.storeGet("print.emptyChar");
+        var fontSize = iasufr.storeGet("print.customFontSize" + opt.code) || 7;
         if (emptyChar === undefined) emptyChar = "-";
 
         if (o.json[0].isText == "1") {
-            iasufr.print(o.json[0].txtData);
+            iasufr.print(fillTextData(o.json[0].txtData, o.json[0].savedData));
             iasufr.close(tt);
             return;
         }
@@ -545,7 +587,7 @@ Frm.PrintForm.Create = function(opt) {
 
 
                         var idx = GetCellIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
-                        var cell = { text: '', fontSize: 7 };
+                        var cell = { text: '', fontSize: fontSize };
                         if (idx != -1) {
                             if (tdesc.cells[idx].value == "#COL_NUM#") tdesc.cells[idx].value = (c+1).toString();
                             if (tdesc.cells[idx].value) cell.text = tdesc.cells[idx].value.replace(/\\u0027/g, "'");
@@ -595,12 +637,14 @@ Frm.PrintForm.Create = function(opt) {
                     table.table.body.push(row);
                 }
                 content.push(table);
+                if (tdesc.printData.note) {
+                    pu.parseHtml(content, tdesc.printData.note);
+                }
                 if (tdesc.printData) {
                     if (tdesc.printData.footer) {
                         pu.parseHtml(content, tdesc.printData.footer);
                     }
                 }
-
             }
             if (z != o.json.length - 1) content.push({text:"", pageBreak: 'after'});
         }

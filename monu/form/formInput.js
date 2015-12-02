@@ -14,7 +14,7 @@ Frm.Input.Create = function(opt) {
     if (!t.isKazn) t.isKazn = 0;
     t.tableData = {};
 
-    var formData;
+    var formData, rowAdder, rowAdderBtn;
     //iasufr.alert(t.idZvit);
 
     var layout = t.owner.attachLayout("2E");
@@ -243,6 +243,35 @@ Frm.Input.Create = function(opt) {
         }
     }
 
+    function onAddRow(noAnim) {
+        rowAdder.removeClass("anim-size").removeClass("anim-move");
+        var clone = rowAdder.clone();
+        if (!noAnim) clone.addClass("anim-move");
+        clone.insertAfter(rowAdder);
+        rowAdder.removeClass("row-adder");
+        if (!noAnim) rowAdder.addClass("anim-size");
+        rowAdderBtn.remove();
+
+        rowAdder = clone;
+        rowAdderBtn = clone.find(".row-adder-button");
+        var inputs = rowAdder.find(".txtform-input");
+        inputs.each(function(idx, input) {
+            var newAttr = $(input).attr("datafield").replace(/\d+/g, function(n){ return ++n });
+            $(input).attr("datafield", newAttr);
+        });
+        inputs.val("").bind("keydown", onTxtInputKeyDown);
+        if (!noAnim && inputs[0]) $(inputs[0]).focus();
+        rowAdderBtn.click(function(){onAddRow();});
+    }
+
+    function fillTextData(cell, savedData) {
+        var inputs = cell.find(".txtform-input");
+        for (var p in savedData) {
+            var input = cell.find("[datafield=" + p + "]");
+            input.val(savedData[p]);
+        }
+    }
+
     function FillData(txt, o) {
         t.owner.progressOff();
         var prg = o.json.prg;
@@ -263,9 +292,36 @@ Frm.Input.Create = function(opt) {
             tb.hideItem("download");
             tb.hideItem("upload");
             layout.cells("b").attachHTMLString("<div style='overflow-y: scroll;width:100%;height:100%'>" + o.json.txtData + "</div>");
-            var inputs = $(".txtform-input");
+            var cell = $(layout.cells("b"));
+            var inputs = cell.find(".txtform-input");
             if (inputs.length != 0) inputs[0].focus();
             inputs.bind("keydown", onTxtInputKeyDown);
+            rowAdder = cell.find(".row-adder");
+            rowAdderBtn = $("<div></div>")
+                                .addClass("row-adder-button")
+                                .click(function(){onAddRow();})
+                                .appendTo(rowAdder);
+            //rowAdderBtn = cell.find(".row-adder-button");
+            //rowAdderBtn.click(onAddRow);
+
+            // Создаем недостающие поля
+            // Находим количество заполненых блоков
+            var max = 0;
+            for (var p in o.json.savedData) {
+                var v = parseInt(p.match(/\d+/)[0]);
+                if (v > max) max = v;
+            }
+            var cur = 0;
+            // Находим  сколько блоков задано в форме
+            inputs.each(function(idx, input){
+               var v = parseInt($(input).attr("datafield").match(/\d+/)[0]);
+               if (v > cur) cur = v;
+            });
+            // Колчиество блоков котрые нужно создать
+            var count = max - cur;
+            if (count > 0) for (var i = 0; i < count; i++) onAddRow(true);
+
+            fillTextData(cell, o.json.savedData);
             return;
         }
 

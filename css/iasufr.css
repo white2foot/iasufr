@@ -403,8 +403,71 @@ div.dhtmlxMenu_dhx_skyblue_TopLevel_Item_Normal, div.dhtmlxMenu_dhx_skyblue_TopL
     background-image: url('/images/icons/32/ffh.png');
     background-repeat: no-repeat;
     background-position-x: 2px;
+    z-index: 1000;
 }
 
 .btn-instruct:hover {
     padding-top:3px;
+}
+
+.row-adder {
+    border: 2px solid green;
+    display: inline-block;
+    padding: 2px;
+    position: relative;
+    border-radius: 5px 0px 5px 5px;
+    -webkit-border-radius: 5px 0px 5px 5px;
+    -moz-border-radius: 5px 0px 5px 5px;
+}
+
+.row-adder-button {
+    width: 32px;
+    border: 2px solid green;
+    height: 32px;
+    display: block;
+    position: absolute;
+    right: -36px;
+    top: -2px;
+    border-radius: 0px 10px 10px 0px;
+    -webkit-border-radius: 0px 10px 10px 0px;
+    -moz-border-radius: 0px 10px 10px 0px;
+    background-image: url('/images/icons/16/plus.png');
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    cursor: pointer;
+}
+
+.row-adder-button:hover {
+    background-color: #C4E4C5;
+}
+
+@-webkit-keyframes size {
+    0% { background-color: transparent; transform: scaleY(0)}
+    100% { background-color: transparent; transform: scaleY(1) }
+}
+@keyframes size {
+    0% { background-color: transparent; transform: scaleY(0)}
+    100% { background-color: transparent; transform: scaleY(1)}
+}
+
+.anim-size {
+    transform-origin: 0% 0%;
+    -webkit-animation: size linear .2s;
+    animation: size linear .2s;
+}
+
+
+@-webkit-keyframes move {
+    0% { background-color: transparent; transform: translateY(-100%);}
+    100% { background-color: transparent; transform: translateY(0%); }
+}
+@keyframes move {
+    0% { background-color: transparent; transform: translateY(-100%);}
+    100% { background-color: transparent; transform: translateY(0%); }
+}
+
+.anim-move {
+    transform-origin: 0% 0%;
+    -webkit-animation: move linear .2s;
+    animation: move linear .2s;
 }

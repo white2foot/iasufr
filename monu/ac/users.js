@@ -144,6 +144,8 @@ Usr.Form.Create = function(opt) {
     iasufr.enableRowselectMode(gUsers);
     gUsers.attachEvent("onRowSelect", function(id,ind){ UpdateUserGroups(); UpdateUserFuncs();});
 
+    if (!iasufr.pFunc("usrEdit")) gUsers.setColumnHidden(2, true);
+
     //window.tmp = gUsers;
 
     ///////////////////////////////////////////// GROUPS ///////////////////////////////////////////////////////
@@ -324,7 +326,7 @@ Usr.Form.Create = function(opt) {
             for (var i = 0; i < cnt; i++) {
                 //var login = getUsrCell2(i, "login");
                 var txt =  getUsrCell2(i, "login");
-                setUsrCell2(i, "fio", '<a href="#'+txt+'" onclick="iasufr.loadForm(\'UserAdd\',{Login:\''+txt+'\', modal: true})">'+getUsrCell2(i, "fio")+'</a>');
+                if (iasufr.pFunc("usrEdit")) setUsrCell2(i, "fio", '<a href="#'+txt+'" onclick="iasufr.loadForm(\'UserAdd\',{Login:\''+txt+'\', modal: true})">'+getUsrCell2(i, "fio")+'</a>');
                 var ico = getUsrCell2(i, "ico");
                 switch (ico) {
                     case "1":{

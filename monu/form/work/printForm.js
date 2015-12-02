@@ -637,12 +637,14 @@ Frm.PrintForm.Create = function(opt) {
                     table.table.body.push(row);
                 }
                 content.push(table);
+                if (tdesc.printData.note) {
+                    pu.parseHtml(content, tdesc.printData.note);
+                }
                 if (tdesc.printData) {
                     if (tdesc.printData.footer) {
                         pu.parseHtml(content, tdesc.printData.footer);
                     }
                 }
-
             }
             if (z != o.json.length - 1) content.push({text:"", pageBreak: 'after'});
         }

@@ -38,7 +38,8 @@ Frm.Input.Create = function(opt) {
     }
     tb.addButton("download", 4, " Зберегти у файл", "16/download.png", "");
     if (!opt.status) if (File != undefined) tb.addButton("upload", 5, " Завантажити з файлу", "16/sql_server.png", "");
-    tb.addButton("close", 6, iasufr.lang.ui.close, "16/door.png", "");
+    tb.addButton("transfer", 6, "Перенести суми з попереднього перiоду", "16/arrow_rotate_clockwise.png", "");
+    tb.addButton("close", 7, iasufr.lang.ui.close, "16/door.png", "");
     tb.attachEvent("onClick", onToolbarClick);
 
     var tabs;
@@ -51,6 +52,7 @@ Frm.Input.Create = function(opt) {
 
 
     function onToolbarClick(name) {
+        if (name == "transfer") Transfer(false);
         if (name == "save") Save(false);
         if (name == "saveandquit") Save(true);
         if (name == "close") iasufr.close(t);
@@ -87,6 +89,29 @@ Frm.Input.Create = function(opt) {
                  } else {
                     iasufr.alert("Помилка завантаження файла")
                  }
+            }
+        }
+    }
+
+    function Transfer() {
+        var trans = formData.transfer;
+        console.log(formData.transfer);
+        for (var i = 0; i < t.tableData.tables.length; i++) {
+            if (!trans[t.tableData.tables[i].id]) continue;
+            var g = t.tableData.tables[i].grid;
+            var fd = g.tableData;
+            for (var j = 0; j < trans[t.tableData.tables[i].id].length; j++ ) {
+                var tr = trans[t.tableData.tables[i].id][j];
+
+                var tcd = fd.getCellData(tr.row, tr.col);
+                var ctype = 2;
+                if (tcd) ctype = tcd.type;
+
+                var colIdx = g.getColIndexById(tr.col);
+                if (colIdx != undefined) {
+                    var ce = g.cells(tr.row, g.getColIndexById(tr.col));
+                    if (ce) ce.setValue(fd.formatValue(tr.value, ctype));
+                }
             }
         }
     }
@@ -278,7 +303,8 @@ Frm.Input.Create = function(opt) {
         formData = {
             dateInput: o.json.dateInput,
             idOrg: o.json.idOrg,
-            orgName: o.json.org
+            orgName: o.json.org,
+            transfer: o.json.per
         };
 
         if (prg) prg = prg.substring(3, 7);

@@ -369,9 +369,8 @@ Frm.PrintForm.Create = function(opt) {
         var content  = [];
         var isPortrait = false;
         var pageMargins = "";
-        var emptyChar = iasufr.storeGet("print.emptyChar");
+        var emptyChar = iasufr.storeGet("print.emptyChar") || "-";
         var fontSize = iasufr.storeGet("print.customFontSize" + opt.code) || 7;
-        if (emptyChar === undefined) emptyChar = "-";
 
         if (o.json[0].isText == "1") {
             iasufr.print(fillTextData(o.json[0].txtData, o.json[0].savedData));

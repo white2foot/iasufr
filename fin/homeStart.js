@@ -51,7 +51,6 @@ Fin.HomeStart.Create = function (opt) {
         //tb.addTab("a4", "Вiдгуки", wid);
         tb.addTab("a5", "Типові (поширені) запитання", wid);
 
-
        if (!Zap) tb.setTabActive("a1");
        //tb.disableTab("a3");
        tb.enableAutoReSize();

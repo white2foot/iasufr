@@ -2,6 +2,17 @@
 if (!Fin.HomeStart1) Fin.HomeStart1 = {};
 
 Fin.HomeStart1.Create = function (opt) {
+
+
+      // 1111111111
+    if (iasufr.pGrp(1)) ask="Питання та заявки на реєстрацiю користувача";
+    tb.addTab("a1", "Новини", '150px');
+    tb.addTab("a2", "Контакти",  '150px');
+    tb.addTab("a3", ask, '300px');
+    //tb.addTab("a4", "Вiдгуки", wid);
+    tb.addTab("a5", "Типові (поширені) запитання", wid);
+
+
     var t=iasufr.initForm(this, opt);
     var user=iasufr.user;
     var toolbar;

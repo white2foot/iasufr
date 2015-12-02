@@ -187,14 +187,15 @@ Fin.Dog.Create = function (opt) {
     function InitTable() {
         gD=main.cells('b').attachGrid();
         gD.setImagePath(iasufr.const.IMG_PATH);
-        //                0        1           2          3       4         5            6           7            8         9           10        11      12      13      14      15      16          17       18
-        gD.setHeader("N договору,Дата дог.,Сформ. корист.,Код,Контрагент,ЄДРПОУ,Тип органiзацii,Сума договору,Сума актiв,Сума оплати,Дата опл.,Дата вводу,Платник,Мiсто,Область,Группа,Стан договору,рег.N,Стан акту,Переговори");
-        gD.setInitWidths("110,70,35,40,300,70,90,80,80,80,80,80,250,90,100,100,130,30,130,200");
+        //                0        1           2          3       4         5            6           7            8         9           10        11        12         13      14      15      16          17       18     19        20
+        gD.setHeader("N договору,Дата дог.,Сформ. корист.,Код,Контрагент,ЄДРПОУ,Тип органiзацii,Сума договору,Сума актiв,Сума оплати,Перiод опл.,Дата опл.,Дата вводу,Платник,Мiсто,Область,Группа,Стан договору,рег.N,Стан акту,Переговори,Коментар");
+        gD.setInitWidths("110,70,35,40,300,70,90,80,80,80,80,80,80,250,90,100,100,130,30,130,200,180");
         //                0      1      2      3     4    5     6      7     8    9    10      11    12   13   14     15   16   17
-        gD.setColAlign("center,center,center,center,left,center,left,right,right,right,center,center,left,left,left,left,left,right,left,left");
-        gD.setColTypes("ro,ro,ro,ro,ro,ro,ro,edn,edn,edn,dhxCalendarA,dhxCalendarA,ro,ro,ro,ro,ro,ro,ro,ro");
-        gD.setColSorting("str,str,str,str,str,str,str,int,int,int,date,date,str,str,str,str,str,int,str,str");
-        gD.setColumnIds("sND,sDTD,sSFK,sKOD,sORGK,sEDRP,tip,ssD,ssA,ssO,datOpl,datIsp,sPLAT,city,obl,sGRUP,stan,regDog,sSTAN,speak");
+        gD.setColAlign("center,center,center,center,left,center,left,right,right,right,left,center,center,left,left,left,left,left,right,left,left,left");
+        gD.setColTypes("ro,ro,ro,ro,ro,ro,ro,edn,edn,edn,ro,dhxCalendarA,dhxCalendarA,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+        gD.setColSorting("str,str,str,str,str,str,str,int,int,int,str,date,date,str,str,str,str,str,int,str,str,str");
+        //                0                        5                     10                             15                          20
+        gD.setColumnIds("sND,sDTD,sSFK,sKOD,sORGK,sEDRP,tip,ssD,ssA,ssO,period,datOpl,datIsp,sPLAT,city,obl,sGRUP,stan,regDog,sSTAN,speak,koment");
         gD.init();
         //gD.enableTooltips("false,false,true");
         cellNumDog=gD.getColIndexById("regDog");
@@ -206,14 +207,14 @@ Fin.Dog.Create = function (opt) {
         gD.attachFooter(",,,,Усього<br><span style='color:#cc0000'>не сплачено</span>,,,<div id='sumD'></div>,<div id='sumA'></div>,<div id='sumO'></div>",["text-align:right;"]);
             //gD.attachFooter("Итого по договорам,#cspan,#cspan,<div id='sumD'></div>","Итого по актам,#cspan,#cspan,<div id='sumA'></div>",["text-align:right;"]);
         //gD.splitAt(4);
-        gD.enableHeaderMenu("true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false");
+        gD.enableHeaderMenu("true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,true");
         gD.attachEvent("onResizeEnd", function(obj){
             //var ind=gD.getColIndexById("sEDRP");
 
         });
 
         //var arr1 = ["datOpl","datIsp","sDTD", "sPLAT" , "sGRUP", "sKOM", "stan", "sKOSHT", "regDog", "sSTAN"];
-        var arr1 = ["datOpl","datIsp","sDTD","sSFK", "sPLAT" , "sGRUP", "stan", "regDog", "sSTAN","speak"];
+        var arr1 = ["datOpl","datIsp","sDTD","sSFK", "sPLAT" , "sGRUP", "stan", "regDog", "sSTAN","speak","koment","period"];
         for (var a in arr1) gD.setColumnHidden(gD.getColIndexById(arr1[a]),true);
         /*
         gD.enableAutoHiddenColumnsSaving("gD");
@@ -460,8 +461,8 @@ Fin.Dog.Create = function (opt) {
                 //if (!form.isItemChecked("Speak")) gD.setColumnHidden(gD.getColIndexById("speak",true));
                 //--------------------------------------------
                 if ((gD.getRowsNum() > 0) && (pHeader == 0)) {
-                                      // 0            1            2             3             4            5              6              7            8           9           10              11          12            13           14             15             16           17           18
-                    gD.attachHeader("#text_filter,#text_filter,#select_filter,#text_filter,#text_filter,#text_filter,#select_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#select_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+                                      // 0            1            2             3             4            5              6              7            8           9           10              11          12            13           14             15             16           17           18          19         20            21
+                    gD.attachHeader("#text_filter,#text_filter,#select_filter,#text_filter,#text_filter,#text_filter,#select_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#select_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
                     pHeader = 1;
                 }
                 if  (gD.getRowsNum() == 0) { gD.detachHeader(1);  pHeader = 0;   }

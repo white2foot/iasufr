@@ -135,7 +135,7 @@ Fin.HomeAsk.Create = function (opt) {
             if ((id == "edit")||(id == "add")) {
                  if (id == "add") idRow=0;
                  if ( (id == "edit")&&(!idRow) ) { iasufr.message('Вкажiть строку !'); return; }
-                 var hei=420; if (id=="add") hei=280;
+                 var hei=580; if (id=="add") hei=330;
                  iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:selOrg.id, idRow:idRow, addZ:"0"});
             }
             if (id == "addZ") {

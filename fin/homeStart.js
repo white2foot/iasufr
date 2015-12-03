@@ -43,7 +43,7 @@ Fin.HomeStart.Create = function (opt) {
        //var offs='400';
        //tb.setOffset(50);
         var ask="Вiдповiдi на питання";  // та заявки на регiстр.користувача";
-        if (iasufr.pGrp(3)) var ask="Вiдповiдi на питання та заявки на регiстр.користувача";
+        if (iasufr.pGrp(3)) var ask="Вiдповiдi на питання та заявки на реєстр.користувача";
         if (iasufr.pGrp(1)) ask="Питання та заявки на реєстрацiю користувача";
        tb.addTab("a1", "Новини", '150px');
         tb.addTab("a2", "Контакти",  '150px');
@@ -107,10 +107,10 @@ Fin.HomeStart.Create = function (opt) {
 
         tb3.attachEvent("onClick", function (id) {
             if ((id == "edit")||(id == "add")) {
-                var idRow=0; var hei=250;
+                var idRow=0; var hei=330;
                 if (iasufr.pGrp(1))  {  if (gZ.getSelectedId()==null) { iasufr.message('Вкажiть строку !'); return; }
                                         var ind=gZ.getRowId(gD.getRowIndex(gZ.getSelectedId()));
-                                        idRow=gZ.cells(ind,0).getValue(); hei=420;
+                                        idRow=gZ.cells(ind,0).getValue(); hei=580;
                                         var org=gZ.cells(ind,6).getValue(); idRow=idRow+"!"+org;
                 }
                 iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:orgUser, idRow:idRow, home:1,  addAsk:"1"});
@@ -122,7 +122,7 @@ Fin.HomeStart.Create = function (opt) {
         gZ = tb.cells('a3').attachGrid();
         gZ.setImagePath(iasufr.const.IMG_PATH);
         var tt='N, Прочитано,Дата питання, Текст питання, Текст вiдповiдi,';
-        if (!iasufr.pGrp(1)) tt = tt+"Дата вiдповiдi / Адмiн.,";
+        if (!iasufr.pGrp(1)) tt = tt+"Вiдповiдач,";
         if (iasufr.pGrp(1))  tt = tt+"Користувач,";
         gZ.setHeader(tt);
         gZ.setInitWidths('20,55,100,650,450,*,10');
@@ -140,7 +140,7 @@ Fin.HomeStart.Create = function (opt) {
         });
         gZ.attachEvent("onRowSelect", function (id) {
             var ind=gZ.getRowId(gD.getRowIndex(gZ.getSelectedId()));
-            var idRow=gZ.cells(ind,0).getValue(); var hei=420;
+            var idRow=gZ.cells(ind,0).getValue(); var hei=580;
             var org=gZ.cells(ind,6).getValue(); idRow=idRow+"!"+org;
             iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:orgUser, idRow:idRow, home:1, addAsk:"1"});
         });

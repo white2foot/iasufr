@@ -109,9 +109,10 @@ Frm.WorkWithForms.Create = function(opt) {
      menu.attachEvent("onClick", onUserToolbarClick);
      */
     actionsList = [];
-    actionsList.push(['check_4', 'obj', 'Прийнятi', '']);
-    actionsList.push(['check_2', 'obj', 'Вiдправленi', '']);
+
     actionsList.push(['check_3', 'obj', 'Пiдтвердженi', '']);
+    actionsList.push(['check_2', 'obj', 'Вiдправленi', '']);
+    actionsList.push(['check_4', 'obj', 'Прийнятi', '']);
     actionsList.push(['check_0', 'obj', 'Усi звiти', '']);
     toolbar.addButtonSelect("actions0", null, "Перевiрити", actionsList, "", "", "", true);
     toolbar.addSeparator("sep2", null);
@@ -404,7 +405,7 @@ Frm.WorkWithForms.Create = function(opt) {
         else if (paramCheck.param.idStatus==3) strStatus=" (за статусом - пiдтвердженi)"
 
         if (paramCheck.param.typeCheck==undefined){
-            var paramFiltrs=[["idOrg","idZvit","date1Zvit","idStatus","typeCheck"],[ID_ORG,selRow,date1Zvit,paramCheck.param.idStatus,2]];
+            var paramFiltrs=[["idOrg","idZvit","date1Zvit","idStatus","typeCheck"],[ID_ORG,selRow,date1Zvit,paramCheck.param.idStatus,1]];
             iasufr.ajax({
                 url: "base.Simple.cls",
                 data: {func: "init",idDoc:"CheckOrgReports",idLayout:"T1",param:JSON.stringify(paramFiltrs)},

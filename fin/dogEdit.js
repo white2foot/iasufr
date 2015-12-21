@@ -62,7 +62,7 @@ Fin.DogEdit.Create = function (opt) {
 
     if (idDog>0) {
 	   tolb.addSeparator("sep1", 11);
-       //tolb.addButton("printd", 12, "Друк договору ", "32/printer_empty.png", "");
+       tolb.addButton("printd", 12, "Друк договору ", "32/printer_empty.png", "");
 	   
        tolb.addSeparator("sep1", 13);
        tolb.addButton("print", 14, "Друк акту звiрки на дату ", "32/printer_empty.png", "");
@@ -82,10 +82,23 @@ Fin.DogEdit.Create = function (opt) {
 
     function onToolbarClick(name) {
         if (name=='print')        {   DocToPrint(0,'acz');     }
+        if (name=='printd')        {   ToPrint();     }
         if (name == "save")  { Save(); }
         if (name == "reload"){ Reload(); }
         if (name == "del") iasufr.confirm('Пiдтвердiть: Видалити договiр ?', Del);
         if (name == "close") { iasufr.close(t); }
+    }
+
+    function ToPrint() {
+        main.progressOn();
+        var pu = new PrintUtils();
+        iasufr.ajax({url:'fin.Dog.cls', data: {func: "TextForPrint", json: JSON.stringify( {idDog:idDog, idOrg:selOrgK.id}) }, success: function (data) {
+            var jso = JSON.parse(data);
+            var txt =jso.txt;
+            iasufr.print( txt );
+            main.progressOff();
+
+        } });
     }
     //-------------------------------------------
     var tlbb = main.cells("b").attachToolbar();

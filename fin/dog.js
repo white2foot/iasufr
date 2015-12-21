@@ -60,6 +60,9 @@ Fin.Dog.Create = function (opt) {
         toolbar = main.attachToolbar();
         toolbar.setIconsPath(iasufr.const.ICO_PATH);
         toolbar.setIconSize(32);
+        if (admin) { toolbar.addButton("sms", 1, "Смс-повiдомлення", "32/webmail.png", "");
+        toolbar.setItemToolTip("sms", "Надiслати смс-повiдомлення користувачам вибраних органiзацiй");
+        }
         toolbar.addButton("printA", 1, "Друк адрес", "32/printer_book.png", "");
         toolbar.addButton("print", 2, "Друк", "32/printer_empty.png", "");
         toolbar.setItemToolTip("printA", "Адреси вибраних органiзацiй будуть сформованi у Excel-файлi");
@@ -97,6 +100,20 @@ Fin.Dog.Create = function (opt) {
                         }
                     }
                     iasufr.confirm('Пдтвердть формування файла з адресами вибраних органзацй', Excel);
+                    break;
+                case "sms":
+                    var cnt = gD.getRowsNum(); stroka="";
+                    if ( cnt==0 ) { iasufr.message("Сформуйте список органiзацiй з договорами  !"); return }
+                    if (cnt>0) {
+                        for (var i = 0; i < cnt; i++) {
+                            var idRow=gD.cells2(i, cellNumDog).getValue();
+                            stroka+=idRow+",";
+                        }
+                    }
+                    //alert(stroka); break;
+                    var hei=$( document ).height()-50;
+                    if (admin) iasufr.loadForm("ReqSms", { width: 1200, height: hei, idOrg:selOrg.id, orgName:orgName,  listDog:stroka } );
+                    //else alert('В разработке !');
                     break;
             }
         });

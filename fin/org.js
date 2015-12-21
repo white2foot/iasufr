@@ -160,7 +160,7 @@ Fin.Org.Create = function (opt) {
         json=$.extend(json, {Frm:"", Tip:tip, Obl:obl, Cont:cont } );
         json=$.extend(json, {accountAdd: form.getItemValue('Bank'), ATO: form.getItemValue('ATO'), Real:form.getItemValue('Real')} );
         json=$.extend(json, {Level:form.getItemValue('Level'), Date:date} );
-        json=$.extend(json, {Par:'org',pHelp:0, ReqOnly: form.getItemValue('Req')} );  //Req - только заявки
+        json=$.extend(json, {Par:'org',pHelp:0, ReqOnly: form.getItemValue('Req'), Dog: form.getItemValue('Dog')} );  //Req - только заявки
 
         var json1=$.extend({accountAdd: form.getItemValue('Bank'), Cont: cont, pHelp:0}, {Par:'zag'} );
         var jsOrg={Date:date};

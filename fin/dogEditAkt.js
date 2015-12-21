@@ -92,7 +92,7 @@ Fin.DogEditAkt.Create = function (opt) {
         tlb.setIconsPath(iasufr.const.ICO_PATH);
         tlb.setIconSize(16);
         tlb.addButton("new", 2, iasufr.lang.ui.add, "16/plus.png", "");
-        tlb.addButton("cut", 3, iasufr.lang.ui.delete, "16/cross.png", "");
+        //tlb.addButton("cut", 3, iasufr.lang.ui.delete, "16/cross.png", "");
 
         tlb.attachEvent("onClick", function (id) {
             if (id == 'new')  AddDel(1);

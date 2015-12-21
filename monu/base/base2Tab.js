@@ -328,8 +328,11 @@ base.Layout2Tab.Create = function (opt) {
         dhxGridInit.idLayout=prop.idLayout;
         dhxGridInit.type=prop.type;
         dhxGridInit.idCells=prop.idCells;
+        dhxGridInit.types=prop.types;
         dhxGridInit.idKeysRowTemp=prop.idKeysRowTemp;
+        dhxGridInit.style=prop.style;
         dhxGridInit.isFunc=prop.isFunc;
+        dhxGridInit.isEdit=prop.isEdit;
 
         dhxGridInit.init();
 
@@ -422,8 +425,8 @@ base.Layout2Tab.Create = function (opt) {
                             if ((numbIdKeys==-1)&&(isReq==1)) {alert(idObj+ "не вказан у idKeysRowTemp :" +dhxGridInit.idKeysRowTemp);return retError}
                             strCell=dhxGridInit.cells(idRow,numbCellIdKeys).getValue();
                             if (strCell==null) return retError
-                            strCell=strCell.split(".");
-                            val2=strCell[numbIdKeys]; if (val2==null) val2="";
+                            strCell=JSON.parse(strCell);
+                            val2=strCell[0][numbIdKeys]; if (val2==null) val2="";
                         }
                         else {
                             val2=dhxGridInit.cells(idRow,dhxGridInit.idCells.indexOf(idObj)).getValue();
@@ -617,8 +620,10 @@ base.Layout2Tab.Create = function (opt) {
         //2)2-ая строка - value
 
         var idI="";
+        var json;
         var indRowEdit=0;
         var numbIsChange=dhxGridInit.idCells.indexOf("isChangeRowTemp");
+        var numbCellIdKeys=dhxGridInit.idCells.indexOf("idKeysRowTemp");
         var t=dhxGridInit.getSelectedRowId();
         var i1= 0,i2=dhxGridInit.getRowsNum()-1;
         if (isRow==1) {i1= dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId()),i2=i1; if ((i1==null)||(i1==-1)) {i1=0; i2=-1;};}
@@ -629,6 +634,7 @@ base.Layout2Tab.Create = function (opt) {
                 for (var j=0;j<dhxGridInit.getColumnsNum();j++){
                     var val=dhxGridInit.cells2(i,j).getValue();
                     if (val==null) val="";
+                    if (j==numbCellIdKeys) {json=JSON.parse(val);val=json[0][0]+","+json[0][1]+","+json[0][2]+","+json[0][3]+","+json[0][4]}
                     jsoDATA[indRowEdit].push(val);
                 }
             }

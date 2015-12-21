@@ -23,7 +23,7 @@ Selector.Find.Create = function(opt) {
     //1.3 dhx объекты
     var dhxLayout;
     var dhxLayoutT1;
-
+    var isCheck=1;
     //---------------------2.1 описание Layout ----------------
     dhxLayout = new dhtmlXLayoutObject(_this.owner, "1c");
     dhxLayout.cells("a").hideHeader();
@@ -61,6 +61,8 @@ Selector.Find.Create = function(opt) {
             dhxLayoutT1.type=prop.type;
             dhxLayoutT1.idCells=prop.idCells;
             dhxLayoutT1.idKeysRowTemp=prop.idKeysRowTemp;
+            dhxLayoutT1.strIsAll=prop.strIsAll;
+
             dhxLayoutT1.init();
             dhxLayoutT1.enableAutoHiddenColumnsSaving("idDoc:"+_this.idDoc+",idLayout:"+_this.idLayout+",idRekv:"+_this.idRekv);
             dhxLayoutT1.loadHiddenColumnsFromCookie("idDoc:"+_this.idDoc+",idLayout:"+_this.idLayout+",idRekv:"+_this.idRekv);
@@ -76,6 +78,7 @@ Selector.Find.Create = function(opt) {
 
             var indId=dhxLayoutT1.idCells.indexOf("idKeysRowTemp");
             var indName=dhxLayoutT1.idCells.indexOf("name");
+
             if (json.data[0].prop.type=="treeGrid") {
 
                 dhxLayoutT1.expandAll();
@@ -85,16 +88,7 @@ Selector.Find.Create = function(opt) {
                 dhxLayoutT1.collapseAll();
                 dhxLayoutT1.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:"+_this.idLayout+",idRekv:"+_this.idRekv);
             }
-            if ((_this.isMany==1)) {
-                var idRow;
-                for (var i = 0; i < dhxLayoutT1.getRowsNum(); i++){
-                    idRow=dhxLayoutT1.getRowId(i);
-                    if (dhxLayoutT1.cells(idRow,indId).getValue()==-1){
-                        dhxLayoutT1.setRowTextBold(idRow);
-                        break;
-                    }
-                } //for
-            }
+
             //focus
             iasufr.gridRowFocusApply(dhxLayoutT1);
 
@@ -131,12 +125,7 @@ Selector.Find.Create = function(opt) {
                     if (_this.type==6) name= "("+code + ")   "+name;
                     if (opt.onSelect) { opt.onSelect({id:id,code:code,name:name,idDoc:_this.idDoc,idLayout:_this.idLayout,idRekv:_this.idRekv}); iasufr.close(_this); }
                 }
-                else if ((_this.isMany==1)&&(id==-1)){
-                    var isCheckAll=dhxLayoutT1.cells(rowId,indCheck).getValue();
-                    if (isCheckAll==0) checkAll(1);
-                    else checkAll(0);
 
-                }
                 else if ((_this.isMany==1)&&(id!=-1)){
                     var isCheck=dhxLayoutT1.cells(rowId,indCheck).getValue();
                     if (isCheck==0)  dhxLayoutT1.cells(rowId,indCheck).setValue(1);
@@ -144,6 +133,18 @@ Selector.Find.Create = function(opt) {
 
                 }
                 });
+            dhxLayoutT1.attachEvent("onHeaderClick", function(ind,obj){
+                if (dhxLayoutT1.idCells[ind]=="isCHECK") {
+                    if (isCheck==0){isCheck=1;dhxLayoutT1.setColLabel(ind,"img:[/images/imgs/iconCheckGray.gif]");}
+                    else {isCheck=0;dhxLayoutT1.setColLabel(ind,"img:[/images/imgs/iconUncheckAll.gif]");}
+                    for (var i = 0; i <= dhxLayoutT1.getRowsNum()-1; i++){
+                        dhxLayoutT1.cells2(i,ind).setValue(isCheck);
+                    } //for
+
+                    return false
+                }
+                return true
+            });
         }
 
         });
@@ -195,7 +196,7 @@ Selector.Find.Create = function(opt) {
 
             if ((isCheck==1)&&(id!=-1)) countCheck=countCheck+1;
 
-            if (id==-1) {nameAll=dhxLayoutT1.cells(rowId,indCheck+1).getValue();nameAll=nameAll.replace("<b>",""),nameAll=nameAll.replace("</b>",""),nameAll=nameAll.replace("<B>",""),nameAll=nameAll.replace("</B>","")}
+            //if (id==-1) {nameAll=dhxLayoutT1.cells(rowId,indCheck+1).getValue();nameAll=nameAll.replace("<b>",""),nameAll=nameAll.replace("</b>",""),nameAll=nameAll.replace("<B>",""),nameAll=nameAll.replace("</B>","")}
             //if ((id==-1) &&(isCheck==1)) isAll=1;
             if ((id!=-1) &&(isCheck==1)) {
 
@@ -217,13 +218,12 @@ Selector.Find.Create = function(opt) {
         } //for
         if (countCheck<=1){}
         else{
-            if ((countCheck==countT1-1)) { //((isAll==1)&&(countCheck==countT1))||((isAll==0)
-                idRet=-1;codeRet="";nameRet=nameAll;
+            if ((countCheck==countT1)) { //((isAll==1)&&(countCheck==countT1))||((isAll==0)
+                idRet=-1;codeRet="";nameRet=dhxLayoutT1.strIsAll;
             }
             else{
                 nameRet="Декiлька";
             }
-
         }
 
         if (opt.onSelect) { opt.onSelect({id:idRet,code:codeRet,name:nameRet,idDoc:_this.idDoc,idLayout:_this.idLayout,idRekv:_this.idRekv}); iasufr.close(_this); }

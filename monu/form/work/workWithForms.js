@@ -108,29 +108,59 @@ Frm.WorkWithForms.Create = function(opt) {
      menu.attachEvent("onStateChange", onToolbarStateChange);
      menu.attachEvent("onClick", onUserToolbarClick);
      */
-    actionsList = [];
+    if (iasufr.pFunc("zvCanCheck") ){
+        actionsList = [];
 
-    actionsList.push(['check_3', 'obj', 'Пiдтвердженi', '']);
-    actionsList.push(['check_2', 'obj', 'Вiдправленi', '']);
-    actionsList.push(['check_4', 'obj', 'Прийнятi', '']);
-    actionsList.push(['check_0', 'obj', 'Усi звiти', '']);
-    toolbar.addButtonSelect("actions0", null, "Перевiрити", actionsList, "", "", "", true);
-    toolbar.addSeparator("sep2", null);
+        actionsList.push(['check_3', 'obj', 'Пiдтвердженi', '']);
+        actionsList.push(['check_2', 'obj', 'Вiдправленi', '']);
+        actionsList.push(['check_4', 'obj', 'Прийнятi', '']);
+        actionsList.push(['check_0', 'obj', 'Усi звiти', '']);
+        toolbar.addButtonSelect("actions0", null, "Перевiрити", actionsList, "", "", "", true);
+        toolbar.addSeparator("sep2", null);
 
-    actionsList = [];
-    actionsList.push(['exp__0', 'obj', 'Файл BtGot - для всiх звiтiв', '']);
-    actionsList.push(['exp_4_0', 'obj', 'Файл BtGot - прийнятi', '']);
-    actionsList.push(['exp_2_0', 'obj', 'Файл BtGot - вiдправленi', '']);
-    actionsList.push(['exp_3_0', 'obj', 'Файл BtGot - пiдтвердженi', '']);
-    actionsList.push(['seporator']);
-    actionsList.push(['exp__1', 'obj', 'Файл BtGot загальний - для всiх звiтiв', '']);
-    actionsList.push(['exp_4_1', 'obj', 'Файл BtGot загальний - прийнятi', '']);
-    actionsList.push(['exp_2_1', 'obj', 'Файл BtGot загальний - вiдправленi', '']);
-    actionsList.push(['exp_3_1', 'obj', 'Файл BtGot загальний - пiдтвердженi', '']);
-    toolbar.addButtonSelect("actions2", null, "Ехпорт", actionsList, "", "", "", true);
-    toolbar.addSeparator("sep3", null);
-    toolbar.addButton("import", 54, "Iмпорт");
-    toolbar.addSeparator("sep4", null);
+    }
+    var t2=iasufr.pFunc("zvCanExportBtGot")
+    var t=iasufr.pFunc("zvCanImport");
+
+    if (iasufr.pFunc("zvCanExportBtGot")||(iasufr.pFunc("zvCanExportEData"))||iasufr.pFunc("zvCanExportBtGotChildOrg")||iasufr.pFunc("zvCanExportDKSY")){
+        actionsList = [];
+        if (iasufr.pFunc("zvCanExportBtGot")){
+            actionsList.push(['exp__0', 'obj', 'Файл BtGot - для всiх звiтiв', '']);
+            actionsList.push(['exp_4_0', 'obj', 'Файл BtGot - прийнятi', '']);
+            actionsList.push(['exp_2_0', 'obj', 'Файл BtGot - вiдправленi', '']);
+            actionsList.push(['exp_3_0', 'obj', 'Файл BtGot - пiдтвердженi', '']);
+
+        }
+        if (iasufr.pFunc("zvCanExportEData")){
+            actionsList.push(['seporator']);
+            actionsList.push(['exp__3', 'obj', 'Файл E-Data - для всiх звiтiв', '']);
+            actionsList.push(['exp_4_3', 'obj', 'Файл E-Data - прийнятi', '']);
+            actionsList.push(['exp_2_3', 'obj', 'Файл E-Data - вiдправленi', '']);
+            actionsList.push(['exp_3_3', 'obj', 'Файл E-Data - пiдтвердженi', '']);
+        }
+        if (iasufr.pFunc("zvCanExportBtGotChildOrg")){
+            actionsList.push(['seporator']);
+            actionsList.push(['exp__1', 'obj', 'Файл BtGot загальний - для всiх звiтiв', '']);
+            actionsList.push(['exp_4_1', 'obj', 'Файл BtGot загальний - прийнятi', '']);
+            actionsList.push(['exp_2_1', 'obj', 'Файл BtGot загальний - вiдправленi', '']);
+            actionsList.push(['exp_3_1', 'obj', 'Файл BtGot загальний - пiдтвердженi', '']);
+        }
+        if (iasufr.pFunc("zvCanExportDKSY")){
+            actionsList.push(['seporator']);
+            actionsList.push(['exp__2', 'obj', 'Файл ДКСУ - для всiх звiтiв', '']);
+            actionsList.push(['exp_4_2', 'obj', 'Файл ДКСУ - прийнятi', '']);
+            actionsList.push(['exp_2_2', 'obj', 'Файл ДКСУ - вiдправленi', '']);
+            actionsList.push(['exp_3_2', 'obj', 'Файл ДКСУ - пiдтвердженi', '']);
+        }
+        toolbar.addButtonSelect("actions2", null, "Ехпорт", actionsList, "", "", "", true);
+        toolbar.addSeparator("sep3", null);
+    }
+
+    if (iasufr.pFunc("zvCanImport")) {
+        toolbar.addButton("import", 54, "Iмпорт");
+        toolbar.addSeparator("sep4", null);
+    }
+
     actionsList = [];
     actionsList.push(['delete', 'obj', iasufr.lang.ui.delete, '']);
     if (iasufr.pFunc("zvCanRestore")) actionsList.push(['undelete', 'obj', "Востановити", '']);
@@ -148,7 +178,6 @@ Frm.WorkWithForms.Create = function(opt) {
 
     actionsList.push(['recalc', 'obj', "Перерахувати", '']);
     actionsList.push(['printsettings', 'obj', "Параметри друку", '']);
-    var t=iasufr.pFunc("zvCanDod23")
 
     if (iasufr.pFunc("zvCanDod23")){
         actionsList.push(['seporator2']);
@@ -456,13 +485,13 @@ Frm.WorkWithForms.Create = function(opt) {
 
     }
 
-    function exportDbf(idStatus,isChildOrg){
+    function exportDbf(idStatus,typeExpZvit){
         var m = toolbar.getListOptionSelected("month"); if (m.length==1)m="0"+m;
         var y=toolbar.getValue("year");
         var date1Zvit=y+m+"01";
         iasufr.ajax({
             url: "frm.TitleZvitForm.cls",
-            data: {func: "export",idOrg:ID_ORG,date1Zvit:date1Zvit,idStatus:idStatus,isChildOrg:isChildOrg},
+            data: {func: "export",idOrg:ID_ORG,date1Zvit:date1Zvit,idStatus:idStatus,typeExpZvit:typeExpZvit},
             success: function (data) {
                 var json = JSON.parse(data);
                 iasufr.downloadDbf(json.nameFile, json.data);

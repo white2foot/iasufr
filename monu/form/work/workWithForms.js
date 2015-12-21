@@ -200,7 +200,7 @@ Frm.WorkWithForms.Create = function(opt) {
 
     var grid = dhxLayout.cells("b").attachGrid();
     grid.setColumnIds("sel,idZvit,status,prog,code,fond,type,form,isDel,isZved,lastchange");
-    grid.setHeader("#master_checkbox,idZvit,Статус,Программа,Код,Фонд,Вид,Форма,Видалений,Зведений,Остання змiна");
+    grid.setHeader("#master_checkbox,idZvit,Статус,Програма,Код,Фонд,Вид,Форма,Видалений,Зведений,Остання змiна");
     grid.setInitWidths("20,0,70,70,48,70,70,*,0,0,230");
     grid.setColTypes("ch,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
     grid.setColAlign("center,right,center,center,center,center,center,left,center,center,left");

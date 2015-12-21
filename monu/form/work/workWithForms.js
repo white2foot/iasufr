@@ -489,9 +489,11 @@ Frm.WorkWithForms.Create = function(opt) {
         var m = toolbar.getListOptionSelected("month"); if (m.length==1)m="0"+m;
         var y=toolbar.getValue("year");
         var date1Zvit=y+m+"01";
+        var selRow = grid.getCheckedRows(grid.getColIndexById("sel"));
+        if (!selRow) {selRow = selRow=""}
         iasufr.ajax({
             url: "frm.TitleZvitForm.cls",
-            data: {func: "export",idOrg:ID_ORG,date1Zvit:date1Zvit,idStatus:idStatus,typeExpZvit:typeExpZvit},
+            data: {func: "export",idOrg:ID_ORG,date1Zvit:date1Zvit,idStatus:idStatus,typeExpZvit:typeExpZvit,idZvit:selRow},
             success: function (data) {
                 var json = JSON.parse(data);
                 iasufr.downloadDbf(json.nameFile, json.data);

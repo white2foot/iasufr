@@ -79,7 +79,7 @@ base.Layout2.Create = function (opt) {
             dhxLayoutT2=dhxLayout.cells(nameGrid).attachGrid();
             dhxLayoutT2.enableDragAndDrop(true);
             dhxLayoutT2.setDragBehavior("complex");
-            dhxLayoutT2.enableTreeCellEdit(false);
+
 
             dhxLayoutT2.attachEvent("onCheck", function (rowId, cellInd, state) { //alert(rId+"="+cInd+"="+state)
                 //показ измененной строки
@@ -89,8 +89,17 @@ base.Layout2.Create = function (opt) {
                 dhxLayoutT2.cells(rowId,numbIsChange).setValue(1);
 
             });
-
+            dhxLayoutT2.attachEvent("onEditCell", function (stage, rowId, cellInd, nValue, oValue) {
+                if ((stage==2)&&(nValue!=oValue)) {
+                    //массив измененных строк
+                    var numbIsChange=dhxLayoutT2.idCells.indexOf("isChangeRowTemp");if (numbIsChange==-1) return
+                    dhxLayoutT2.cells(rowId,numbIsChange).setValue(1);
+                }
+                    // iasufr.enableAskBeforClose(t);  return true
+                return true
+            });
             dhxLayoutT2.attachEvent("onRowDblClicked", function(rowId,cellInd){
+
                 var isFunc=dhxLayoutT2.isFunc[cellInd];
                 if (dhxLayoutT2.isFunc[dhxLayoutT2.idCells.indexOf("idKeysRowTemp")]!=""){
                     isFunc=dhxLayoutT2.isFunc[dhxLayoutT2.idCells.indexOf("idKeysRowTemp")]
@@ -100,14 +109,16 @@ base.Layout2.Create = function (opt) {
                     var idBut1=isFunc,idBut2="",idBut3="";
                     var cellId=dhxLayoutT2.idCells[cellInd];
                     if (isFunc.lastIndexOf(".")>-1){isFunc=isFunc.split(".");idBut1=isFunc[0],idBut2=isFunc[1]; if (isFunc[2]!=undefined)idBut3=isFunc[2]}
-                    if (idBut1!="") onToolbarClick(idBut1,rowId,cellId)
-                    if (idBut2!="") onToolbarClick(idBut2,rowId,cellId) //по обяз.параметрам не пропустит
-                    if (idBut3!="") onToolbarClick(idBut3,rowId,cellId)
+                    if (idBut1!="") {onToolbarClick(idBut1,rowId,cellId);return false}
+                    if (idBut2!="") {onToolbarClick(idBut2,rowId,cellId);return false} //по обяз.параметрам не пропустит
+                    if (idBut3!="") {onToolbarClick(idBut3,rowId,cellId);return false}
                 }
+                var masType=dhxLayoutT2.types.split("•");
+                var t=masType[cellInd];
+                if (masType[cellInd]=="ed") return true
+                return false
             });
-            dhxLayoutT2.attachEvent("onFilterEnd", function(elements){
-                var t=elements;
-            });
+
 
             dhxLayoutT2.attachEvent("onDrop", function(id1,id2){
                 //alert(id1+"/"+id2)
@@ -302,7 +313,7 @@ base.Layout2.Create = function (opt) {
         eval(str);
 
         dhxGridInit.type=prop.type;
-        if (prop.type=="treeGrid")dhxGridInit.enableTreeCellEdit(false);
+
 
         dhxGridInit.setDelimiter("•");
         dhxGridInit.setHeader(prop.head1);
@@ -320,6 +331,9 @@ base.Layout2.Create = function (opt) {
         if (prop.itog1) dhxGridInit.attachFooter(prop.itog1);
         if (prop.itog2) dhxGridInit.attachFooter(prop.itog2);
 
+
+        dhxGridInit.enableTreeCellEdit(dhxGridInit.isEdit);
+
         dhxGridInit.setColTypes(prop.types);
         var masType=prop.types.split("•");
         var masPType=prop.ptypes.split("•")
@@ -333,13 +347,17 @@ base.Layout2.Create = function (opt) {
         dhxGridInit.idLayout=prop.idLayout;
         dhxGridInit.type=prop.type;
         dhxGridInit.idCells=prop.idCells;
+        dhxGridInit.types=prop.types;
         dhxGridInit.idKeysRowTemp=prop.idKeysRowTemp;
+        dhxGridInit.style=prop.style;
         dhxGridInit.isFunc=prop.isFunc;
+        dhxGridInit.isEdit=prop.isEdit;
 
-        dhxGridInit.enableColumnMove(true,"false,true,true,true,true,true");
+
+        //dhxGridInit.enableColumnMove(true,"false,true,true,true,true,true");
         //dhxGridInit.enableCollSpan(true);
-        if (prop.multiline) dhxGridInit.enableMultiline(true);
-        //dhxGridInit.enableHeaderImages(true);
+        if (prop.multiline==1) dhxGridInit.enableMultiline(true);
+        //if (prop.isImg==1)     dhxGridInit.enableHeaderImages(true); - не нужно - ошибки (в справ-ке и не было)
 
         dhxGridInit.init();
 
@@ -363,18 +381,72 @@ base.Layout2.Create = function (opt) {
         //focus
         iasufr.gridRowFocusApply(dhxGridInit);
 
-        if (dhxGridInit.type!="treeGrid") return
+        if (dhxGridInit.type=="treeGrid") {
+            dhxGridInit.expandAll();
+        }
 
-        dhxGridInit.expandAll();
 
+        var numbCellIdKeys=dhxGridInit.idCells.indexOf("idKeysRowTemp");
+        var style=dhxGridInit.style;
+        var isImgTree=0;
+        if ((style=="")&&(dhxGridInit.type=="treeGrid")) {style=["img"];isImgTree="/js/dhtmlxw/imgs/blank.gif"}
+        var countStyle=style.length;
+        var t=JSON.stringify(style).lastIndexOf("colspan");
+        if (JSON.stringify(style).lastIndexOf("colspan")>-1){
+            dhxGridInit.enableColSpan(true);}
+        var styleI,data,json;
 
-        for (var i = 0; i < dhxGridInit.getRowsNum(); i++){
-            dhxGridInit.setItemImage(dhxGridInit.getRowId(i), "/js/dhtmlxw/imgs/blank.gif","/js/dhtmlxw/imgs/blank.gif");
+        if (style!="") for (var i = 0; i < dhxGridInit.getRowsNum(); i++){
+            var idRow=dhxGridInit.getRowId(i);
+            data=dhxGridInit.cells2(i,numbCellIdKeys).getValue();
+            if (data!=""){
+                json=JSON.parse(data);
+                if (!json[1]){if (isImgTree!=0)dhxGridInit.setItemImage(idRow, isImgTree)}
+                else{
+                    for (var j = 0; j < countStyle; j++){
+                        styleI=style[j].split("/");
+                        //по ячейкам
+                        if (json[1][j]!=""){
+                            if (styleI[1]!=null){
+                                switch (styleI[0]) {
+                                    case "style":{
+                                        dhxGridInit.setCellTextStyle(idRow,styleI[1],json[1][j]);
+                                        break;
+                                    }
+                                    case "rowspan": {
+                                        dhxGridInit.setRowspan(dhxGridInit.getRowId(i+1), styleI[1],json[1][j]);
+                                        break;
+                                    }
+                                    case "colspan": {
+                                        dhxGridInit.setColspan(dhxGridInit.getRowId(i+1), styleI[1],json[1][j]);
+                                        break;
+                                    }
+                                }
+
+                            }
+                            else{
+                                switch (style[j]) {
+                                    case "style":{
+                                        dhxGridInit.setRowTextStyle(dhxGridInit.getRowId(i), json[1][j]);
+                                        break;
+                                    }
+                                    case "img":  {
+                                        dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + json[1][j]);
+                                        break;
+                                    }
+                                }//switch
+                            } //if (json[1][j]=="")
+                        }
+                    } //for
+                } //else json[1]!=""
+            } //if data!=""
+
         } //for
-        dhxGridInit.collapseAll();
 
-        if (dhxGridInit.type=="treeGrid"){
-            dhxGridInit.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:"+idLayout);
+
+        if (dhxGridInit.type=="treeGrid") {
+            dhxGridInit.collapseAll();
+            dhxGridInit.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:"+idLayout)
         }
 
         /*
@@ -521,8 +593,8 @@ base.Layout2.Create = function (opt) {
                             if ((numbIdKeys==-1)&&(isReq==1)) {alert(idObj+ "не вказан у idKeysRowTemp :" +dhxGridInit.idKeysRowTemp);return retError}
                             strCell=dhxGridInit.cells(idRow,numbCellIdKeys).getValue();
                             if (strCell==null) return retError
-                            strCell=strCell.split(".");
-                            val2=strCell[numbIdKeys]; if (val2==null) val2="";
+                            strCell=JSON.parse(strCell);
+                            val2=strCell[0][numbIdKeys]; if (val2==null) val2="";
                         }
                         else {
                             val2=dhxGridInit.cells(idRow,dhxGridInit.idCells.indexOf(idObj)).getValue();
@@ -691,6 +763,9 @@ base.Layout2.Create = function (opt) {
         var dhxGridInit;
         var str="dhxGridInit=dhxLayout"+idLayout; //dhxLayoutObj[numbLayout]; //dhxLayoutObj[numbLayout]; //dhxGrid;
         eval(str);
+        if (dhxGridInit.type=="treeGrid") {
+            dhxGridInit.saveOpenStates("idDoc:"+_this.idDoc+",idLayout:"+idLayout);
+            dhxGridInit.expandAll();}
 
         var jsoDATA = [];
         //1)1-ая строка - id
@@ -698,16 +773,21 @@ base.Layout2.Create = function (opt) {
         //2)2-ая строка - value
 
         var idI="";
+        var json;
         var indRowEdit=0;
         var numbIsChange=dhxGridInit.idCells.indexOf("isChangeRowTemp"); //выбор из нижней таблицы
+        var numbCellIdKeys=dhxGridInit.idCells.indexOf("idKeysRowTemp");
         var t=dhxGridInit.getSelectedRowId();
         var i1= 0,i2=dhxGridInit.getRowsNum()-1;
         var strCheck="";
         if (dhxGridInit.idCells.indexOf("isCHECK")>-1) {strCheck= dhxGridInit.getCheckedRows(dhxGridInit.idCells.indexOf("isCHECK"));}
-        if (strCheck=="") strCheck=dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId());
+        if (strCheck=="") strCheck=dhxGridInit.getSelectedRowId();
         strCheck=","+strCheck+",";
+         var t2=dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId());
+        var t=dhxGridInit.getSelectedRowId();
 
         if (isRow==1) {i1= dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId()),i2=i1; if ((i1==null)||(i1==-1)) {i1=0; i2=-1;};}
+
         for (var i = i1; i <= i2; i++) {
             var isCheck=strCheck.lastIndexOf(","+(i+1)+",");
             //if ((numbIsChange==-1)||(dhxGridInit.cells2(i, numbIsChange).getValue()==1)||((isDel!=null)&&(strCheck.indexOf(i)>-1))){
@@ -717,9 +797,14 @@ base.Layout2.Create = function (opt) {
                 for (var j=0;j<dhxGridInit.getColumnsNum();j++){
                     var val=dhxGridInit.cells2(i,j).getValue();
                     if (val==null) val="";
+                    if (j==numbCellIdKeys) {json=JSON.parse(val);val=json[0][0]+","+json[0][1]+","+json[0][2]+","+json[0][3]+","+json[0][4]}
                     jsoDATA[indRowEdit].push(val);
                 }
             }
+        }
+        if (dhxGridInit.type=="treeGrid") {
+            dhxGridInit.collapseAll();
+            dhxGridInit.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:"+idLayout);
         }
         return jsoDATA
 

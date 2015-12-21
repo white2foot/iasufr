@@ -109,9 +109,10 @@ Frm.WorkWithForms.Create = function(opt) {
      menu.attachEvent("onClick", onUserToolbarClick);
      */
     actionsList = [];
-    actionsList.push(['check_4', 'obj', 'Прийнятi', '']);
-    actionsList.push(['check_2', 'obj', 'Вiдправленi', '']);
+
     actionsList.push(['check_3', 'obj', 'Пiдтвердженi', '']);
+    actionsList.push(['check_2', 'obj', 'Вiдправленi', '']);
+    actionsList.push(['check_4', 'obj', 'Прийнятi', '']);
     actionsList.push(['check_0', 'obj', 'Усi звiти', '']);
     toolbar.addButtonSelect("actions0", null, "Перевiрити", actionsList, "", "", "", true);
     toolbar.addSeparator("sep2", null);
@@ -170,7 +171,7 @@ Frm.WorkWithForms.Create = function(opt) {
 
     var grid = dhxLayout.cells("b").attachGrid();
     grid.setColumnIds("sel,idZvit,status,prog,code,fond,type,form,isDel,isZved,lastchange");
-    grid.setHeader(",idZvit,Статус,Программа,Код,Фонд,Вид,Форма,Видалений,Зведений,Остання змiна");
+    grid.setHeader("#master_checkbox,idZvit,Статус,Программа,Код,Фонд,Вид,Форма,Видалений,Зведений,Остання змiна");
     grid.setInitWidths("20,0,70,70,48,70,70,*,0,0,230");
     grid.setColTypes("ch,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
     grid.setColAlign("center,right,center,center,center,center,center,left,center,center,left");
@@ -404,7 +405,7 @@ Frm.WorkWithForms.Create = function(opt) {
         else if (paramCheck.param.idStatus==3) strStatus=" (за статусом - пiдтвердженi)"
 
         if (paramCheck.param.typeCheck==undefined){
-            var paramFiltrs=[["idOrg","idZvit","date1Zvit","idStatus","typeCheck"],[ID_ORG,selRow,date1Zvit,paramCheck.param.idStatus,2]];
+            var paramFiltrs=[["idOrg","idZvit","date1Zvit","idStatus","typeCheck"],[ID_ORG,selRow,date1Zvit,paramCheck.param.idStatus,1]];
             iasufr.ajax({
                 url: "base.Simple.cls",
                 data: {func: "init",idDoc:"CheckOrgReports",idLayout:"T1",param:JSON.stringify(paramFiltrs)},

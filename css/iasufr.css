@@ -471,3 +471,10 @@ div.dhtmlxMenu_dhx_skyblue_TopLevel_Item_Normal, div.dhtmlxMenu_dhx_skyblue_TopL
     -webkit-animation: move linear .2s;
     animation: move linear .2s;
 }
+
+div.gridbox_dhx_skyblue table.hdr td input[type="checkbox"] {
+    margin-left: 1px;
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+}

@@ -501,9 +501,12 @@ function FormUtils(tableData, period) {
             cd = t.getCellData(rowId, t.grid.getColumnId(colIdx));
             if (cd) {
                 if (cd.type != undefined) type = cd.type;
-                if (cd.readonly == 1 || (cd.value != undefined && cd.value != "")) return false;
+                if (cd.formula || cd.readonly == 1 || (cd.value != undefined && cd.value != "")) return false;
             }
-            if (t.clipboard) t.grid.cells(rowId, colIdx).setValue(t.formatValue(t.clipboard, type));
+            if (t.clipboard) {
+                t.grid.cells(rowId, colIdx).setValue(t.formatValue(t.clipboard, type));
+                CheckForRecalc(rowId, t.grid.getColumnId(colIdx));
+            }
         }
         if (code == 37 || code == 38 || code == 39 || code == 40) t.grid.editStop();
         return true;

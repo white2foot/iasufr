@@ -58,15 +58,15 @@ Frm.Form.Create = function(opt) {
 
     var g = t.owner.attachGrid();
     g.setImagePath(iasufr.const.IMG_PATH);
-    g.setHeader("Id,Код,Пер.,Пiдроздiл,Назва,З,По,Таблицi,Текстова");
-    g.setColumnIds("id,code,pr,dep,name,from,to,tables,istext");
-    g.attachHeader("#rspan,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#rspan,#rspan");
-    g.setInitWidths("0,40,40,100,*,64,64,0,0");
-    g.setColAlign("center,center,center,left,left,center,center,center,center");
-    g.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro");
-    g.setColSorting('str,str,str,str,str,str,str,str,str,str');
+    g.setHeader("Id,Код,Пер.,Пiдроздiл,Назва,З,По,Таблицi,Текстова,Експорт");
+    g.setColumnIds("id,code,pr,dep,name,from,to,tables,istext,isExp");
+    g.attachHeader("#rspan,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#rspan,#rspan,#text_filter");
+    g.setInitWidths("0,40,40,100,*,64,64,0,0,64");
+    g.setColAlign("center,center,center,left,left,center,center,center,center,center");
+    g.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+    g.setColSorting('str,str,str,str,str,str,str,str,str,str,str');
     g.init();
-    g.enableHeaderMenu("true,true,true,true,true,true,true,true,true");
+    g.enableHeaderMenu("true,true,true,true,true,true,true,true,true,true");
 
     if (opt.select) {
         g.enableRowsHover(true, "grid-row-hover");

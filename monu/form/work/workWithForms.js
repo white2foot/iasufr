@@ -125,32 +125,32 @@ Frm.WorkWithForms.Create = function(opt) {
     if (iasufr.pFunc("zvCanExportBtGot")||(iasufr.pFunc("zvCanExportEData"))||iasufr.pFunc("zvCanExportBtGotChildOrg")||iasufr.pFunc("zvCanExportDKSY")){
         actionsList = [];
         if (iasufr.pFunc("zvCanExportBtGot")){
-            actionsList.push(['exp__0', 'obj', 'Файл BtGot - для всiх звiтiв', '']);
-            actionsList.push(['exp_4_0', 'obj', 'Файл BtGot - прийнятi', '']);
-            actionsList.push(['exp_2_0', 'obj', 'Файл BtGot - вiдправленi', '']);
-            actionsList.push(['exp_3_0', 'obj', 'Файл BtGot - пiдтвердженi', '']);
+            actionsList.push(['exp__0', 'obj', '<span style="color:#000080">BtGot - для всiх звiтiв</span>', '']);
+            actionsList.push(['exp_4_0', 'obj', '<span style="color:#000080">BtGot - прийнятi</span>', '']);
+            actionsList.push(['exp_2_0', 'obj', '<span style="color:#000080">BtGot - вiдправленi</span>', '']);
+            actionsList.push(['exp_3_0', 'obj', '<span style="color:#000080">BtGot - пiдтвердженi</span>', '']);
 
-        }
-        if (iasufr.pFunc("zvCanExportEData")){
-            actionsList.push(['seporator']);
-            actionsList.push(['exp__3', 'obj', 'Файл E-Data - для всiх звiтiв', '']);
-            actionsList.push(['exp_4_3', 'obj', 'Файл E-Data - прийнятi', '']);
-            actionsList.push(['exp_2_3', 'obj', 'Файл E-Data - вiдправленi', '']);
-            actionsList.push(['exp_3_3', 'obj', 'Файл E-Data - пiдтвердженi', '']);
         }
         if (iasufr.pFunc("zvCanExportBtGotChildOrg")){
             actionsList.push(['seporator']);
-            actionsList.push(['exp__1', 'obj', 'Файл BtGot загальний - для всiх звiтiв', '']);
-            actionsList.push(['exp_4_1', 'obj', 'Файл BtGot загальний - прийнятi', '']);
-            actionsList.push(['exp_2_1', 'obj', 'Файл BtGot загальний - вiдправленi', '']);
-            actionsList.push(['exp_3_1', 'obj', 'Файл BtGot загальний - пiдтвердженi', '']);
+            actionsList.push(['exp__1', 'obj', '<span style="color:#000080">BtGot загальний - для всiх звiтiв</span>', '']);
+            actionsList.push(['exp_4_1', 'obj', '<span style="color:#000080">BtGot загальний - прийнятi</span>', '']);
+            actionsList.push(['exp_2_1', 'obj', '<span style="color:#000080">BtGot загальний - вiдправленi</span>', '']);
+            actionsList.push(['exp_3_1', 'obj', '<span style="color:#000080">BtGot загальний - пiдтвердженi</span>', '']);
+        }
+        if (iasufr.pFunc("zvCanExportEData")){
+            actionsList.push(['seporator']);
+            actionsList.push(['exp__3', 'obj', '<span style="color:green">E-Data - для всiх звiтiв</span>', '']);
+            actionsList.push(['exp_4_3', 'obj','<span style="color:green">E-Data - прийнятi</span>', '']);
+            actionsList.push(['exp_2_3', 'obj','<span style="color:green">E-Data - вiдправленi</span>', '']);
+            actionsList.push(['exp_3_3', 'obj','<span style="color:green">E-Data - пiдтвердженi</span>', '']);
         }
         if (iasufr.pFunc("zvCanExportDKSY")){
             actionsList.push(['seporator']);
-            actionsList.push(['exp__2', 'obj', 'Файл ДКСУ - для всiх звiтiв', '']);
-            actionsList.push(['exp_4_2', 'obj', 'Файл ДКСУ - прийнятi', '']);
-            actionsList.push(['exp_2_2', 'obj', 'Файл ДКСУ - вiдправленi', '']);
-            actionsList.push(['exp_3_2', 'obj', 'Файл ДКСУ - пiдтвердженi', '']);
+            actionsList.push(['exp__2', 'obj', 'ДКСУ - для всiх звiтiв', '']);
+            actionsList.push(['exp_4_2', 'obj', 'ДКСУ - прийнятi', '']);
+            actionsList.push(['exp_2_2', 'obj', 'ДКСУ - вiдправленi', '']);
+            actionsList.push(['exp_3_2', 'obj', 'ДКСУ - пiдтвердженi', '']);
         }
         toolbar.addButtonSelect("actions2", null, "Ехпорт", actionsList, "", "", "", true);
         toolbar.addSeparator("sep3", null);

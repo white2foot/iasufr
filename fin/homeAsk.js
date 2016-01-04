@@ -61,17 +61,18 @@ Fin.HomeAsk.Create = function (opt) {
 
     gD = main.cells('a').attachGrid();
     gD.setImagePath(iasufr.const.IMG_PATH);
-    gD.setHeader('N, Дата,Час, Текст питання, Користувач, Текст вiдповiдi,Дата,Час,Адмiн.,,');
-    gD.setInitWidths('20,80,40,350,150,350,80,40,80,200,10');
-    gD.setColAlign('center,center,center,left,left,left,center,center,left,left,left');
-    gD.setColTypes("ro,dhxCalendarA,ro,ro,ro,ro,dhxCalendarA,ro,ro,ro,ro");
-    gD.setColSorting('int,date,str,str,str,str,date,str,str,str,int');
+    //            0   1    2       3             4         5       6            7    8    9      10  11
+    gD.setHeader('N, Дата,Час, Текст питання, Користувач, Кому,Текст вiдповiдi,Дата,Час,Вiдповiв,,');
+    gD.setInitWidths('20,80,40,350,130,100,350,80,40,80,200,10');
+    gD.setColAlign('center,center,center,left,left,left,left,center,center,left,left,left');
+    gD.setColTypes("ro,dhxCalendarA,ro,ro,ro,ro,ro,dhxCalendarA,ro,ro,ro,ro");
+    gD.setColSorting('int,date,str,str,str,str,str,date,str,str,str,int');
 
     gD.init();
 
     iasufr.enableRowselectMode(gD);
     gD.setColumnHidden(0,true);
-    gD.setColumnHidden(10,true);
+    gD.setColumnHidden(11,true);
 
     LoadData(0);
 
@@ -87,12 +88,12 @@ Fin.HomeAsk.Create = function (opt) {
            gD.enableRowsHover(true, "grid-row-hover");
             //--------------------------------------------
             if ((gD.getRowsNum() > 0) && (pHeader == 0)) {
-                gD.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#rspan,#rspan");
+                gD.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#rspan,#rspan");
                 pHeader = 1;
             }
 
             var cnt = gD.getRowsNum();  var i; var p; var title
-            if (cnt>0) { for ( i = 0; i < cnt; i++) { p=gD.cells2(i, 10).getValue();
+            if (cnt>0) { for ( i = 0; i < cnt; i++) { p=gD.cells2(i, 11).getValue();
                 if ((p==0))  { gD.setCellTextStyle(gD.getRowId(i),4,"color:#cc0000");
                                title=gD.cells2(i,4).getValue();
                                title += " - нема вiдмiтки користувача, що прочитав вiдповiдь";
@@ -135,7 +136,7 @@ Fin.HomeAsk.Create = function (opt) {
             if ((id == "edit")||(id == "add")) {
                  if (id == "add") idRow=0;
                  if ( (id == "edit")&&(!idRow) ) { iasufr.message('Вкажiть строку !'); return; }
-                 var hei=420; if (id=="add") hei=280;
+                 var hei=580; if (id=="add") hei=330;
                  iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:selOrg.id, idRow:idRow, addZ:"0"});
             }
             if (id == "addZ") {

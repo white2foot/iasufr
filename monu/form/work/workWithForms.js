@@ -108,28 +108,59 @@ Frm.WorkWithForms.Create = function(opt) {
      menu.attachEvent("onStateChange", onToolbarStateChange);
      menu.attachEvent("onClick", onUserToolbarClick);
      */
-    actionsList = [];
-    actionsList.push(['check_4', 'obj', 'Прийнятi', '']);
-    actionsList.push(['check_2', 'obj', 'Вiдправленi', '']);
-    actionsList.push(['check_3', 'obj', 'Пiдтвердженi', '']);
-    actionsList.push(['check_0', 'obj', 'Усi звiти', '']);
-    toolbar.addButtonSelect("actions0", null, "Перевiрити", actionsList, "", "", "", true);
-    toolbar.addSeparator("sep2", null);
+    if (iasufr.pFunc("zvCanCheck") ){
+        actionsList = [];
 
-    actionsList = [];
-    actionsList.push(['exp__0', 'obj', 'Файл BtGot - для всiх звiтiв', '']);
-    actionsList.push(['exp_4_0', 'obj', 'Файл BtGot - прийнятi', '']);
-    actionsList.push(['exp_2_0', 'obj', 'Файл BtGot - вiдправленi', '']);
-    actionsList.push(['exp_3_0', 'obj', 'Файл BtGot - пiдтвердженi', '']);
-    actionsList.push(['seporator']);
-    actionsList.push(['exp__1', 'obj', 'Файл BtGot загальний - для всiх звiтiв', '']);
-    actionsList.push(['exp_4_1', 'obj', 'Файл BtGot загальний - прийнятi', '']);
-    actionsList.push(['exp_2_1', 'obj', 'Файл BtGot загальний - вiдправленi', '']);
-    actionsList.push(['exp_3_1', 'obj', 'Файл BtGot загальний - пiдтвердженi', '']);
-    toolbar.addButtonSelect("actions2", null, "Ехпорт", actionsList, "", "", "", true);
-    toolbar.addSeparator("sep3", null);
-    toolbar.addButton("import", 54, "Iмпорт");
-    toolbar.addSeparator("sep4", null);
+        actionsList.push(['check_3', 'obj', 'Пiдтвердженi', '']);
+        actionsList.push(['check_2', 'obj', 'Вiдправленi', '']);
+        actionsList.push(['check_4', 'obj', 'Прийнятi', '']);
+        actionsList.push(['check_0', 'obj', 'Усi звiти', '']);
+        toolbar.addButtonSelect("actions0", null, "Перевiрити", actionsList, "", "", "", true);
+        toolbar.addSeparator("sep2", null);
+
+    }
+    var t2=iasufr.pFunc("zvCanExportBtGot")
+    var t=iasufr.pFunc("zvCanImport");
+
+    if (iasufr.pFunc("zvCanExportBtGot")||(iasufr.pFunc("zvCanExportEData"))||iasufr.pFunc("zvCanExportBtGotChildOrg")||iasufr.pFunc("zvCanExportDKSY")){
+        actionsList = [];
+        if (iasufr.pFunc("zvCanExportBtGot")){
+            actionsList.push(['exp__0', 'obj', '<span style="color:#000080">BtGot - для всiх звiтiв</span>', '']);
+            actionsList.push(['exp_4_0', 'obj', '<span style="color:#000080">BtGot - прийнятi</span>', '']);
+            actionsList.push(['exp_2_0', 'obj', '<span style="color:#000080">BtGot - вiдправленi</span>', '']);
+            actionsList.push(['exp_3_0', 'obj', '<span style="color:#000080">BtGot - пiдтвердженi</span>', '']);
+
+        }
+        if (iasufr.pFunc("zvCanExportBtGotChildOrg")){
+            actionsList.push(['seporator']);
+            actionsList.push(['exp__1', 'obj', '<span style="color:#000080">BtGot загальний - для всiх звiтiв</span>', '']);
+            actionsList.push(['exp_4_1', 'obj', '<span style="color:#000080">BtGot загальний - прийнятi</span>', '']);
+            actionsList.push(['exp_2_1', 'obj', '<span style="color:#000080">BtGot загальний - вiдправленi</span>', '']);
+            actionsList.push(['exp_3_1', 'obj', '<span style="color:#000080">BtGot загальний - пiдтвердженi</span>', '']);
+        }
+        if (iasufr.pFunc("zvCanExportEData")){
+            actionsList.push(['seporator']);
+            actionsList.push(['exp__3', 'obj', '<span style="color:green">E-Data - для всiх звiтiв</span>', '']);
+            actionsList.push(['exp_4_3', 'obj','<span style="color:green">E-Data - прийнятi</span>', '']);
+            actionsList.push(['exp_2_3', 'obj','<span style="color:green">E-Data - вiдправленi</span>', '']);
+            actionsList.push(['exp_3_3', 'obj','<span style="color:green">E-Data - пiдтвердженi</span>', '']);
+        }
+        if (iasufr.pFunc("zvCanExportDKSY")){
+            actionsList.push(['seporator']);
+            actionsList.push(['exp__2', 'obj', 'ДКСУ - для всiх звiтiв', '']);
+            actionsList.push(['exp_4_2', 'obj', 'ДКСУ - прийнятi', '']);
+            actionsList.push(['exp_2_2', 'obj', 'ДКСУ - вiдправленi', '']);
+            actionsList.push(['exp_3_2', 'obj', 'ДКСУ - пiдтвердженi', '']);
+        }
+        toolbar.addButtonSelect("actions2", null, "Ехпорт", actionsList, "", "", "", true);
+        toolbar.addSeparator("sep3", null);
+    }
+
+    if (iasufr.pFunc("zvCanImport")) {
+        toolbar.addButton("import", 54, "Iмпорт");
+        toolbar.addSeparator("sep4", null);
+    }
+
     actionsList = [];
     actionsList.push(['delete', 'obj', iasufr.lang.ui.delete, '']);
     if (iasufr.pFunc("zvCanRestore")) actionsList.push(['undelete', 'obj', "Востановити", '']);
@@ -147,7 +178,6 @@ Frm.WorkWithForms.Create = function(opt) {
 
     actionsList.push(['recalc', 'obj', "Перерахувати", '']);
     actionsList.push(['printsettings', 'obj', "Параметри друку", '']);
-    var t=iasufr.pFunc("zvCanDod23")
 
     if (iasufr.pFunc("zvCanDod23")){
         actionsList.push(['seporator2']);
@@ -170,7 +200,7 @@ Frm.WorkWithForms.Create = function(opt) {
 
     var grid = dhxLayout.cells("b").attachGrid();
     grid.setColumnIds("sel,idZvit,status,prog,code,fond,type,form,isDel,isZved,lastchange");
-    grid.setHeader("#master_checkbox,idZvit,Статус,Программа,Код,Фонд,Вид,Форма,Видалений,Зведений,Остання змiна");
+    grid.setHeader("#master_checkbox,idZvit,Статус,Програма,Код,Фонд,Вид,Форма,Видалений,Зведений,Остання змiна");
     grid.setInitWidths("20,0,70,70,48,70,70,*,0,0,230");
     grid.setColTypes("ch,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
     grid.setColAlign("center,right,center,center,center,center,center,left,center,center,left");
@@ -404,7 +434,7 @@ Frm.WorkWithForms.Create = function(opt) {
         else if (paramCheck.param.idStatus==3) strStatus=" (за статусом - пiдтвердженi)"
 
         if (paramCheck.param.typeCheck==undefined){
-            var paramFiltrs=[["idOrg","idZvit","date1Zvit","idStatus","typeCheck"],[ID_ORG,selRow,date1Zvit,paramCheck.param.idStatus,2]];
+            var paramFiltrs=[["idOrg","idZvit","date1Zvit","idStatus","typeCheck"],[ID_ORG,selRow,date1Zvit,paramCheck.param.idStatus,1]];
             iasufr.ajax({
                 url: "base.Simple.cls",
                 data: {func: "init",idDoc:"CheckOrgReports",idLayout:"T1",param:JSON.stringify(paramFiltrs)},
@@ -455,13 +485,15 @@ Frm.WorkWithForms.Create = function(opt) {
 
     }
 
-    function exportDbf(idStatus,isChildOrg){
+    function exportDbf(idStatus,typeExpZvit){
         var m = toolbar.getListOptionSelected("month"); if (m.length==1)m="0"+m;
         var y=toolbar.getValue("year");
         var date1Zvit=y+m+"01";
+        var selRow = grid.getCheckedRows(grid.getColIndexById("sel"));
+        if (!selRow) {selRow = selRow=""}
         iasufr.ajax({
             url: "frm.TitleZvitForm.cls",
-            data: {func: "export",idOrg:ID_ORG,date1Zvit:date1Zvit,idStatus:idStatus,isChildOrg:isChildOrg},
+            data: {func: "export",idOrg:ID_ORG,date1Zvit:date1Zvit,idStatus:idStatus,typeExpZvit:typeExpZvit,idZvit:selRow},
             success: function (data) {
                 var json = JSON.parse(data);
                 iasufr.downloadDbf(json.nameFile, json.data);

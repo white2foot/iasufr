@@ -4,8 +4,7 @@ if (!Fin.HomeStart) Fin.HomeStart = {};
 Fin.HomeStart.Create = function (opt) {
     var t=iasufr.initForm(this, opt);
 	var Zap=t.opt.onlyZap;
-	console.log(Zap);
-    var user=iasufr.user;
+	var user=iasufr.user;
     var toolbar;
     t.owner.progressOn();
     var tb;
@@ -14,9 +13,12 @@ Fin.HomeStart.Create = function (opt) {
     var lt3;
     var tb3;
     var tb4;
+    var tb5;
     var gD;
     var gD2;
     var gZ;
+    var gZ1;
+    var gF;
     var gC;
     var int;
     var idOrgOsn;
@@ -42,13 +44,13 @@ Fin.HomeStart.Create = function (opt) {
        var wid='200px';
        //var offs='400';
        //tb.setOffset(50);
-        var ask="Вiдповiдi на питання";  // та заявки на регiстр.користувача";
-        if (iasufr.pGrp(3)) var ask="Вiдповiдi на питання та заявки на регiстр.користувача";
+        var ask="Вiдповiдi на вашi питання";  // та заявки на регiстр.користувача";
+        if (iasufr.pGrp(3)) var ask="Вiдповiдi на питання та заявки на реєстр.користувача";
         if (iasufr.pGrp(1)) ask="Питання та заявки на реєстрацiю користувача";
        tb.addTab("a1", "Новини", '150px');
         tb.addTab("a2", "Контакти",  '150px');
         tb.addTab("a3", ask, '300px');
-        //tb.addTab("a4", "Вiдгуки", wid);
+        tb.addTab("a4", "Повiдомлення Вам", wid);
         tb.addTab("a5", "Типові (поширені) запитання", wid);
 
        if (!Zap) tb.setTabActive("a1");
@@ -107,10 +109,10 @@ Fin.HomeStart.Create = function (opt) {
 
         tb3.attachEvent("onClick", function (id) {
             if ((id == "edit")||(id == "add")) {
-                var idRow=0; var hei=250;
+                var idRow=0; var hei=330;
                 if (iasufr.pGrp(1))  {  if (gZ.getSelectedId()==null) { iasufr.message('Вкажiть строку !'); return; }
                                         var ind=gZ.getRowId(gD.getRowIndex(gZ.getSelectedId()));
-                                        idRow=gZ.cells(ind,0).getValue(); hei=420;
+                                        idRow=gZ.cells(ind,0).getValue(); hei=580;
                                         var org=gZ.cells(ind,6).getValue(); idRow=idRow+"!"+org;
                 }
                 iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:orgUser, idRow:idRow, home:1,  addAsk:"1"});
@@ -121,62 +123,76 @@ Fin.HomeStart.Create = function (opt) {
 
         gZ = tb.cells('a3').attachGrid();
         gZ.setImagePath(iasufr.const.IMG_PATH);
-        var tt='N, Прочитано,Дата питання, Текст питання, Текст вiдповiдi,';
-        if (!iasufr.pGrp(1)) tt = tt+"Дата вiдповiдi / Адмiн.,";
+        var tt='N, Прочитано,Дата питання, Текст питання,Кому,Текст вiдповiдi,';
+        if (!iasufr.pGrp(1)) tt = tt+"Вiдповiдач,";
         if (iasufr.pGrp(1))  tt = tt+"Користувач,";
         gZ.setHeader(tt);
-        gZ.setInitWidths('20,55,100,650,450,*,10');
-        gZ.setColAlign('center,center,center,left,left,left,left');
-        gZ.setColTypes("ro,ch,ro,ro,ro,ro,ro");
-        gZ.setColSorting('int,str,str,str,str,str,str');
+        gZ.setInitWidths('20,55,100,650,150,450,*,10');
+        gZ.setColAlign('center,center,center,left,left,left,left,left');
+        gZ.setColTypes("ro,ch,ro,ro,ro,ro,ro,ro");
+        gZ.setColSorting('int,str,str,str,str,str,str,str');
 
         gZ.init();
         iasufr.enableRowselectMode(gZ);
         gZ.setColumnHidden(0,true);
-        gZ.setColumnHidden(6,true);   // idOrg - чьи вопросы
-        if (iasufr.pGrp(1)) { gZ.setColumnHidden(1,true); gZ.setColumnHidden(4,true); }   // checkbox - убрать для админа и текст ответа(пусто)
+        gZ.setColumnHidden(7,true);   // idOrg - чьи вопросы
+        if (iasufr.pGrp(1)) { gZ.setColumnHidden(1,true); gZ.setColumnHidden(5,true); }   // checkbox - убрать для админа и текст ответа(пусто)
         gZ.attachEvent("onCheck", function (rId, cInd, state) {
-            if (gZ.cells(rId, 4).getValue()!=1)  { Read(rId); Blink(); }
+            if (gZ.cells(rId, 5).getValue()!=1)  { Read(rId); Blink('a3'); }
         });
         gZ.attachEvent("onRowSelect", function (id) {
-            var ind=gZ.getRowId(gD.getRowIndex(gZ.getSelectedId()));
-            var idRow=gZ.cells(ind,0).getValue(); var hei=420;
-            var org=gZ.cells(ind,6).getValue(); idRow=idRow+"!"+org;
+            var ind=gZ.getRowId(gZ.getRowIndex(gZ.getSelectedId()));
+            var idRow=gZ.cells(ind,0).getValue(); var hei=580;
+            var org=gZ.cells(ind,7).getValue(); idRow=idRow+"!"+org;
             iasufr.loadForm("HomeAskEdit", {onSave: Reload, width: 700, height: hei, idOrg:orgUser, idRow:idRow, home:1, addAsk:"1"});
         });
-        LoadAsk();
+        LoadAsk(gZ);
         //-------------------  tb3
-        /*
-        //------------------------ вiдгуки
+
+        //------------------------ вопросы и сообщения
         tb4 =tb.cells('a4').attachToolbar();
         tb4.setIconsPath(iasufr.const.ICO_PATH);
         tb4.addButton("print", 2,iasufr.lang.ui.print , "16/printer_empty.png", "");
-        tb4.addButton("add", 3, iasufr.lang.ui.add, "16/toolbar_add.png", "");
-
+        //tb4.addButton("add", 3, iasufr.lang.ui.add, "16/toolbar_add.png", "");
 
         tb4.attachEvent("onClick", function (id) {
             if ((id == "edit")||(id == "add")) {
                 var idRow=0;
-                var hei=250;
-                iasufr.loadForm("HomeCommentEdit", {onSave: ReloadC, width: 700, height: hei, idOrg:orgUser, idRow:0});
+                var hei=580;
+                iasufr.loadForm("HomeAskEdit", {onSave: ReloadC, width: 700, height: hei, idOrg:orgUser, idRow:idRow, home:1,  addAsk:"1"});
             }
-            if (id == 'print')  {  gC.printView();        }
+            if (id == 'print')  {  gZ1.printView();        }
 
         }); // onClick
 
-        gC = tb.cells('a4').attachGrid();
-        gC.setImagePath(iasufr.const.IMG_PATH);
-        gC.setHeader('N, Дата, Текст, Користувач');
-        gC.setInitWidths('20,90,800,*');
-        gC.setColAlign('center,center,left,left');
-        gC.setColTypes("ro,ro,ro,ro");
-        gC.setColSorting('int,str,str,str');
-        gC.init();
-        iasufr.enableRowselectMode(gC);
-        gC.setColumnHidden(0,true);
-        LoadComment();
+        gZ1 = tb.cells('a4').attachGrid();
+        gZ1.setImagePath(iasufr.const.IMG_PATH);
+        var tt='N, Прочитано,Дата питання, Текст питання,Вiд кого,Текст вiдповiдi,Вiдповiдач,';
+        //if (!iasufr.pGrp(1)) tt = tt+"Вiдповiдач,";
+        //if (iasufr.pGrp(1))  tt = tt+"Користувач,";
+        gZ1.setHeader(tt);
+        gZ1.setInitWidths('20,55,100,650,150,450,*,10');
+        gZ1.setColAlign('center,center,center,left,left,left,left,left');
+        gZ1.setColTypes("ro,ch,ro,ro,ro,ro,ro,ro");
+        gZ1.setColSorting('int,str,str,str,str,str,str,str');
+
+        gZ1.init();
+        iasufr.enableRowselectMode(gZ1);
+        gZ1.setColumnHidden(0,true); gZ1.setColumnHidden(1,true);  // не показывать checkbox для вопросов пользователю
+        gZ1.setColumnHidden(7,true);   // idOrg - чьи вопросы
+        //if (iasufr.pGrp(1)) { gZ1.setColumnHidden(1,true); gZ1.setColumnHidden(5,true); }   // checkbox - убрать для админа и текст ответа(пусто)
+        gZ1.attachEvent("onCheck", function (rId, cInd, state) {
+            //if (gZ1.cells(rId, 5).getValue()!=1)  { Read(rId); Blink('a4'); }
+        });
+        gZ1.attachEvent("onRowSelect", function (id) {
+            var ind=gZ1.getRowId(gZ1.getRowIndex(gZ1.getSelectedId()));
+            var idRow=gZ1.cells(ind,0).getValue(); var hei=580;
+            var org=gZ1.cells(ind,7).getValue(); idRow=idRow+"!"+org;  // организация - от кторой пришел вопрос-сообщение
+            iasufr.loadForm("HomeAskEdit", {onSave: ReloadC, width: 700, height: hei, idOrg:org, idRow:idRow, home:1, addAsk:"1"});
+        });
+        LoadAsk(gZ1);
         //-------------------  tb4
-        */
+
 
         //------------------------ F A Q
         var ww=$( document ).width(); ww=ww/3;
@@ -307,13 +323,15 @@ Fin.HomeStart.Create = function (opt) {
         });
     }
 
-    function Reload() { t.owner.progressOn();  LoadAsk(); t.owner.progressOff(); }
-    function ReloadC() { t.owner.progressOn();  LoadComment(); t.owner.progressOff(); }
+    function Reload() { t.owner.progressOn();  LoadAsk(gZ); t.owner.progressOff(); }
+    function ReloadC() { t.owner.progressOn();  LoadAsk(gZ1); t.owner.progressOff(); }
     function ReloadF() { t.owner.progressOn();  LoadFAQ(); t.owner.progressOff(); }
 
-    function LoadAsk() {
+    function LoadAsk(gZ) {
         gZ.clearAll();
-        iasufr.ajax({url:'fin.Home.cls', data: {func: "HomeAskGet", json: JSON.stringify( {idOrg:orgUser, home:1}) }, success: function (data) {
+        var mes=0; var tab='a3'; if (gZ==gZ1) { mes=1; tab='a4'; }
+
+        iasufr.ajax({url:'fin.Home.cls', data: {func: "HomeAskGet", json: JSON.stringify( {idOrg:orgUser, home:1, message:mes}) }, success: function (data) {
             var jso = JSON.parse(data);
             gZ.parse(jso, 'json');
             gZ.enableRowsHover(true, "grid-row-hover");
@@ -323,16 +341,15 @@ Fin.HomeStart.Create = function (opt) {
             read=1;                                                                    // Admin
 
             for (i = 0; i < cnt; i++)  {
-                                             if ( (!iasufr.pGrp(1)) && (gZ.cells2(i,1).getValue()==0) && (gZ.cells2(i,4).getValue()!="") ) {
+                                             if ( (!iasufr.pGrp(1)) && (gZ.cells2(i,1).getValue()==0) && (gZ.cells2(i,5).getValue()!="") && (gZ!=gZ1) ) {
                                                read=0;
-                                               gZ.setCellTextStyle(gZ.getRowId(i),4,"color:rgb(12, 213, 91);font-weight:bold");
+                                               gZ.setCellTextStyle(gZ.getRowId(i),5,"color:rgb(12, 213, 91);font-weight:bold");
                                              }
-                if ( (iasufr.pGrp(1)) &&  (gZ.cells2(i,4).getValue()=="") ) {
-                    read=0;
-                    //gZ.setCellTextStyle(gZ.getRowId(i),4,"color:rgb(12, 213, 91);font-weight:bold");
-                }
+                if ( (iasufr.pGrp(1)) &&  (gZ.cells2(i,5).getValue()=="") ) read=0;
+                if ( (gZ==gZ1) &&  (gZ.cells2(i,5).getValue()=="") ) read=0;
+                //console.log(i+'---'+orgUser+'---'+gZ.cells2(i, 7).getValue());
             }
-            if (read==0) Blink();
+            if (read==0) Blink(tab);
         } });
 
     }
@@ -363,21 +380,22 @@ Fin.HomeStart.Create = function (opt) {
 
     function Read(rId) {
         var zn=gZ.cells(rId, 1).getValue();
-        if (zn==1) gZ.setCellTextStyle(rId,4,"color:#000000;font-weight:normal");
-        if (zn==0) gZ.setCellTextStyle(rId,4,"color:rgb(12, 213, 91);font-weight:bold");
+        if (zn==1) gZ.setCellTextStyle(rId,5,"color:#000000;font-weight:normal");
+        if (zn==0) gZ.setCellTextStyle(rId,5,"color:rgb(12, 213, 91);font-weight:bold");
         var idRow = gZ.cells(rId, 0).getValue();
+        //console.log(orgUser+'---'+gZ.cells(rId, 7).getValue());
         iasufr.ajax({url:'fin.Home.cls', data: {func: "HomeAskRead", json: JSON.stringify( {idOrg:orgUser, idRow:idRow, check:zn}) }, success: function (data) {
         } });
 
     }
 
-    function Blink() {
+    function Blink(tab) {
     //var d = new Date();    d = d.valueOf();
     //var idDiv = 'info' + d;
     //$("<div id="+idDiv+" style='width:100px'>111<div>").insertAfter($(tb._tabs["a1"]));
 
-    var obj=$(tb._tabs["a3"]);
-    //$(obj).css("font-weight","bold");
+    var obj=$(tb._tabs[tab]);
+    //le.log(tab+'conso---'+obj);
     if (!iasufr.pGrp(1)) $(obj).css("color","rgb(12, 213, 91)");  // зеленый --> пользователю
     if (iasufr.pGrp(1))  $(obj).css("color","#cc0000");  // красный  --> админу
     //
@@ -385,7 +403,7 @@ Fin.HomeStart.Create = function (opt) {
     //setTimeout(function(){  $(obj).show(); int=setInterval( function(){$(obj).toggle();}, 400)
     //                         }, 100);
 
-     $(obj).animate({  opacity: 0.25, }, 500, function() {} );
+     $(obj).animate({  opacity: 0.25 }, 500, function() {} );
      setTimeout(function(){   $(obj).animate({ opacity: 1}, 500, function(){} );
                               int=setInterval( function(){ $(obj).animate({ opacity: 0.1, opacity:"toggle"}, 500)    }
                                   , 400)

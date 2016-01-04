@@ -14,6 +14,7 @@ Fin.HomeAskEdit.Create = function (opt) {
     var toolbar;
     var form;
     var edit;
+    var selUser={};
 
     t.owner.progressOn();
 
@@ -42,16 +43,26 @@ Fin.HomeAskEdit.Create = function (opt) {
              var jso = JSON.parse(data);
              var frm  = jso.form;
              edit = jso.Edit;
+             var komuI= jso.KomuI;
+             if (komuI>0) selUser.id = komuI;
              form = t.owner.attachForm(frm);
              if ( iasufr.pGrp(1) ) $(form.getInput("TextV")).focus();
-             else $(form.getInput("Text")).focus();
+             //else $(form.getInput("Text")).focus();
+             $(form.getInput("Komu")).css('color','gray');
+             //console.log(edit+'---'+JSON.stringify(iasufr.user));
+             if ( (komuI != iasufr.user.idUser) && (edit==1) ) iasufr.attachSelector(form.getInput("Komu"), "Users",  { width:1100,height:600, ignoreReadonly:true, selectUser:true, onSelect: UserSelect});
+             form.setNote("Komu", { text:'тут можна при необхiдностi вказати користувача, якому буде вiдправлено ваше питання або повiдомлення' , width:650 });
              t.owner.progressOff();
              if (edit==0)  toolbar.disableItem("save");
-             //var obj=form.getItemsList()[2];
-             //$(obj).attr('title','Вiдмiтити, щоб введений текст мав статус заявки на реєстрацiю користувача у системi');
-             //console.log(obj+'-'+ $(obj).attr('title') );
           }
          });
+    }
+
+    function UserSelect(o, $txt)  { selUser = o;
+        if ( o ) { $txt.val(o.fio+' /'+ o.post+' /' + o.orgName);
+            //iasufr.enableAskBeforClose(t);
+        }
+
     }
 
     function Save() {
@@ -64,7 +75,8 @@ Fin.HomeAskEdit.Create = function (opt) {
                                              textV = form.getItemValue("TextV")
             }
             var pRead=0; if (form.isItemChecked('Read')) pRead=1;
-            var json = {idOrg: idOrg, idRow:idRow, DateN:dateN, DateV:dateV,  Text:form.getItemValue("Text"),  TextV:textV,home:home,Read:pRead,zFIO:form.getItemValue("zFIO"),zPos:form.getItemValue("zPos"),zTel:form.getItemValue("zTel")};
+            var komu="";   if (selUser) { komu=selUser.id; }
+            var json = {idOrg: idOrg, idRow:idRow, DateN:dateN, DateV:dateV,  Text:form.getItemValue("Text"),  TextV:textV,home:home,Read:pRead,zFIO:form.getItemValue("zFIO"),zPos:form.getItemValue("zPos"),zTel:form.getItemValue("zTel"),Komu:komu};
             console.log(JSON.stringify(json));
             iasufr.ajax({
                 url: "fin.Home.cls",

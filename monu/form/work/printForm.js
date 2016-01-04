@@ -364,7 +364,119 @@ Frm.PrintForm.Create = function(opt) {
         return c.html();
     }
 
+    function print2(d) {
+        var res = "";
+        var o = JSON.parse(d);
+        var emptyChar = iasufr.storeGet("print.emptyChar") || "-";
+        var fontSize = iasufr.storeGet("print.customFontSize" + opt.code) || 7;
+        var pageMargins = "";
+        var pu = new PrintUtils();
+
+        function indexOfRow(tdesc, rid) {
+            for (var i = 0; i < tdesc.rows.length; i++) if (tdesc.rows[i].id == rid) return i;
+            return -1;
+        }
+
+        for (var z = 0 ; z < o.json.length; z++) {
+            for (var t = 0; t < o.json[z].tables.length; t++) {
+                var tdesc = o.json[z].tables[t];
+
+                if (!pageMargins) if (tdesc.printData.margins) pageMargins = tdesc.printData.margins;
+                /*if (tdesc.printData) {
+                    if (t != 0) if (tdesc.printData.fromNewPage == 1) content.push({text: "", pageBreak: 'after', pageOrientation: tdesc.printData.portrait == 1 ? 'portrait' : 'landscape'});
+
+                    if (tdesc.printData.caption) {
+                        pu.parseHtml(content, tdesc.printData.caption);
+                    }
+                    if ((z == 0) && (tdesc.printData.portrait == 1)) isPortrait = true;
+                }*/
+
+                if (tdesc.printData) {
+                    res += tdesc.printData.caption;
+                }
+
+                tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
+
+                var table = '<table border="1" style="font-size: ' + fontSize + 'px; font-family: Times; border: 1px solid" cellpadding="0" cellspacing="0">';
+                var skipRows = [];
+                for (var r = 0; r < tdesc.rows.length; r++) {
+                    var row = "<tr>";
+                    var skipCols = 0;
+                    for (var c = 0; c < tdesc.cols.length; c++) {
+                        if (skipRows[c]) {
+                            skipRows[c]--;
+                            continue;
+                        }
+                        if (skipCols != 0) {
+                            skipCols--;
+                            continue;
+                        }
+                        var idx = GetCellIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
+                        var cell = { text: '', fontSize: fontSize };
+                        if (idx != -1) {
+                            if (tdesc.cells[idx].value == "#COL_NUM#") tdesc.cells[idx].value = (c+1).toString();
+                            if (tdesc.cells[idx].value) cell.text = tdesc.cells[idx].value.replace(/\\u0027/g, "'");
+                            if (tdesc.cells[idx].rspan) {
+                                cell.rowSpan = tdesc.cells[idx].rspan;
+                                skipRows[c] = cell.rowSpan - 1;
+                            }
+                            if (tdesc.cells[idx].cspan) {
+                                cell.colSpan = tdesc.cells[idx].cspan;
+                                skipCols = cell.colSpan - 1;
+                            }
+                            if (tdesc.cells[idx].indent) cell.margin = [tdesc.cells[idx].indent * 5, 0];
+                            if (tdesc.cells[idx].font) {
+                                var fnt = parseInt(tdesc.cells[idx].font);
+                                if ((fnt & 2) != 0) cell.bold = true;
+                                if ((fnt & 4) != 0) cell.decoration = "underline";
+                                if ((fnt & 8) != 0) cell.italics = true;
+                            }
+                            if (tdesc.cells[idx].align != undefined) {
+                                switch (tdesc.cells[idx].align) {
+                                    case 1: cell.alignment = "center"; break;
+                                    case 2: cell.alignment = "right"; break;
+                                }
+                            }
+                            if (!cell.text) cell.text = " ";
+                            var inputIdx = GetInputDataIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
+                            if (inputIdx != -1) {
+                                if (tdesc.inputData[inputIdx].value) {
+                                    cell.text = FormatValue(tdesc.inputData[inputIdx].value, tdesc.cells[idx].type);
+                                }
+                            }
+                        }
+
+
+                        var spans = "";
+                        if (cell.rowSpan || cell.colSpan) {
+                            if (cell.colSpan) spans = " colspan='" + cell.colSpan + "'";
+                            if (cell.rowSpan) spans = " rowspan='" + cell.rowSpan + "'";
+                        }
+                        if (cell.text == " " || cell.text == "") {
+                            if (idx !== -1 && tdesc.cells[idx].readonly == 1)
+                                row += "<td"+spans+"></td>";
+                            else {
+                                if (!cell.alignment) cell.alignment = "right";
+                                cell.text = emptyChar;
+                                row += "<td"+spans+">" + (cell.text|| "") + "</td>"
+                            }
+                        } else row += "<td"+spans+">" + (cell.text|| "") + "</td>"
+
+
+                    }
+                    row += "</tr>";
+                    table += row;
+                }
+                table += "</table>";
+                res += table ;
+            }
+        }
+
+        console.log(res);
+    }
+
     function onDataLoaded(d) {
+        print2(d);
         var o = JSON.parse(d);
         var content  = [];
         var isPortrait = false;

@@ -431,7 +431,7 @@ Frm.PrintForm.Create = function(opt) {
 
         function getMargins(table) {
             if (!table.printData) return DEF_MARGINS;
-            return table.printData.margin || DEF_MARGINS;
+            return table.printData.margins || DEF_MARGINS;
         }
 
         function getLeftMargin() {
@@ -442,11 +442,13 @@ Frm.PrintForm.Create = function(opt) {
             return parseInt(pageMargins.split(" ")[2]);
         }
 
-        function addPdf() {
+        function addPdf(table) {
             pdfs.push({
                 content: res,
                 orientation: orientation,
-                margins: pageMargins
+                margins: pageMargins,
+                colonFirst: table.printData.colonFirst,
+                colonOther: table.printData.colonOther
             });
             res= "";
         }
@@ -471,7 +473,7 @@ Frm.PrintForm.Create = function(opt) {
             for (var t = 0; t < o.json[z].tables.length; t++) {
                 var tdesc = o.json[z].tables[t];
                 if (hasDifferentFormatting(tdesc)) {
-                    addPdf();
+                    addPdf( o.json[z].tables[t - 1] || o.json[z].tables[t]);
                 } else {
                     if (tdesc.printData.fromNewPage == 1) {
                         res += "<div style='page-break-after: always;'></div>";
@@ -481,6 +483,9 @@ Frm.PrintForm.Create = function(opt) {
                 pageMargins = getMargins(tdesc);
                 PAGE_WIDTH = (210 - getLeftMargin() - getRightMargin());
                 if (orientation === "landscape") PAGE_WIDTH = (297 - getLeftMargin() - getRightMargin());
+                var widths = calcWidths(tdesc);
+
+
                 /*if (tdesc.printData) {
                     if (t != 0) if (tdesc.printData.fromNewPage == 1) content.push({text: "", pageBreak: 'after', pageOrientation: tdesc.printData.portrait == 1 ? 'portrait' : 'landscape'});
 
@@ -491,14 +496,17 @@ Frm.PrintForm.Create = function(opt) {
                 }*/
 
                 if (tdesc.printData) {
-                    res += tdesc.printData.caption;
+                        res += tdesc.printData.caption;
+                        /*if (tdesc.printData.colonFirst) {
+                         res += "<div style='position:fixed; right: 0mm; top: 0mm'>" + tdesc.printData.colonFirst + "</div>";
+                         }*/
                 }
 
-                var widths = calcWidths(tdesc);
+
 
                 tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
 
-                var tableInitial = '<table border="1" style="table-layout: fixed;font-size: ' + fontSize + 'px;" cellpadding="2" cellspacing="0">';
+                var tableInitial = '<table border="1" style="font-size: ' + fontSize + 'px;" cellpadding="2" cellspacing="0">';
                 var table = /*"<div style='background-color:#FF0000;border:1px solid black;position:fixed;left:0mm;top:0mm;width:185mm;height:40mm'>q</div><div style='page-break-after: always;'>ttttttttttttt</div>" +*/ tableInitial;
                 var hasHeader = false;
                 var headerDone = false;
@@ -525,7 +533,7 @@ Frm.PrintForm.Create = function(opt) {
                                 if (tdesc.rows[r].newpage === 1 && !headerOnNewPage) {
                                     headerOnNewPage = true;
                                     table += "</thead></table>" + tableInitial;
-                                    table += "<colgroup>";
+                                    table += "<colgroup style='page-break-before: avoid;'>";
                                     for (var i = 0; i < widths.length; i++) {
                                         table += "<col style='width:" + widths[i].toString() + "mm'>";
                                     }
@@ -609,11 +617,24 @@ Frm.PrintForm.Create = function(opt) {
                     headerOnNewPage = false;
                 }
                 table += "</table>";
+
+
+
                 res += table ;
+
+                if (tdesc.printData) {
+                     res += tdesc.printData.note || "";
+                }
+
+                if (tdesc.printData) {
+                    if (tdesc.printData.footer) {
+                        res += tdesc.printData.footer;
+                    }
+                }
             }
         }
 
-        addPdf();
+        addPdf( o.json[z-1].tables[t - 2] || o.json[z-1].tables[t-1]);
         //pdfs = pdfs.reverse();
         console.log(pdfs);
 

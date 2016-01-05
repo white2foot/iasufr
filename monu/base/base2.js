@@ -108,10 +108,10 @@ base.Layout2.Create = function (opt) {
                 if ((isFunc!=null)&&(isFunc!="")){
                     var idBut1=isFunc,idBut2="",idBut3="";
                     var cellId=dhxLayoutT2.idCells[cellInd];
-                    if (isFunc.lastIndexOf(".")>-1){isFunc=isFunc.split(".");idBut1=isFunc[0],idBut2=isFunc[1]; if (isFunc[2]!=undefined)idBut3=isFunc[2]}
-                    if (idBut1!="") {onToolbarClick(idBut1,rowId,cellId);return false}
-                    if (idBut2!="") {onToolbarClick(idBut2,rowId,cellId);return false} //по обяз.параметрам не пропустит
-                    if (idBut3!="") {onToolbarClick(idBut3,rowId,cellId);return false}
+                    if (isFunc.lastIndexOf(".")>-1){isFunc=isFunc.split(".");idBut1=isFunc[0],idBut2=isFunc[1]; if (isFunc[2]!=undefined)idBut3=isFunc[2];}
+                    if (idBut1!="") {onToolbarClick(idBut1,rowId,cellId);}
+                    if (idBut2!="") {onToolbarClick(idBut2,rowId,cellId);} //по обяз.параметрам не пропустит
+                    if (idBut3!="") {onToolbarClick(idBut3,rowId,cellId);}
                 }
                 var masType=dhxLayoutT2.types.split("•");
                 var t=masType[cellInd];
@@ -177,6 +177,10 @@ base.Layout2.Create = function (opt) {
                 isLoad(idBut,idRowCheck,idCellCheck);
                 break;
             case "print":
+                if (dhxLayoutT2.idCells.indexOf("idKeysRowTemp")>-1)   dhxLayoutT2.setColumnHidden(dhxLayoutT2.idCells.indexOf("idKeysRowTemp"),true);
+                if (dhxLayoutT2.idCells.indexOf("isChangeRowTemp")>-1) dhxLayoutT2.setColumnHidden(dhxLayoutT2.idCells.indexOf("isChangeRowTemp"),true);
+                if (dhxLayoutT2.idCells.indexOf("style")>-1)           dhxLayoutT2.setColumnHidden(dhxLayoutT2.idCells.indexOf("style"),true);
+                //dhxLayoutT2.detachHeader(parseInt(dhxLayoutT2.countHeader));
                 dhxLayoutT2.printView();
                 break;
             case "delete":
@@ -190,6 +194,7 @@ base.Layout2.Create = function (opt) {
             }}
 
     }
+
     //////////////////////////////////////////////////////////////////
     ////////////////////////////////////// 4.INIT,FOCUS///////////////
     function initForm(idLayout,isData){
@@ -243,6 +248,7 @@ base.Layout2.Create = function (opt) {
                     initGrid("T2");
             }
         });
+
         dhxFormInit.attachEvent("onKeyDown",function(inp, ev, id){
             isKeyDown(ev,id,idLayout)});
 
@@ -322,8 +328,10 @@ base.Layout2.Create = function (opt) {
         if (prop.head3)dhxGridInit.attachHeader(prop.head3);
         if (prop.head4)dhxGridInit.attachHeader(prop.head4);
         if (prop.text) {
-            dhxLayout.cells("c").showHeader();
-            dhxLayout.cells("c").setText(prop.text);}
+            //dhxLayout.cells("c").showHeader();
+            //dhxLayout.cells("c").setText(prop.text);
+            _this.owner.setText(prop.text);
+        }
 
         dhxGridInit.setInitWidths(prop.width);
         dhxGridInit.setColAlign(prop.align);
@@ -352,7 +360,8 @@ base.Layout2.Create = function (opt) {
         dhxGridInit.style=prop.style;
         dhxGridInit.isFunc=prop.isFunc;
         dhxGridInit.isEdit=prop.isEdit;
-
+        dhxGridInit.countHeader=prop.countHeader;
+        dhxGridInit.filtr=prop.filtr;
 
         //dhxGridInit.enableColumnMove(true,"false,true,true,true,true,true");
         //dhxGridInit.enableCollSpan(true);
@@ -369,7 +378,7 @@ base.Layout2.Create = function (opt) {
         dhxGridInit.enableAutoSizeSaving("idDoc:"+_this.idDoc+",idLayout:"+idLayout);
         dhxGridInit.loadSizeFromCookie("idDoc:"+_this.idDoc+",idLayout:"+idLayout);
 
-        //dhxGridInit.setColumnHidden(dhxGridInit.idCells.indexOf("idKeysRowTemp"),true);
+        //
 
     }
     function initProp2Grid(idLayout){
@@ -387,62 +396,64 @@ base.Layout2.Create = function (opt) {
 
 
         var numbCellIdKeys=dhxGridInit.idCells.indexOf("idKeysRowTemp");
+        var numbStyle=dhxGridInit.idCells.indexOf("style");
         var style=dhxGridInit.style;
-        var isImgTree=0;
-        if ((style=="")&&(dhxGridInit.type=="treeGrid")) {style=["img"];isImgTree="/js/dhtmlxw/imgs/blank.gif"}
         var countStyle=style.length;
-        var t=JSON.stringify(style).lastIndexOf("colspan");
-        if (JSON.stringify(style).lastIndexOf("colspan")>-1){
-            dhxGridInit.enableColSpan(true);}
         var styleI,data,json;
 
-        if (style!="") for (var i = 0; i < dhxGridInit.getRowsNum(); i++){
-            var idRow=dhxGridInit.getRowId(i);
-            data=dhxGridInit.cells2(i,numbCellIdKeys).getValue();
-            if (data!=""){
-                json=JSON.parse(data);
-                if (!json[1]){if (isImgTree!=0)dhxGridInit.setItemImage(idRow, isImgTree)}
-                else{
-                    for (var j = 0; j < countStyle; j++){
-                        styleI=style[j].split("/");
-                        //по ячейкам
-                        if (json[1][j]!=""){
-                            if (styleI[1]!=null){
-                                switch (styleI[0]) {
-                                    case "style":{
-                                        dhxGridInit.setCellTextStyle(idRow,styleI[1],json[1][j]);
-                                        break;
-                                    }
-                                    case "rowspan": {
-                                        dhxGridInit.setRowspan(dhxGridInit.getRowId(i+1), styleI[1],json[1][j]);
-                                        break;
-                                    }
-                                    case "colspan": {
-                                        dhxGridInit.setColspan(dhxGridInit.getRowId(i+1), styleI[1],json[1][j]);
-                                        break;
-                                    }
+        if (JSON.stringify(style).lastIndexOf("colspan")>-1){
+            dhxGridInit.enableColSpan(true);
+        }
+
+        if (style[0]=="") {
+            if (dhxGridInit.type=="treeGrid"){
+                for (var i = 0; i < dhxGridInit.getRowsNum(); i++){
+                    dhxGridInit.setItemImage(dhxGridInit.getRowId(i), "/js/dhtmlxw/imgs/blank.gif")
+                }
+            }
+        }
+        else  {
+            for (var i = 0; i < dhxGridInit.getRowsNum(); i++){
+                var idRow=dhxGridInit.getRowId(i);
+                data=dhxGridInit.cells2(i,numbStyle).getValue();
+                json=data.split(",");
+                for (var j = 0; j < countStyle; j++){
+                    styleI=style[j].split("/");
+                    if (json[j]!=""){
+                        //еще добавить вврху описание 1-это backgound:green;
+                        if (styleI[1]!=null){ //по ячейкам
+                            switch (styleI[0]) {
+                                case "style":{
+                                    dhxGridInit.setCellTextStyle(idRow,styleI[1],json[j]);
+                                    break;
                                 }
-
+                                case "rowspan": {
+                                    dhxGridInit.setRowspan(dhxGridInit.getRowId(i+1), styleI[1],json[j]);
+                                    break;
+                                }
+                                case "colspan": {
+                                    dhxGridInit.setColspan(dhxGridInit.getRowId(i+1), styleI[1],json[j]);
+                                    break;
+                                }
                             }
-                            else{
-                                switch (style[j]) {
-                                    case "style":{
-                                        dhxGridInit.setRowTextStyle(dhxGridInit.getRowId(i), json[1][j]);
-                                        break;
-                                    }
-                                    case "img":  {
-                                        dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + json[1][j]);
-                                        break;
-                                    }
-                                }//switch
-                            } //if (json[1][j]=="")
+
                         }
-                    } //for
-                } //else json[1]!=""
-            } //if data!=""
-
-        } //for
-
+                        else{ //по строкам
+                            switch (style[j]) {
+                                case "style":{
+                                    dhxGridInit.setRowTextStyle(dhxGridInit.getRowId(i), json[j]);
+                                    break;
+                                }
+                                case "img":  {
+                                    dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + json[j]);
+                                    break;
+                                }
+                            }//switch
+                        } //styleI[1]==null - по строкам
+                    } //if (json[j]!="")
+                } //for countStyle
+            } //for countRow
+        } //else style[0]!=""
 
         if (dhxGridInit.type=="treeGrid") {
             dhxGridInit.collapseAll();
@@ -593,8 +604,8 @@ base.Layout2.Create = function (opt) {
                             if ((numbIdKeys==-1)&&(isReq==1)) {alert(idObj+ "не вказан у idKeysRowTemp :" +dhxGridInit.idKeysRowTemp);return retError}
                             strCell=dhxGridInit.cells(idRow,numbCellIdKeys).getValue();
                             if (strCell==null) return retError
-                            strCell=JSON.parse(strCell);
-                            val2=strCell[0][numbIdKeys]; if (val2==null) val2="";
+                            strCell=strCell.split(",");
+                            val2=strCell[numbIdKeys]; if (val2==null) val2="";
                         }
                         else {
                             val2=dhxGridInit.cells(idRow,dhxGridInit.idCells.indexOf(idObj)).getValue();
@@ -797,7 +808,6 @@ base.Layout2.Create = function (opt) {
                 for (var j=0;j<dhxGridInit.getColumnsNum();j++){
                     var val=dhxGridInit.cells2(i,j).getValue();
                     if (val==null) val="";
-                    if (j==numbCellIdKeys) {json=JSON.parse(val);val=json[0][0]+","+json[0][1]+","+json[0][2]+","+json[0][3]+","+json[0][4]}
                     jsoDATA[indRowEdit].push(val);
                 }
             }
@@ -823,7 +833,8 @@ base.Layout2.Create = function (opt) {
         var param=masFunc[numbBut].param;
 
         var javaObj=masFunc[numbBut].javaObj; if(javaObj==null) return
-        var paramLoad=getParam(masFunc[numbBut].param,masFunc[numbBut].isParam,idRowCheck); if (paramLoad==-1) return
+        var paramLoad=getParam(masFunc[numbBut].param,masFunc[numbBut].isParam,idRowCheck);
+        if (paramLoad==-1) return
         var paramLoadFunc={onSave:initGrid,openId:idCellCheck};
         $.extend(paramLoad, paramLoadFunc );
         iasufr.loadForm(javaObj, paramLoad);

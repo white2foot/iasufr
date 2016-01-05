@@ -342,8 +342,8 @@ base.Form.Create = function(opt) {
                         if (numbIdKeys==-1) {alert(idObj+ "не вказан у idKeysRowTemp :" +dhxGridInit.idKeysRowTemp);return retError}
                         strCell=dhxGridInit.cells(idRow,numbCellIdKeys).getValue();
                         if (strCell==null) return retError
-                        strCell=JSON.parse(strCell);
-                        val2=strCell[0][numbIdKeys]; if (val2==null) val2="";
+                        strCell=strCell.split(",");
+                        val2=strCell[numbIdKeys]; if (val2==null) val2="";
                     }
                     else {
                         val2=dhxGridInit.cells(idRow,dhxGridInit.idCells.indexOf(idObj)).getValue();

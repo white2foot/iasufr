@@ -107,7 +107,13 @@ base.Layout2Tab.Create = function (opt) {
                 isLoad(idBut,idRowCheck);
                 break;
             case "print":
-                dhxLayoutT2.printView();
+                var str="dhxGridInit=dhxLayout"+idLayoutActivTab; //dhxLayoutObj[numbLayout]; //dhxLayoutObj[numbLayout]; //dhxGrid;
+                eval(str);
+                if (dhxGridInit.idCells.indexOf("idKeysRowTemp")>-1)   dhxGridInit.setColumnHidden(dhxGridInit.idCells.indexOf("idKeysRowTemp"),true);
+                if (dhxGridInit.idCells.indexOf("isChangeRowTemp")>-1) dhxGridInit.setColumnHidden(dhxGridInit.idCells.indexOf("isChangeRowTemp"),true);
+                if (dhxGridInit.idCells.indexOf("style")>-1)           dhxGridInit.setColumnHidden(dhxGridInit.idCells.indexOf("style"),true);
+                //dhxGridInit.detachHeader(parseInt(dhxGridInit.countHeader));
+                dhxGridInit.printView();
                 break;
             case "delStr":{}
                 break;
@@ -138,6 +144,10 @@ base.Layout2Tab.Create = function (opt) {
         if (idLayoutActivTab==""){idLayoutActivTab="T2";}
         if (dhxLayoutTab.cells(idLayoutActivTab)==null){idLayoutActivTab="T2";}
         dhxLayoutTab.setTabActive(idLayoutActivTab);
+
+        dhxLayoutTab.attachEvent("onTabClick", function(idClicked, idSelected){
+            idLayoutActivTab=idClicked;
+        });
 
         if (dhxLayoutTab.cells("T2")){
             dhxLayoutT2 = dhxLayoutTab.cells("T2").attachGrid();
@@ -171,11 +181,42 @@ base.Layout2Tab.Create = function (opt) {
         if (dhxLayoutTab.cells("T3")){
             dhxLayoutT3 = dhxLayoutTab.cells("T3").attachGrid();
             dhxLayoutT3.enableDragAndDrop(true);dhxLayoutT3.setDragBehavior("complex");dhxLayoutT3.enableTreeCellEdit(false);
+
+            dhxLayoutT3.attachEvent("onRowDblClicked", function(rowId,cellInd){
+                var isFunc=dhxLayoutT3.isFunc[cellInd];
+                if (dhxLayoutT3.isFunc[dhxLayoutT3.idCells.indexOf("idKeysRowTemp")]!=""){
+                    isFunc=dhxLayoutT3.isFunc[dhxLayoutT2.idCells.indexOf("idKeysRowTemp")]
+                };
+
+                if ((isFunc!=null)&&(isFunc!="")){
+                    var idBut1=isFunc,idBut2="",idBut3="";
+                    if (isFunc.lastIndexOf(".")>-1){isFunc=isFunc.split(".");idBut1=isFunc[0],idBut2=isFunc[1]; if (isFunc[2]!=undefined)idBut3=isFunc[2]}
+                    if (idBut1!="") onToolbarClick(idBut1,rowId)
+                    if (idBut2!="") onToolbarClick(idBut2,rowId) //по обяз.параметрам не пропустит
+                    if (idBut3!="") onToolbarClick(idBut3,rowId)
+                }
+            });
             dhxLayoutT3.init();
+
         }
         if (dhxLayoutTab.cells("T4")){
             dhxLayoutT4 = dhxLayoutTab.cells("T4").attachGrid();
             dhxLayoutT4.enableDragAndDrop(true);dhxLayoutT4.setDragBehavior("complex");dhxLayoutT4.enableTreeCellEdit(false);
+            dhxLayoutT4.attachEvent("onRowDblClicked", function(rowId,cellInd){
+                var isFunc=dhxLayoutT3.isFunc[cellInd];
+                if (dhxLayoutT4.isFunc[dhxLayoutT4.idCells.indexOf("idKeysRowTemp")]!=""){
+                    isFunc=dhxLayoutT4.isFunc[dhxLayoutT4.idCells.indexOf("idKeysRowTemp")]
+                };
+
+                if ((isFunc!=null)&&(isFunc!="")){
+                    var idBut1=isFunc,idBut2="",idBut3="";
+                    if (isFunc.lastIndexOf(".")>-1){isFunc=isFunc.split(".");idBut1=isFunc[0],idBut2=isFunc[1]; if (isFunc[2]!=undefined)idBut3=isFunc[2]}
+                    if (idBut1!="") onToolbarClick(idBut1,rowId)
+                    if (idBut2!="") onToolbarClick(idBut2,rowId) //по обяз.параметрам не пропустит
+                    if (idBut3!="") onToolbarClick(idBut3,rowId)
+                }
+            });
+
             dhxLayoutT4.init();
         }
 
@@ -314,7 +355,9 @@ base.Layout2Tab.Create = function (opt) {
         dhxGridInit.attachHeader(prop.filtr);
         if (prop.itog1) dhxGridInit.attachFooter(prop.itog1);
         if (prop.itog2) dhxGridInit.attachFooter(prop.itog2);
-
+        if (prop.text) {
+            _this.owner.setText(prop.text);
+        }
         dhxGridInit.setColTypes(prop.types);
         var masType=prop.types.split("•")
         var masPType=prop.ptypes.split("•")
@@ -333,7 +376,7 @@ base.Layout2Tab.Create = function (opt) {
         dhxGridInit.style=prop.style;
         dhxGridInit.isFunc=prop.isFunc;
         dhxGridInit.isEdit=prop.isEdit;
-
+        dhxGridInit.countHeader=prop.countHeader;
         dhxGridInit.init();
 
         //dhxGridInit.enableStableSorting(true);
@@ -353,20 +396,77 @@ base.Layout2Tab.Create = function (opt) {
         var dhxGridInit;
         var str="dhxGridInit=dhxLayout"+idLayout; //dhxLayoutObj[numbLayout]; //dhxLayoutObj[numbLayout]; //dhxGrid;
         eval(str);
-
         //focus
         iasufr.gridRowFocusApply(dhxGridInit);
-        var t=dhxGridInit.getRowsNum();
-        if (dhxGridInit.type!="treeGrid") return
 
-        dhxGridInit.expandAll();
-        for (var i = 0; i < dhxGridInit.getRowsNum(); i++){
-            dhxGridInit.setItemImage(dhxGridInit.getRowId(i), "/js/dhtmlxw/imgs/blank.gif","/js/dhtmlxw/imgs/blank.gif");
-        } //for
-        dhxGridInit.collapseAll();
+        if (dhxGridInit.type=="treeGrid") {
+            dhxGridInit.expandAll();
+        }
 
-        if (dhxGridInit.type=="treeGrid"){
-            dhxGridInit.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:"+idLayout);
+
+        var numbCellIdKeys=dhxGridInit.idCells.indexOf("idKeysRowTemp");
+        var numbStyle=dhxGridInit.idCells.indexOf("style");
+        var style=dhxGridInit.style;
+        var countStyle=style.length;
+        var styleI,data,json;
+
+        if (JSON.stringify(style).lastIndexOf("colspan")>-1){
+            dhxGridInit.enableColSpan(true);
+        }
+
+        if (style[0]=="") {
+            if (dhxGridInit.type=="treeGrid"){
+                for (var i = 0; i < dhxGridInit.getRowsNum(); i++){
+                    dhxGridInit.setItemImage(dhxGridInit.getRowId(i), "/js/dhtmlxw/imgs/blank.gif")
+                }
+            }
+        }
+        else  {
+            for (var i = 0; i < dhxGridInit.getRowsNum(); i++){
+                var idRow=dhxGridInit.getRowId(i);
+                data=dhxGridInit.cells2(i,numbStyle).getValue();
+                json=data.split(",");
+                for (var j = 0; j < countStyle; j++){
+                    styleI=style[j].split("/");
+                    if (json[j]!=""){
+                        //еще добавить вврху описание 1-это backgound:green;
+                        if (styleI[1]!=null){ //по ячейкам
+                            switch (styleI[0]) {
+                                case "style":{
+                                    dhxGridInit.setCellTextStyle(idRow,styleI[1],json[j]);
+                                    break;
+                                }
+                                case "rowspan": {
+                                    dhxGridInit.setRowspan(dhxGridInit.getRowId(i+1), styleI[1],json[j]);
+                                    break;
+                                }
+                                case "colspan": {
+                                    dhxGridInit.setColspan(dhxGridInit.getRowId(i+1), styleI[1],json[j]);
+                                    break;
+                                }
+                            }
+
+                        }
+                        else{ //по строкам
+                            switch (style[j]) {
+                                case "style":{
+                                    dhxGridInit.setRowTextStyle(dhxGridInit.getRowId(i), json[j]);
+                                    break;
+                                }
+                                case "img":  {
+                                    dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + json[j]);
+                                    break;
+                                }
+                            }//switch
+                        } //styleI[1]==null - по строкам
+                    } //if (json[j]!="")
+                } //for countStyle
+            } //for countRow
+        } //else style[0]!=""
+
+        if (dhxGridInit.type=="treeGrid") {
+            dhxGridInit.collapseAll();
+            dhxGridInit.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:"+idLayout)
         }
 
 
@@ -391,6 +491,8 @@ base.Layout2Tab.Create = function (opt) {
             //описание
             idObj=listParam[numbObj].idRekv;
             idLayout=listParam[numbObj].idLayout; if (idLayout==null) idLayout="";
+            if (idLayout=="T2") idLayout=idLayoutActivTab; //23/12/2015 activ
+
             val1=listParam[numbObj].val;    if (val1==null) val1="";
             val2="";
             isReq=listParam[numbObj].isReq; if (isReq==null) isReq=0;
@@ -425,8 +527,8 @@ base.Layout2Tab.Create = function (opt) {
                             if ((numbIdKeys==-1)&&(isReq==1)) {alert(idObj+ "не вказан у idKeysRowTemp :" +dhxGridInit.idKeysRowTemp);return retError}
                             strCell=dhxGridInit.cells(idRow,numbCellIdKeys).getValue();
                             if (strCell==null) return retError
-                            strCell=JSON.parse(strCell);
-                            val2=strCell[0][numbIdKeys]; if (val2==null) val2="";
+                            strCell=strCell.split(",");
+                            val2=strCell[numbIdKeys]; if (val2==null) val2="";
                         }
                         else {
                             val2=dhxGridInit.cells(idRow,dhxGridInit.idCells.indexOf(idObj)).getValue();
@@ -634,7 +736,6 @@ base.Layout2Tab.Create = function (opt) {
                 for (var j=0;j<dhxGridInit.getColumnsNum();j++){
                     var val=dhxGridInit.cells2(i,j).getValue();
                     if (val==null) val="";
-                    if (j==numbCellIdKeys) {json=JSON.parse(val);val=json[0][0]+","+json[0][1]+","+json[0][2]+","+json[0][3]+","+json[0][4]}
                     jsoDATA[indRowEdit].push(val);
                 }
             }

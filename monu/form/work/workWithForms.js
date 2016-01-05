@@ -413,8 +413,8 @@ Frm.WorkWithForms.Create = function(opt) {
         if (!$.isArray(rows)) rows = [rows];
         var code = grid.cells(rows[0], grid.getColIndexById("code")).getValue();
 
-        Frm.PrintForm.Create({ids: rows, isKazn: isKazn ? 1: 0, code: code });
-        //iasufr.loadForm("PrintForm", {ids: rows, isKazn: isKazn ? 1: 0, code: code });
+        //Frm.PrintForm.Create({ids: rows, isKazn: isKazn ? 1: 0, code: code });
+        iasufr.loadForm("PrintForm", {ids: rows, isKazn: isKazn ? 1: 0, code: code });
     }
     //проверка отчетов
     function check(paramCheck){
@@ -480,8 +480,8 @@ Frm.WorkWithForms.Create = function(opt) {
                 iasufr.messageSuccess("Додаток 23 зроблено");
                 RefreshGrid();
                 Frm.PrintForm.Create({ids: [json.idZvit]});
-                //iasufr.loadForm("PrintForm", {ids: [json.idZvit]});
-                iasufr.gridRowFocus(grid, json.idZvit); //не успевает
+                iasufr.loadForm("PrintForm", {ids: [json.idZvit]});
+                //iasufr.gridRowFocus(grid, json.idZvit); //не успевает
             }
         })
 

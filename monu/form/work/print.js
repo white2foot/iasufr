@@ -2,9 +2,16 @@ if (!window.Frm) window.Frm = {}
 if (!Frm.PrintForm) Frm.PrintForm = {};
 
 Frm.PrintForm.Create = function(opt) {
+    var t = iasufr.initForm(this, opt);
+    var tt = t;
 
     var ids = opt.ids;
     var isKazn = opt.isKazn;
+
+    var l = new dhtmlXLayoutObject(t.owner, "1C");
+    l.cells("a").hideHeader();
+    l.progressOn();
+    t.owner.progressOn();
 
     LoadData();
 
@@ -353,13 +360,107 @@ Frm.PrintForm.Create = function(opt) {
     };
 
     function print2(d) {
+        var DEF_MARGINS = "25 15 15 15";
+        function createTd(cell) {
+            var style = "";
+            if (cell.margin) {
+                if (!style) style = " style='";
+                style += " padding-left:" + (parseInt(cell.margin) || 0) + "mm;";
+            }
+            if (cell.bold) {
+                if (!style) style = " style='";
+                style += " font-weight: bold;";
+            }
+            if (cell.decoration === "underline") {
+                if (!style) style = " style='";
+                style += " text-decoration: underline;";
+            }
+            if (cell.italics) {
+                if (!style) style = " style='";
+                style += " font-style: italic;";
+            }
+            if (cell.alignment) {
+                if (!style) style = " style='";
+                style += " text-align: " + cell.alignment + ";";
+            }
+            if (style) style += "'";
+            return "<td"+spans+style+">" + (cell.text || "") + "</td>";
+        }
+
+        function calcWidths(tdesc) {
+            var widths = [];
+            var hasCustomWidths = false;
+            if (tdesc.printData.customWidths) hasCustomWidths = tdesc.printData.customWidths.replace(/,/g, "").trim() != "";
+            if (hasCustomWidths) {
+                if (iasufr.replaceAll(tdesc.printData.customWidths, ",", "") != "") {
+                    var parts = tdesc.printData.customWidths.split(",");
+                    for (var ttt = 0; ttt < parts.length; ttt++) {
+                        if (parts[ttt] == "") widths.push("");
+                        else
+                            widths.push(Math.floor(parseFloat(parts[ttt]) / 100 * PAGE_WIDTH));
+                    }
+                }
+            } else {
+                for (var c = 0; c < tdesc.cols.length; c++) {
+                    if (tdesc.cols[c].printWidth) widths.push(Math.floor(parseFloat(tdesc.cols[c].printWidth) / 100 * PAGE_WIDTH));
+                    else widths.push("");
+                }
+            }
+            var emptyCount = widths.filter(function(el) { return el === ""; }).length;
+            if (emptyCount !== 0) {
+                var emptySpace = PAGE_WIDTH;
+                widths.map(function (el) {
+                    if (el) emptySpace -= el;
+                });
+                emptySpace /= emptyCount;
+                if (emptySpace < 0) emptySpace = 0;
+                for (var i = 0; i < widths.length; i++) if (widths[i] === "") widths[i] = emptySpace;
+            }
+            return widths;
+        }
+
+        function hasDifferentFormatting(table) {
+            return ((orientation !== "" && (getOrientation(table) !== orientation))) || ((pageMargins !== DEF_MARGINS && (getMargins(table) !== pageMargins)));
+
+        }
+
+        function getOrientation(table) {
+            if (!table.printData) return "portrait";
+            return table.printData.portrait == 1 ? "portrait" : "landscape";
+        }
+
+        function getMargins(table) {
+            if (!table.printData) return DEF_MARGINS;
+            return table.printData.margin || DEF_MARGINS;
+        }
+
+        function getLeftMargin() {
+            return parseInt(pageMargins.split(" ")[0]);
+        }
+
+        function getRightMargin() {
+            return parseInt(pageMargins.split(" ")[2]);
+        }
+
+        function addPdf() {
+            pdfs.push({
+                content: res,
+                orientation: orientation,
+                margins: pageMargins
+            });
+            res= "";
+        }
+
         var res = "";
         var o = JSON.parse(d);
         var emptyChar = iasufr.storeGet("print.emptyChar") || "-";
         var fontSize = iasufr.storeGet("print.customFontSize" + opt.code) || 8;
-        var pageMargins = "";
-        var PAGE_WIDTH = (297 - 10 - 10);
+        var pageMargins = DEF_MARGINS;
+        var orientation = "";
+        var PAGE_WIDTH = (297 - getLeftMargin() - getRightMargin());
         var pu = new PrintUtils();
+
+        var pdfs = [];
 
         function indexOfRow(tdesc, rid) {
             for (var i = 0; i < tdesc.rows.length; i++) if (tdesc.rows[i].id == rid) return i;
@@ -369,8 +470,17 @@ Frm.PrintForm.Create = function(opt) {
         for (var z = 0 ; z < o.json.length; z++) {
             for (var t = 0; t < o.json[z].tables.length; t++) {
                 var tdesc = o.json[z].tables[t];
-
-                if (!pageMargins) if (tdesc.printData.margins) pageMargins = tdesc.printData.margins;
+                if (hasDifferentFormatting(tdesc)) {
+                    addPdf();
+                } else {
+                    if (tdesc.printData.fromNewPage == 1) {
+                        res += "<div style='page-break-after: always;'></div>";
+                    }
+                }
+                orientation = getOrientation(tdesc);
+                pageMargins = getMargins(tdesc);
+                PAGE_WIDTH = (210 - getLeftMargin() - getRightMargin());
+                if (orientation === "landscape") PAGE_WIDTH = (297 - getLeftMargin() - getRightMargin());
                 /*if (tdesc.printData) {
                     if (t != 0) if (tdesc.printData.fromNewPage == 1) content.push({text: "", pageBreak: 'after', pageOrientation: tdesc.printData.portrait == 1 ? 'portrait' : 'landscape'});
 
@@ -384,63 +494,6 @@ Frm.PrintForm.Create = function(opt) {
                     res += tdesc.printData.caption;
                 }
 
-                function calcWidths(tdesc) {
-                    var widths = [];
-                    var hasCustomWidths = false;
-                    if (tdesc.printData.customWidths) hasCustomWidths = tdesc.printData.customWidths.replace(/,/g, "").trim() != "";
-                    if (hasCustomWidths) {
-                        if (iasufr.replaceAll(tdesc.printData.customWidths, ",", "") != "") {
-                            var parts = tdesc.printData.customWidths.split(",");
-                            for (var ttt = 0; ttt < parts.length; ttt++) {
-                                    if (parts[ttt] == "") widths.push("");
-                                else
-                                    widths.push(Math.floor(parseFloat(parts[ttt]) / 100 * PAGE_WIDTH));
-                            }
-                        }
-                    } else {
-                        for (var c = 0; c < tdesc.cols.length; c++) {
-                            if (tdesc.cols[c].printWidth) widths.push(Math.floor(parseFloat(tdesc.cols[c].printWidth) / 100 * PAGE_WIDTH));
-                            else widths.push("");
-                        }
-                    }
-                    var emptyCount = widths.filter(function(el) { return el === ""; }).length;
-                    if (emptyCount !== 0) {
-                        var emptySpace = PAGE_WIDTH;
-                        widths.map(function (el) {
-                            if (el) emptySpace -= el;
-                        });
-                        emptySpace /= emptyCount;
-                        if (emptySpace < 0) emptySpace = 0;
-                        for (var i = 0; i < widths.length; i++) if (widths[i] === "") widths[i] = emptySpace;
-                    }
-                    return widths;
-                }
-
-                function createTd(cell) {
-                    var style = "";
-                    if (cell.margin) {
-                        if (!style) style = " style='";
-                        style += " padding-left:" + (parseInt(cell.margin) || 0) + "mm;";
-                    }
-                    if (cell.bold) {
-                        if (!style) style = " style='";
-                        style += " font-weight: bold;";
-                    }
-                    if (cell.decoration === "underline") {
-                        if (!style) style = " style='";
-                        style += " text-decoration: underline;";
-                    }
-                    if (cell.italics) {
-                        if (!style) style = " style='";
-                        style += " font-style: italic;";
-                    }
-                    if (cell.alignment) {
-                        if (!style) style = " style='";
-                        style += " text-align: " + cell.alignment + ";";
-                    }
-                    if (style) style += "'";
-                    return "<td"+spans+style+">" + (cell.text || "") + "</td>";
-                }
                 var widths = calcWidths(tdesc);
 
                 tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
@@ -456,22 +509,27 @@ Frm.PrintForm.Create = function(opt) {
                 var headerExisists = tdesc.rows.filter(function(el) { return el.header; }).length !== 0;
                 var headerFromNewPageExists = tdesc.rows.filter(function(el) { return el.newpage; }).length !== 0;
 
+                table += "<colgroup>";
                 for (var i = 0; i < widths.length; i++) {
                     table += "<col style='width:" + widths[i].toString() + "mm'>";
                 }
+                table += "</colgroup>";
                 if (headerExisists) {
                     table += "<thead>";
                 }
                 for (var r = 0; r < tdesc.rows.length; r++) {
+                    //if ((tdesc.rows[r].header && !tdesc.rows[r].newpage)) continue;
                     if (!headerDone) {
                         if (headerExisists) {
                             if (headerFromNewPageExists) {
                                 if (tdesc.rows[r].newpage === 1 && !headerOnNewPage) {
                                     headerOnNewPage = true;
                                     table += "</thead></table>" + tableInitial;
+                                    table += "<colgroup>";
                                     for (var i = 0; i < widths.length; i++) {
                                         table += "<col style='width:" + widths[i].toString() + "mm'>";
                                     }
+                                    table += "</colgroup>";
                                     table += "<thead>";
                                 }
                             } else {
@@ -483,36 +541,7 @@ Frm.PrintForm.Create = function(opt) {
                                 table += "</thead>";
                             }
                         }
-                        /*if (tdesc.rows[r].header) {
-                            if (tdesc.rows[r].newpage === 1 && !headerOnNewPage) {
-                                if (hasHeader) {
-                                    headerOnNewPage = true;
-                                    table += "</thead></table>" + tableInitial + "<thead>";
-                                    hrows = 0;
-                                }
-                            }
-                            if (!hasHeader) {
-                                hasHeader = true;
-                                table += "<thead>";*/
-                                /*var maxspan = 0;
-                                tdesc.cells.map(function (el) {
-                                    if (el.row === tdesc.rows[r].id) {
-                                        var v = el.rspan || 0;
-                                        if (v > maxspan) maxspan = v;
-                                    }
-                                });
-                                hrows += maxspan;*/
-                        /*    }
-                        } else {
-                            //hrows--;
-                            if (hasHeader && hrows <= 0) {
-                                table += "</thead>";
-                                headerDone = true;
-                            }
-                        }*/
                     }
-
-                    //if (r > 10) continue;
 
                     var row = "<tr>";
                     var skipCols = 0;
@@ -584,13 +613,18 @@ Frm.PrintForm.Create = function(opt) {
             }
         }
 
+        addPdf();
+        //pdfs = pdfs.reverse();
+        console.log(pdfs);
+
         iasufr.ajax({
             url: "base.Print.cls", data: {
-                func: "Test",
-                content: res
+                func: "Print",
+                pdfs: JSON.stringify(pdfs)
             },
             success: function(d, res) {
                 window.open("/base.Page.cls?&func=View&class=base.Print&iasu=1&pdfdownload=1&file=" + res.json);
+                iasufr.close(tt);
             }
         });
     }
@@ -605,11 +639,7 @@ Frm.PrintForm.Create = function(opt) {
         var emptyChar = iasufr.storeGet("print.emptyChar") || "-";
         var fontSize = iasufr.storeGet("print.customFontSize" + opt.code) || 7;
 
-        if (o.json[0].isText == "1") {
-            iasufr.print(fillTextData(o.json[0].txtData, o.json[0].savedData));
-            iasufr.close(tt);
-            return;
-        }
+
 
         var pu = new PrintUtils();
 

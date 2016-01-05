@@ -478,3 +478,10 @@ div.gridbox_dhx_skyblue table.hdr td input[type="checkbox"] {
     height: 16px;
     margin-top: 1px;
 }
+
+/* Shadow for active windows */
+div.dhtmlx_window_active {
+    -webkit-box-shadow: 3px 3px 17px 0px rgba(0, 0, 0, 0.37);
+    -moz-box-shadow: 3px 3px 17px 0px rgba(0, 0, 0, 0.37);
+    box-shadow: 3px 3px 17px 0px rgba(0, 0, 0, 0.37);
+}

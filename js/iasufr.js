@@ -84,12 +84,17 @@
             var wnd = iasufr.wins.createWindow("sp" + new Date().valueOf(), 0, 0, w, h);
             wnd.spravName = opt.sprav;
             if (opt) {
-                if (opt.maximized) wnd.maximize();
+                //if (opt.maximized) wnd.maximize();
+                if (opt.maximized) {
+                    wnd.setDimension(iasufr.wins.vp.offsetWidth, iasufr.wins.vp.offsetHeight - 26);
+                    wnd.setPosition(0, 26);
+                    //wnd.maximize();
+                }
                 if (opt.modal) wnd.setModal(true);
                 if ((opt.ico != undefined) && (opt.ico)) wnd.setIcon("iasufrIcons/" + opt.ico, "iasufrIcons/" + opt.ico);
             }
             wnd.setText(title);
-            wnd.centerOnScreen();
+            if (!opt.maximized) wnd.centerOnScreen();
             setTimeout(function() {try{if(wnd) wnd.bringToTop()}catch(e){}}, 100);
             var evtClose = iasufr.wins.attachEvent("onClose", function(closedWin) {
                 if (closedWin == wnd) {
@@ -660,7 +665,7 @@
         }
     },
 
-    downloadDbf: function(filename, dataArray) {
+    downloadDbf: function(filename, dataArray, meta) {
         function _arrayBufferToBase64( buffer ) {
             var binary = '';
             var bytes = new Uint8Array( buffer );
@@ -670,7 +675,7 @@
             }
             return window.btoa( binary );
         }
-        var buf = dbf.structure(dataArray);
+        var buf = dbf.structure(dataArray, meta);
         var blob;
         try {
             blob = new Blob([buf], {type: "application/octetstream"});

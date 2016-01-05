@@ -11,9 +11,6 @@ ac.MenuReports.Create = function (opt) {
     _this.idDoc=opt.idDoc;
     var masFunc; //массив функций
     var json1;
-
-    var imgGroup="16/book.png";     if (this.idDoc=="MenuReports")imgGroup="16/folder.png";
-    var imgFile="16/bullet_key.png";if (this.idDoc=="MenuReports")imgFile="16/menu_item.png";
     var expand=1;
 
 //1.3 dhx объекты
@@ -212,6 +209,7 @@ ac.MenuReports.Create = function (opt) {
         dhxGridInit.type=prop.type;
         dhxGridInit.idCells=prop.idCells;
         dhxGridInit.idKeysRowTemp=prop.idKeysRowTemp;
+        dhxGridInit.style=prop.style;
         dhxGridInit.isFunc=prop.isFunc;
 
         dhxGridInit.init();
@@ -235,38 +233,59 @@ ac.MenuReports.Create = function (opt) {
         iasufr.gridRowFocusApply(dhxGridInit);
         if (dhxGridInit.type!="treeGrid") return
 
-        //img tree
-        var imgGroup="16/folder.png";
-        var imgFile0="16/menu_item.png";
-        var imgFile1="16/bullet_key.png";
-
+        if (dhxGridInit.type=="treeGrid") {
+            dhxGridInit.expandAll();
+        }
         var numbIsGroup=dhxGridInit.idCells.indexOf("urlMenu");
-        dhxGridInit.expandAll();
-        if (_this.idDoc=="FuncReports")  numbIsGroup=dhxGridInit.idCells.indexOf("idFunc");
+        var numbCellIdKeys=dhxGridInit.idCells.indexOf("idKeysRowTemp");
+        var numbStyle=dhxGridInit.idCells.indexOf("style");
+        var style=dhxGridInit.style;
+        var countStyle=style.length;
+        var styleI,data,json;
+
         for (var i = 0; i < dhxGridInit.getRowsNum(); i++){
+            var idRow=dhxGridInit.getRowId(i);
+            data=dhxGridInit.cells2(i,numbStyle).getValue();
+            json=data.split(",");
+            for (var j = 0; j < countStyle; j++){
+                styleI=style[j].split("/");
+                //по ячейкам
+                if (json[j]!=""){
+                    if (styleI[1]!=null){ //по ячейкам
+                        switch (styleI[0]) {
+                            case "style":{
+                                dhxGridInit.setCellTextStyle(idRow,styleI[1],json[j]);
+                                break;
+                            }
+                        }
+                    }
+                    else { //по строкам
+                        switch (style[j]) {
+                            case "style":{
+                                dhxGridInit.setRowTextStyle(dhxGridInit.getRowId(i), json[j]);
+                                break;
+                            }
+                            case "img":  {
+                                dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + json[j]);
+                                break;
+                            }
+                        }//switch
+                    }
+                }
+
+            } //for
             if (dhxGridInit.cells2(i,numbIsGroup).getValue() == "") {
-                dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + imgGroup);
-                dhxGridInit.setRowTextStyle(dhxGridInit.getRowId(i), "font-weight:bold");
                 //на папках (группах)спрятать checkbox
                 for (var j=1;j<dhxGridInit.idCells.length;j++){
                     if (dhxGridInit.idCells[j].lastIndexOf("CHECK")>-1)$(dhxGridInit.cells2(i,j).cell).children().hide();
                 }
             }
-            else {
-                var id=dhxGridInit.cells2(i,0).getValue();
-                id=id.split(".");
-                if (id[4]==0)  dhxGridInit.setCellTextStyle(dhxGridInit.getRowId(i),2,"color:gray"); //dhxGridInit.setRowTextStyle(dhxGridInit.getRowId(i), "color:gray");
-                if (id[3]==0) dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + imgFile0);
-                else          dhxGridInit.setItemImage(dhxGridInit.getRowId(i), iasufr.const.ICO_PATH + imgFile1);
-            }
-
-
-
         } //for
-        dhxGridInit.collapseAll();
-        dhxGridInit.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:"+idLayout);
 
-
+        if (dhxGridInit.type=="treeGrid") {
+            dhxGridInit.collapseAll();
+            dhxGridInit.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:"+idLayout)
+        }
 
     }
     ///////////////////////////////////////////////////
@@ -323,7 +342,7 @@ ac.MenuReports.Create = function (opt) {
                             if ((numbIdKeys==-1)&&(isReq==1)) {alert(idObj+ "не вказан у idKeysRowTemp :" +dhxGridInit.idKeysRowTemp);return retError}
                             strCell=dhxGridInit.cells(idRow,numbCellIdKeys).getValue();
                             if (strCell==null) return retError
-                            strCell=strCell.split(".");
+                            strCell=strCell.split(",");
                             val2=strCell[numbIdKeys]; if (val2==null) val2="";
                         }
                         else {
@@ -380,8 +399,10 @@ ac.MenuReports.Create = function (opt) {
         //2)2-ая строка - value
 
         var idI="";
+        var json;
         var indRowEdit=0;
         var numbIsChange=dhxLayoutT1.idCells.indexOf("isChangeRowTemp");
+        var numbCellIdKeys=dhxGridInit.idCells.indexOf("idKeysRowTemp");
         var t=dhxGridInit.getSelectedRowId();
         var i1= 0,i2=dhxGridInit.getRowsNum()-1;
         if (isRow==1) {i1= dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId()),i2=i1; if (i1==null) {i1=0; i2=-1;};}
@@ -483,7 +504,8 @@ ac.MenuReports.Create = function (opt) {
         var idI;
         var indParentI;
         var keyI="";
-        var keyParentI=""
+        var keyParentI="";
+        var json;
         var indKey=dhxLayoutT1.idCells.indexOf("idKeysRowTemp");
 
         //dhxLayoutT1.saveOpenStates("idDoc:"+_this.idDoc+",idLayout:T1");
@@ -495,16 +517,14 @@ ac.MenuReports.Create = function (opt) {
             idI=dhxLayoutT1.getRowId(i);
             //idKeysRowTemp
             keyI=dhxLayoutT1.cells2(i,indKey).getValue();
-            keyI=keyI.split(".");
-            jsoT2[i].push(keyI[0]);
+            json=JSON.parse(keyI);
+            jsoT2[i].push(json[0][0]);
             //idParentI
-            var tt=dhxLayoutT1.getParentId(idI);
-            var tt2=dhxLayoutT1.getRowIndex(dhxLayoutT1.getParentId(idI));
             indParentI=dhxLayoutT1.getRowIndex(dhxLayoutT1.getParentId(idI));
             if (indParentI!=-1){
                 keyParentI=dhxLayoutT1.cells2(indParentI,indKey).getValue();
-                keyParentI=keyParentI.split(".");
-                jsoT2[i].push(keyParentI[0]);
+                json=JSON.parse(keyParentI);
+                jsoT2[i].push(json[0][0]);
             }
             else{
                 jsoT2[i].push("");
@@ -512,7 +532,6 @@ ac.MenuReports.Create = function (opt) {
             jsoT2[i].push((i+1));
 
         }
-        var t=jsoT2;
 
         //dhxLayoutT1.collapseAll();
         //dhxLayoutT1.loadOpenStates("idDoc:"+_this.idDoc+",idLayout:T1");
@@ -531,17 +550,18 @@ ac.MenuReports.Create = function (opt) {
         var t1=dhxLayoutT1.getRowIndex(idRow1);
         var t2=dhxLayoutT1.idCells.indexOf("idKeysRowTemp");
         var idKeys1=dhxLayoutT1.cells2(dhxLayoutT1.getRowIndex(idRow1),dhxLayoutT1.idCells.indexOf("idKeysRowTemp")).getValue();
-        idKeys1=idKeys1.split(".");
-        var idMenu=idKeys1[0]; if (idMenu==null) return
-        var id="idMenu";if (_this.idDoc=="FuncReports")id="idFunc";
+
+        var json=idKeys1.split(",");
+        var idMenu=json[0];
         if (flagSave==1) {
             if (!idUser) return
-            param=[["idKeysRowTemp",id,"idUserCHECK"+idUser],["",idMenu,1]]
+            param=[["idKeysRowTemp","idMenu","idUserCHECK"+idUser],["",idMenu,1]]
         }
         else if (flagSave==2) {
             var idRow2 = dhxLayoutT2.getSelectedRowId(); if (!idRow2) return
             var id2=dhxLayoutT2.cells2(dhxLayoutT2.getRowIndex(idRow2),dhxLayoutT2.idCells.indexOf("idKeysRowTemp")).getValue();
-            param=[["idKeysRowTemp",id,"idUserCHECK"+id2],["",idMenu,0]]
+            var json=id2.split(",");; id2=json[0];
+            param=[["idKeysRowTemp","idMenu","idUserCHECK"+id2],["",idMenu,0]]
         }
         var param2=[{idLayout:"T2",idKeysRowTemp:dhxLayoutT2.idKeysRowTemp,data:param}]
         var t=param2;

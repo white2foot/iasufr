@@ -537,8 +537,8 @@ Frm.PrintForm.Create = function(opt) {
         addPdf( o.json[z-1].tables[t - 2] || o.json[z-1].tables[t-1]);
 
         iasufr.ajax({
-            url: "base.PrintParralel.cls", data: {
-                func: "Print",
+            url: "base.Print.cls", data: {
+                func: "PrintParralel",
                 pdfs: JSON.stringify(pdfs)
             },
             success: function(d, res) {

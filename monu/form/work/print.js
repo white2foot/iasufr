@@ -25,7 +25,7 @@ Frm.PrintForm.Create = function(opt) {
             ids: ids.join(","),
             isKazn: isKazn
         },
-        success: onDataLoaded});
+        success: print2});
     }
 
     function GetCellIdx(tdesc, rid, cid) {
@@ -89,245 +89,6 @@ Frm.PrintForm.Create = function(opt) {
         }
     }
 
-    function ParseContainer(cnt, e, p, styles) {
-        var elements = [];
-        var children = e.childNodes;
-        if (children.length != 0) {
-            for (var i = 0; i < children.length; i++) p = ParseElement(elements, children[i], p, styles);
-        }  else {
-            //p = ParseElement(cnt, e, p, styles);
-            //if (e.innerText) elements.push({ text: e.innerText });
-        }
-        if (elements.length != 0) {
-            //for (var i = 0; i < elements.length; i++) cnt.push(elements[i]);
-            //if (onCurLevel) {
-                for (var i = 0; i < elements.length; i++) cnt.push(elements[i]);
-            //} else cnt.push({stack: elements});
-            //cnt.push(elements);
-        }
-        return p;
-    }
-
-    function ComputeStyle(o, styles) {
-        for (var i = 0; i < styles.length; i++) {
-            var st = styles[i].trim().toLowerCase().split(":");
-            if (st.length == 2) {
-                st[0] = st[0].trim();
-                st[1] = st[1].trim();
-                switch (st[0]) {
-                    case "margin-top":{
-                        if (!o.margin) o.margin = [0, 0, 0, 0];
-                        o.margin[1] = parseInt(st[1]);
-                        break;
-                    }
-                    case "margin-bottom":{
-                        if (!o.margin) o.margin = [0, 0, 0, 0];
-                        o.margin[3] = parseInt(st[1]);
-                        break;
-                    }
-                    case "margin-left":{
-                        if (!o.margin) o.margin = [0, 0, 0, 0];
-                        o.margin[0] = parseInt(st[1]);
-                        break;
-                    }
-                    case "margin-right":{
-                        if (!o.margin) o.margin = [0, 0, 0, 0];
-                        o.margin[2] = parseInt(st[1]);
-                        break;
-                    }
-                    case "font-size":{
-                        o.fontSize = parseInt(st[1]);
-                        break;
-                    }
-                    case "text-align": {
-                        switch (st[1]) {
-                            case "right": o.alignment = 'right'; break;
-                            case "center": o.alignment = 'center'; break;
-                        }
-                        break;
-                    }
-                    case "font-weight": {
-                        switch (st[1]) {
-                            case "bold": o.bold = true; break;
-                        }
-                        break;
-                    }
-                    case "text-decoration": {
-                        switch (st[1]) {
-                            case "underline": o.decoration = "underline"; break;
-                        }
-                        break;
-                    }
-                    case "font-style": {
-                        switch (st[1]) {
-                            case "italic": o.italics = true; break;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    function ParseElement(cnt, e, p, styles) {
-        if (!styles) styles = [];
-        if (e.getAttribute) {
-            var nodeStyle = e.getAttribute("style");
-            if (nodeStyle) {
-                var ns = nodeStyle.split(";");
-                for (var k = 0; k < ns.length; k++) styles.push(ns[k]);
-            }
-        }
-
-        switch (e.nodeName.toLowerCase()) {
-            case "#text": {
-                var t = { text: e.textContent.replace(/\n/g, "") };
-                if (styles) ComputeStyle(t, styles);
-                p.text.push(t);
-                break;
-            }
-            case "b":case "strong": {
-                //styles.push("font-weight:bold");
-                ParseContainer(cnt, e, p, styles.concat(["font-weight:bold"]));
-                break;
-            }
-            case "u": {
-                //styles.push("text-decoration:underline");
-                ParseContainer(cnt, e, p, styles.concat(["text-decoration:underline"]));
-                break;
-            }
-            case "i": {
-                //styles.push("font-style:italic");
-                ParseContainer(cnt, e, p, styles.concat(["font-style:italic"]));
-                //styles.pop();
-                break;
-                //cnt.push({ text: e.innerText, bold: false });
-            }
-            case "span": {
-                ParseContainer(cnt, e, p, styles);
-                break;
-            }
-            case "br": {
-                p = CreateParagraph();
-                cnt.push(p);
-                break;
-            }
-            case "table":
-            {
-                var t = {
-                    table: {
-                        widths: [],
-                        body: []
-                    }
-                }
-                var border = e.getAttribute("border");
-                var isBorder = false;
-                if (border) if (parseInt(border) == 1) isBorder = true;
-                if (!isBorder) t.layout = 'noBorders';
-                ParseContainer(t.table.body, e, p, styles);
-
-                var widths = e.getAttribute("widths");
-                if (!widths) {
-                    if (t.table.body.length != 0) {
-                        if (t.table.body[0].length != 0) for (var k = 0; k < t.table.body[0].length; k++) t.table.widths.push("*");
-                    }
-                } else {
-                    var w = widths.split(",");
-                    for (var k = 0; k < w.length; k++) t.table.widths.push(w[k]);
-                }
-                cnt.push(t);
-                break;
-            }
-            case "tbody": {
-                ParseContainer(cnt, e, p, styles);
-                break;
-            }
-            case "tr": {
-                var row = [];
-                ParseContainer(row, e, p, styles);
-                cnt.push(row);
-                break;
-            }
-            case "td": {
-                p = CreateParagraph();
-                var st = {stack: []}
-                st.stack.push(p);
-
-                var rspan = e.getAttribute("rowspan");
-                if (rspan) st.rowSpan = parseInt(rspan);
-                var cspan = e.getAttribute("colspan");
-                if (cspan) st.colSpan = parseInt(cspan);
-
-                ParseContainer(st.stack, e, p, styles);
-                cnt.push(st);
-                break;
-            }
-            case "div": {
-                p = CreateParagraph();
-                var st = {stack: []}
-                st.stack.push(p);
-                ComputeStyle(st, styles);
-                ParseContainer(st.stack, e, p);
-
-                cnt.push(st);
-                break;
-            }
-            default: {
-                console.log("Parsing for node " + e.nodeName + " not found");
-                break;
-            }
-        }
-        return p;
-    }
-/*
-    function ParseHtml(cnt, html) {
-        var elements = [];
-        var children = html.children();
-        var len = children.length;
-
-        for (var i = 0; i < len; i++) {
-            var e = $(children[i]);
-            if (e.children().length == 0) {
-                ParseElement(elements, e[0]);
-            } else {
-                ParseHtml(elements, e);
-            }
-        }
-        if (elements.length != 0) cnt.push({ stack: elements });
-    }*/
-
-    function ParseNode(cnt, node) {
-        if (node.length == 1) {
-            var el = node.get(0);
-            ParseElement(cnt, el);
-        } else {
-            var elements = [];
-            for (var i = 0; i < node.length; i++) ParseNode(elements, $(node.get(i)));
-            if (elements.length != 0) cnt.push({ stack: elements });
-        }
-    }
-
-
-    function CreateParagraph() {
-        var p = {text:[]};
-        return p;
-    }
-
-    function addRow(c, savedData) {
-        var ra = c.find(".row-adder");
-        var clone = ra.clone();
-        ra.removeClass("row-adder");
-
-        var inputs = clone.find(".txtform-input");
-        inputs.each(function(idx, input) {
-            var newAttr = $(input).attr("datafield").replace(/\d+/g, function(n){ return ++n });
-            $(input).attr("datafield", newAttr);
-            if (savedData[newAttr] !== undefined) $(input).text(savedData[newAttr]);
-        });
-
-        clone.insertAfter(ra);
-    }
-
     function fillTextData(str, savedData) {
         var el = document.createElement("div");
         var html = $.parseHTML( str );
@@ -355,11 +116,155 @@ Frm.PrintForm.Create = function(opt) {
         return c.html();
     }
 
-    window.tempPrint = function() {
-        print2();
-    };
+    function indexOfRow(tdesc, rid) {
+        for (var i = 0; i < tdesc.rows.length; i++) if (tdesc.rows[i].id == rid) return i;
+        return -1;
+    }
+
+    // Add dynamic rows from input data
+    function extendTableWithDynamicData(tdesc) {
+        tdesc.inputData.sort(function (a,b) {
+            if (a.createdFromId !== undefined && b.createdFromId !== undefined) {
+                return a.idx < b.idx ? 1: -1;
+            } else {
+                return a.idRow < b.idRow ? 1: -1;
+            }
+        });
+        for (var m = 0; m < tdesc.inputData.length - 1; m++) {
+            if (tdesc.inputData[m].createdFromId !== undefined) {
+                var ridx = indexOfRow(tdesc, tdesc.inputData[m].idRow);
+                if (ridx == -1) {
+                    var ridx = indexOfRow(tdesc, tdesc.inputData[m].createdFromId);
+                    var rd = $.extend({}, tdesc.rows[ridx]);
+                    rd.id = tdesc.inputData[m].idRow;
+                    tdesc.rows.splice(ridx + 1, 0, rd);
+
+                    // copy cell data
+                    var newCells = [];
+                    for (var n = 0; n < tdesc.cells.length; n++) if (tdesc.cells[n].row == tdesc.inputData[m].createdFromId) {
+                        var nc = $.extend({}, tdesc.cells[n]);
+                        nc.row = rd.id;
+                        newCells.push(nc);
+                    }
+                    for (var n = 0; n < newCells.length; n++) tdesc.cells.push(newCells[n]);
+                }
+            }
+            var idx = GetCellIdx(tdesc, tdesc.inputData[m].idRow, tdesc.inputData[m].idCol);
+            if (idx == -1) {
+                tdesc.cells.push({row: tdesc.inputData[m].idRow, col: tdesc.inputData[m].idCol});
+            }
+            delete tdesc.inputData[m].createdFromId;
+        }
+    }
+
+    function calcSubtotals(tdesc) {
+        // Only one subtotal column supported
+        var subIdx = -1;
+        var subPrevIdx = 0;
+        var subVal = null;
+        var subColumns = [];
+        var subDoInsert = false;
+        var subTitle = "";
+        var newRowDescs = [];
+        for (var c = 0; c < tdesc.cols.length; c++) {
+            if (tdesc.cols[c].subtotal) {
+                subTitle = tdesc.cols[c].subtotalTitle;
+                subIdx = c;
+                subColumns = tdesc.cols[c].subtotal.replace(/ /g, "").split(",")
+                subColumns = subColumns.map(function(el) {return parseInt(el)});
+            }
+        }
+        if (subIdx != -1) {
+            // find max row id to generate new ones
+            var maxid = 0;
+            tdesc.rows.map(function(obj){ if (obj.id > maxid) maxid = obj.id; });
+            maxid++;
+
+            for (var r = 0; r < tdesc.rows.length; r++) {
+                for (var c = 0; c < tdesc.cols.length; c++) {
+                    // check for subtotal
+                    if ((subIdx == c) && !tdesc.rows[r].header) {
+                        var ct = "";
+                        var idx = GetCellIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
+                        if (idx != -1) ct = tdesc.cells[idx].value || "";
+                        var inputIdx = GetInputDataIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
+                        if (inputIdx != -1) {
+                            if (tdesc.inputData[inputIdx].value) {
+                                ct = tdesc.inputData[inputIdx].value || "";
+                            }
+                        }
+                        ct = ct.trim();
+                        if (subVal != null && ct != "") {
+                            if (subVal != ct) {
+                                subDoInsert = true;
+                            }
+                        }
+                        if (ct != "") subVal = ct;
+                    }
+                }
+
+                if (subDoInsert) {
+                    console.log("=================");
+                    subDoInsert = false;
+                    // create new row desc for subtotal row
+                    var newDesc = $.extend({}, tdesc.rows[r - 1]);
+                    newDesc.id = maxid++;
+                    newDesc.insertBefore = r;
+                    newRowDescs.push(newDesc);
+
+                    var subRow = [];
+                    for (var c = 0; c < tdesc.cols.length; c++) {
+                        var cd = {};
+                        var idx = GetCellIdx(tdesc, tdesc.rows[r - 1].id, tdesc.cols[c].id);
+                        if (idx != -1) cd = $.extend({}, tdesc.cells[idx]);
+                        cd.row = newDesc.id;
+
+                        if (cd.formula) {
+                            // TODO: formulas support
+                        }
+
+                        if (c == subIdx) {
+                            cd.value = subTitle.toString();
+                        } else if (subColumns.indexOf(c + 1) != -1) {
+                            // calc total sub from subPrevIdx to r
+                            var total = 0;
+                            for (var p = subPrevIdx; p < r; p++) {
+                                if (tdesc.rows[p].header) continue;
+                                var inputIdx = GetInputDataIdx(tdesc, tdesc.rows[p].id, tdesc.cols[c].id);
+                                if (inputIdx != -1) {
+                                    var v = tdesc.inputData[inputIdx].value;
+                                    if (v != undefined) v = parseInt(v);
+                                    if (c == 6) {
+                                        console.log(v);
+                                    }
+                                    if (!isNaN(v)) total += v;
+                                }
+                            }
+                            console.log("Total: ", total);
+                            cd.value = FormatValue(total, cd.type);
+                        } else cd.value = "";
+
+                        tdesc.cells.push(cd);
+                    }
+                    subPrevIdx = r;
+                }
+            }
+
+            for (var r = 0; r < newRowDescs.length; r++) {
+                tdesc.rows.splice(parseInt(newRowDescs[r].insertBefore) + r, 0, newRowDescs[r]);
+            }
+            //tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
+        }
+    }
 
     function print2(d) {
+        var o = JSON.parse(d);
+        if (o.json[0].isText == "1") {
+            iasufr.print(fillTextData(o.json[0].txtData, o.json[0].savedData));
+            iasufr.close(tt);
+            return;
+        }
+
         var DEF_MARGINS = "25 15 15 15";
         function createTd(cell) {
             var style = "";
@@ -454,20 +359,13 @@ Frm.PrintForm.Create = function(opt) {
         }
 
         var res = "";
-        var o = JSON.parse(d);
         var emptyChar = iasufr.storeGet("print.emptyChar") || "-";
         var fontSize = iasufr.storeGet("print.customFontSize" + opt.code) || 8;
         var pageMargins = DEF_MARGINS;
         var orientation = "";
         var PAGE_WIDTH = (297 - getLeftMargin() - getRightMargin());
         var pu = new PrintUtils();
-
         var pdfs = [];
-
-        function indexOfRow(tdesc, rid) {
-            for (var i = 0; i < tdesc.rows.length; i++) if (tdesc.rows[i].id == rid) return i;
-            return -1;
-        }
 
         for (var z = 0 ; z < o.json.length; z++) {
             for (var t = 0; t < o.json[z].tables.length; t++) {
@@ -505,6 +403,8 @@ Frm.PrintForm.Create = function(opt) {
 
 
                 tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
+                extendTableWithDynamicData(tdesc);
+                calcSubtotals(tdesc);
 
                 var tableInitial = '<table border="1" style="font-size: ' + fontSize + 'px;" cellpadding="2" cellspacing="0">';
                 var table = /*"<div style='background-color:#FF0000;border:1px solid black;position:fixed;left:0mm;top:0mm;width:185mm;height:40mm'>q</div><div style='page-break-after: always;'>ttttttttttttt</div>" +*/ tableInitial;
@@ -635,16 +535,15 @@ Frm.PrintForm.Create = function(opt) {
         }
 
         addPdf( o.json[z-1].tables[t - 2] || o.json[z-1].tables[t-1]);
-        //pdfs = pdfs.reverse();
-        console.log(pdfs);
 
         iasufr.ajax({
-            url: "base.Print.cls", data: {
+            url: "base.PrintParralel.cls", data: {
                 func: "Print",
                 pdfs: JSON.stringify(pdfs)
             },
             success: function(d, res) {
-                window.open("/base.Page.cls?&func=View&class=base.Print&iasu=1&pdfdownload=1&file=" + res.json);
+                console.log("pdf generation time: " + res.json.time);
+                window.open("/base.Page.cls?&func=View&class=base.Print&iasu=1&pdfdownload=1&file=" + res.json.file);
                 iasufr.close(tt);
             }
         });
@@ -660,7 +559,11 @@ Frm.PrintForm.Create = function(opt) {
         var emptyChar = iasufr.storeGet("print.emptyChar") || "-";
         var fontSize = iasufr.storeGet("print.customFontSize" + opt.code) || 7;
 
-
+        if (o.json[0].isText == "1") {
+            iasufr.print(fillTextData(o.json[0].txtData, o.json[0].savedData));
+            iasufr.close(tt);
+            return;
+        }
 
         var pu = new PrintUtils();
 

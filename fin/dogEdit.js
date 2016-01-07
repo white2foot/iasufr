@@ -57,7 +57,10 @@ Fin.DogEdit.Create = function (opt) {
         tolb.addButton("save", 7, iasufr.lang.ui.save, "32/database_save.png", "");
         tolb.addButton("del", 8, "Видалити договiр", "32/toolbar_delete.png", "");
     }
-    if  (!dost)  { tolb.disableItem("save"); tolb.disableItem("del"); }
+    if  (!dost)  {
+        if (tolb.objPull[tolb.idPrefix + "save"]) tolb.disableItem("save");
+        if (tolb.objPull[tolb.idPrefix + "del"]) tolb.disableItem("del");
+    }
     //tolb.addButton("reload", 9, iasufr.lang.ui.reload, "32/arrow_rotate_anticlockwise.png", "");
 
     if (idDog>0) {

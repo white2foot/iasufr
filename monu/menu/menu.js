@@ -11,9 +11,9 @@
 
                     // добавляем имя пользователя с иконкой
                     var orgTxt = iasufr.user.orgName;
-                    if (iasufr.user.orgCode) orgTxt = "(" + iasufr.user.orgCode + ") " + orgTxt;
+                    if (iasufr.user.orgCode) orgTxt = "(" + iasufr.user.orgCode + ") " + orgTxt.substring(0,50);;
                     //<img src='/images/icons/16/user_silhouette.png' style='vertical-align: middle'>
-                    menu.setTopText("<span onclick='GoToEditCurrentOrg()' style='cursor:pointer;color:#4c4c4c;font-style: italic'>"+ orgTxt + " </span><span onclick='GoToEditCurrentUser()' style='cursor: pointer;padding-right:100px'>&nbsp;<b><u>" + iasufr.user.login + "</u></b></span>");
+                    menu.setTopText("<span onclick='GoToEditCurrentOrg()' title='"+iasufr.user.orgName+"' style='cursor:pointer;color:#4c4c4c;font-style: italic'>"+ orgTxt + " </span><span onclick='GoToEditCurrentUser()' style='cursor: pointer;padding-right:100px'>&nbsp;<b><u>" + iasufr.user.login + "</u></b></span>");
                     menu.setIconsPath(iasufr.const.ICO_PATH);
                     menu.attachEvent("onClick", function (id, a, keys, button){
                         if (retAjax.json.url[id]) {

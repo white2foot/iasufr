@@ -7,7 +7,7 @@ Fin.Dog.Create = function (opt) {
     var t = iasufr.initForm(this, opt);
     var user=iasufr.user;
     var idOrgUser=user.orgId;
-
+    var bodyhei=$('body').height()-100;
     dhtmlx.image_path = iasufr.const.IMG_PATH;
 
     var main = new dhtmlXLayoutObject(t.owner, '2U');
@@ -78,14 +78,14 @@ Fin.Dog.Create = function (opt) {
                 case "print": gD.printView(); break;
                 case "save":   SaveTable(); break;
                 case "new":   var idOrg=0;   if (selOrg) idOrg=selOrg.id;
-                    if (idOrg>0) iasufr.loadForm("DogEdit", {width:1200, height:700, idDog:0, idOrg:idOrg, orgName:orgName, onSave: SelTable});
+                    if (idOrg>0) iasufr.loadForm("DogEdit", {width:1200, height:bodyhei, idDog:0, idOrg:idOrg, orgName:orgName, onSave: SelTable});
                     else  iasufr.message("Вкажiть органiзацiю !");
                     break;
                 case "edit":  var ind = gD.getRowIndex(gD.getSelectedId());
                     var idRow=gD.cells2(ind, cellNumDog).getValue();
                     if (!idRow) { iasufr.message("Вкажiть договiр !"); return }
                     iasufr.gridRowFocus(gD, idRow);
-                    iasufr.loadForm("DogEdit", {onSave: SelTable, width: 1200, height: 700, idOrg:selOrg.id, idDog:idRow, orgName:orgName });
+                    iasufr.loadForm("DogEdit", {onSave: SelTable, width: 1200, height: bodyhei, idOrg:selOrg.id, idDog:idRow, orgName:orgName });
                     pSelTable=0;
                     break;
                 case "rel":   SelTable(); break;
@@ -513,7 +513,8 @@ Fin.Dog.Create = function (opt) {
         window.setTimeout( function(){
             var ind=$(e.currentTarget).parent().index()-1;
             var idRow=gD.cells2(ind, cellNumDog).getValue();
-            iasufr.loadForm("DogEdit", {onSave: SelTable, width: 1200, height: 700, idOrg:selOrg.id, idDog:idRow, orgName:orgName });
+            
+            iasufr.loadForm("DogEdit", {onSave: SelTable, width: 1200, height: bodyhei, idOrg:selOrg.id, idDog:idRow, orgName:orgName });
         }, 1);
         pSelTable=0;
     }

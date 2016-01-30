@@ -158,11 +158,11 @@ Fin.Org.Create = function (opt) {
         // form.getItemValue('Frm')
         //json=$.extend(json, {Frm:form.getItemValue('Frm'), Tip:form.getCombo('Tip').getChecked().toString()} );
         json=$.extend(json, {Frm:"", Tip:tip, Obl:obl, Cont:cont } );
-        json=$.extend(json, {accountAdd: form.getItemValue('Bank'), ATO: form.getItemValue('ATO'), Real:form.getItemValue('Real')} );
+        json=$.extend(json, {accountAdd: form.getItemValue('Bank'), addDate:1, ATO: form.getItemValue('ATO'), Real:form.getItemValue('Real')} );
         json=$.extend(json, {Level:form.getItemValue('Level'), Date:date} );
         json=$.extend(json, {Par:'org',pHelp:0, ReqOnly: form.getItemValue('Req'), Dog: form.getItemValue('Dog')} );  //Req - только заявки
 
-        var json1=$.extend({accountAdd: form.getItemValue('Bank'), Cont: cont, pHelp:0}, {Par:'zag'} );
+        var json1=$.extend({accountAdd: form.getItemValue('Bank'),  Cont: cont, pHelp:0}, {Par:'zag'} );
         var jsOrg={Date:date};
 
         iasufr.ajax({         // данные для заголовка таблицы

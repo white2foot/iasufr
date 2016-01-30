@@ -41,7 +41,7 @@ Fin.DogTxtEdit.Create = function (opt) {
             language: 'uk',
             resize_enabled: false,
             width: "770px",
-            height: "550px",
+            height: "430px",
             enterMode : window.CKEDITOR.ENTER_BR,
             toolbar:[
                 { name: 'actions', items: ['Undo', 'Redo'] },

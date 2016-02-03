@@ -15,6 +15,7 @@ Frm.Form.Create = function(opt) {
         tb.addButton("add", 1, "", "32/table_add.png", "");
         tb.addButton("edit", 2, "", "32/table_edit.png", "");
         tb.addButton("del", 3, "", "32/table_delete.png", "");
+        tb.addButton("clone", 3, "", "32/viewstack.png", "");
         tb.addSeparator("sep", 4);
         tb.addButton("design", 5, "", "32/table_design.png");
         tb.addButton("printsettings", 6, "", "32/font_red.png");
@@ -27,6 +28,7 @@ Frm.Form.Create = function(opt) {
         tb.setItemToolTip("add", iasufr.lang.ui.add);
         tb.setItemToolTip("edit", iasufr.lang.ui.edit);
         tb.setItemToolTip("del", iasufr.lang.ui.delete);
+        tb.setItemToolTip("clone", "Клонувати форму");
         tb.setItemToolTip("design", "Дизайнер форм");
         tb.setItemToolTip("printsettings", "Параметри друку");
         tb.setItemToolTip("print", "Друку форми");
@@ -81,6 +83,45 @@ Frm.Form.Create = function(opt) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    function cloneForm(idForm, dateForm) {
+        var wnd = iasufr.wins.createWindow("ts" + new Date().valueOf(), 0, 0, 320, 160);
+        wnd.denyPark();
+        wnd.denyResize();
+        wnd.setText("Клонувати форму");
+        wnd.setModal(true);
+        wnd.centerOnScreen();
+
+        var frmData = [
+            { type:"settings", labelWidth:200, position:"absolute" },
+            { type:"calendar", name:"date", label:"Дата", required:true,  labelLeft:70, labelTop:16, inputLeft:70, inputTop:32 },
+            { type:"checkbox", name:"reform", label:"Переформувати звiти", labelLeft:90, labelTop:56, inputLeft:70, inputTop:52 },
+            { type: "button", name: "clone", value:"Клонувати", inputLeft:30, inputTop: 90 },
+            { type: "button", name: "close", value:"Вiдмiнити", inputLeft:160, inputTop: 90 }
+        ];
+        var frm = wnd.attachForm(frmData);
+        frm.attachEvent("onButtonClick", function(name) {
+            if (name === "close") wnd.close();
+            if (name === "clone") doClone(wnd, frm.getItemValue("date"), idForm, dateForm, frm.getItemValue("reform"));
+        });
+    }
+
+    function doClone(wnd, newDate, idForm, dateForm, reform) {
+        if (!newDate) {
+            iasufr.alert("Вкажить дату");
+            return;
+        }
+        iasufr.ajax({
+            url: "frm.Form.cls",
+            data: { func: "Clone", id: idForm, reform: reform, date: dateForm, dateNew: iasufr.formatDateStr(iasufr.formatDate(newDate)) },
+            success: function() {
+                wnd.close();
+                iasufr.alert("Форму склоновано");
+            }
+        });
+
+
+    }
+
     function onRowSelect() {
         if (!opt.select) return;
         var row = g.getSelectedId();
@@ -114,6 +155,12 @@ Frm.Form.Create = function(opt) {
             } else ChoseTable(function (id) {iasufr.loadForm("Designer", {id: id, maximized: false, width: g.entBox.offsetWidth, height: g.entBox.offsetHeight})});
         }
         if (name == "print") ShowPrintPreview();// ChoseTable(ShowPrintPreview);
+        if (name == "clone") {
+            if (!row) return;
+            var id = g.cells(row, g.getColIndexById("id")).getValue();
+            var date = iasufr.formatDateStr(g.cells(row, g.getColIndexById("from")).getValue());
+            cloneForm(id, date);
+        }
         if (name == "printsettings") ChoseTable(ShowTableSettings);
         if (name == "datecaptions") ChoseTable(ShowDateCaptions);
            /* if (!row) return;

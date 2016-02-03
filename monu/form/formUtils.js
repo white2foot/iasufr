@@ -231,7 +231,7 @@ function FormUtils(tableData, period) {
     function getNewId() {
         var id = 0;
         //for (var i = 0; i < t.grid.getRowsNum(); i++) if (t.grid.getRowId(i) >= id) id = t.grid.getRowId(i) + 1;
-        for (var i = 0; i < t.data.rows.length - 1; i++) if (t.data.rows[i].id >= id) id = t.data.rows[i].id + 1;
+        for (var i = 0; i < t.data.rows.length; i++) if (t.data.rows[i].id >= id) id = t.data.rows[i].id + 1;
         return id;
     }
 

@@ -596,7 +596,7 @@
             var $txt = $(input);
             pars.onSelect = function(o) {
                 if (params.onSelect) params.onSelect(o, $txt);
-            }
+            };
             iasufr.attachButton(input, function () { 
                 var $inp = $(input);
                 var $img =  $inp.data("btn");
@@ -610,9 +610,10 @@
             $txt.keyup(function() { if ($txt.val() == "") if (params.onSelect) params.onSelect(null, $txt)});
             if (pars.searchUrl) {
                 $txt.keydown(function (e) {if (e.keyCode == 13) {
-                    if ($txt.val() == "") return;
+                    var searchStr = $txt.val().trim();
+                    if (searchStr == "") return;
                     iasufr.ajax({
-                        url: pars.searchUrl.replace("%txt%", $txt.val()),
+                        url: pars.searchUrl.replace("%txt%", searchStr),
                         success: function (d) {
                             if (d && params.onSelect) {
                                 $txt.blur();

@@ -517,14 +517,14 @@ ac.MenuReports.Create = function (opt) {
             idI=dhxLayoutT1.getRowId(i);
             //idKeysRowTemp
             keyI=dhxLayoutT1.cells2(i,indKey).getValue();
-            json=JSON.parse(keyI);
-            jsoT2[i].push(json[0][0]);
+            json=keyI.split(",");
+            jsoT2[i].push(json[0]);
             //idParentI
             indParentI=dhxLayoutT1.getRowIndex(dhxLayoutT1.getParentId(idI));
             if (indParentI!=-1){
                 keyParentI=dhxLayoutT1.cells2(indParentI,indKey).getValue();
-                json=JSON.parse(keyParentI);
-                jsoT2[i].push(json[0][0]);
+                json=keyParentI.split(",");
+                jsoT2[i].push(json[0]);
             }
             else{
                 jsoT2[i].push("");

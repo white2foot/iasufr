@@ -152,7 +152,7 @@ Frm.WorkWithForms.Create = function(opt) {
             actionsList.push(['exp_2_2', 'obj', 'ДКСУ - вiдправленi', '']);
             actionsList.push(['exp_3_2', 'obj', 'ДКСУ - пiдтвердженi', '']);
         }
-        toolbar.addButtonSelect("actions2", null, "Ехпорт", actionsList, "", "", "", true);
+        toolbar.addButtonSelect("actions2", null, "Експорт", actionsList, "", "", "", true);
         toolbar.addSeparator("sep3", null);
     }
 

@@ -509,7 +509,7 @@ Frm.WorkWithForms.Create = function(opt) {
                 data: {func: "setCopy",idOrg:ID_ORG,date1Zvit:date1Zvit,date1ZvitNew:paramCopy.param.date1ZvitNew,idZvit:selRow},
                 success: function (data) {
                     var json = JSON.parse(data);
-                    iasufr.messageSuccess("Скопiювано звiтiв "+data);
+                    iasufr.messageSuccess("Скопiювано звiтiв "+json.count);
                     RefreshGrid();
                 }
             })

@@ -165,6 +165,7 @@ Frm.WorkWithForms.Create = function(opt) {
     actionsList.push(['delete', 'obj', iasufr.lang.ui.delete, '']);
     if (iasufr.pFunc("zvCanRestore")) actionsList.push(['undelete', 'obj', "Востановити", '']);
     if (iasufr.pFunc("zvCanEdit"))    actionsList.push(['editTitle', 'obj', "Змiнити реквизити", '']);
+    if (iasufr.pFunc("zvCanCopy"))    actionsList.push(['copy', 'obj', "Копiювати", '']);
 
     if (iasufr.pFunc("zvCanViewLog")) actionsList.push(['viewLog', 'obj', "Перегляд iсторії", '']);
     actionsList.push(['seporator']);
@@ -486,7 +487,36 @@ Frm.WorkWithForms.Create = function(opt) {
         })
 
     }
+    function copy(paramCopy){
+        // 1)спросить на какую дату
+        if (paramCopy==undefined){
+            var mess=[{type: "settings", position: "label-right"},{type: "label", label:"Задати дату"}];
+            mess.push({type: "calendar", name:"date1ZvitNew",value:'', label: "Обранi звiти копiювати на дату"});
 
+            iasufr.loadForm("Confirm", {title: "Задати дату",mess:mess,onSelect:copy,param:{date1ZvitNew:""},modal:true,width:560,height:150});
+        }
+        else {
+            //2)selRow
+            var selRow = grid.getCheckedRows(grid.getColIndexById("sel"));
+            if (!selRow) {selRow = selRow=""}
+
+            var m = toolbar.getListOptionSelected("month"); if (m.length==1)m="0"+m;
+            var y=toolbar.getValue("year");
+            var date1Zvit=y+m+"01";
+
+            iasufr.ajax({
+                url: "frm.TitleZvitForm.cls",
+                data: {func: "setCopy",idOrg:ID_ORG,date1Zvit:date1Zvit,date1ZvitNew:paramCopy.param.date1ZvitNew,idZvit:selRow},
+                success: function (data) {
+                    var json = JSON.parse(data);
+                    iasufr.messageSuccess("Скопiювано звiтiв "+data);
+                    RefreshGrid();
+                }
+            })
+
+        }
+
+    }
     function exportDbf(idStatus,typeExpZvit){
         var m = toolbar.getListOptionSelected("month"); if (m.length==1)m="0"+m;
         var y=toolbar.getValue("year");
@@ -746,6 +776,11 @@ Frm.WorkWithForms.Create = function(opt) {
             case "exp":
             {
                 exportDbf(nameList[1],nameList[2]);
+                break;
+            }
+            case "copy":
+            {
+                copy();
                 break;
             }
             case "1":case "2":case "3":case "4":case "5":case "6":

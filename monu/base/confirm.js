@@ -21,6 +21,8 @@ base.Confirm.Create = function(opt) {
 
     dhxLayoutT1.attachEvent("onChange", function(idRekv, value, is_checked) {
         if (_this.onSelect) {
+            if (dhxLayoutT1.getItemType(idRekv)=='calendar') {value=iasufr.formatDateStr(dhxLayoutT1.getCalendar(idRekv).getDate(true));};
+
             $.extend(_this.param, JSON.parse('{"'+idRekv+'":"'+value+'"}'));
             _this.onSelect({param:_this.param});
             iasufr.close(_this); }
@@ -32,5 +34,4 @@ base.Confirm.Create = function(opt) {
 
 
 
-                
-     
+

@@ -912,6 +912,58 @@ base.Layout2.Create = function (opt) {
         });
 
     }
+    function isImport(){
+        var wnd = iasufr.wins.createWindow("up" + new Date().valueOf(), 0, 0, 320, 120);
+        wnd.setModal(true);
+        wnd.centerOnScreen();
+        wnd.denyPark();
+        wnd.denyResize();
+        wnd.setText("Завантажити файл");
+        var idUploaderBlock = "frm-uploader-block" + new Date().valueOf().toString();
+        var idUploader      = "uploader" + new Date().valueOf().toString();
+
+        $(document.body).append('<div id="'+idUploaderBlock+'"><input id="'+idUploader+'" class="fm-uploader" type="file" /></div>');
+        wnd.attachObject(idUploaderBlock);
+        document.getElementById(idUploader).addEventListener('change', readSingleFile, false);
+        document.getElementById(idUploader).addEventListener('dragover', function(){$("#"+idUploader).addClass("fm-uploader-over")}, false);
+        document.getElementById(idUploader).addEventListener('dragleave', function(){$("#"+idUploader).removeClass("fm-uploader-over")}, false);
+
+        function readSingleFile(evt) {
+            var f = evt.target.files[0];
+            if (f) {
+                var r = new FileReader();
+                r.onload = function(e) {
+                    var contents = e.target.result;
+
+                    try {
+                        var idOrg=dhxLayoutT1.selector["idOrg"].id;
+
+                        var xotree = new XML.ObjTree();
+                        var tree = xotree.parseXML(contents);
+                        var t=tree;
+                        iasufr.ajax({
+                            url: "personal.ImportDiploma.cls",
+                            data: {func: "import",content:JSON.stringify(tree),idOrg:idOrg},
+                            success:  function(data) {
+                                var json = JSON.parse(data);
+                                if (json!="")setParam(json.param);
+                                initGrid("T2");
+                            }
+
+                        });
+                    } catch (exp) {
+                        iasufr.alert(exp.message);
+                    }
+                    $("#frm-uploader-block").remove();
+                    wnd.close();
+                }
+                r.readAsText(f);
+            } else {
+                iasufr.alert("Помилка завантаження файла")
+            }
+        }
+
+    }
 
 }
 //@ sourceURL=http://base/base2.js

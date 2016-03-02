@@ -95,7 +95,7 @@ base.Layout2.Create = function (opt) {
                     var numbIsChange=dhxLayoutT2.idCells.indexOf("isChangeRowTemp");if (numbIsChange==-1) return
                     dhxLayoutT2.cells(rowId,numbIsChange).setValue(1);
                 }
-                    // iasufr.enableAskBeforClose(t);  return true
+                // iasufr.enableAskBeforClose(t);  return true
                 return true
             });
             dhxLayoutT2.attachEvent("onRowDblClicked", function(rowId,cellInd){
@@ -128,8 +128,8 @@ base.Layout2.Create = function (opt) {
                         if (result) {
                             onToolbarClick("changePos");
                             initGrid("T2");
-                            }
                         }
+                    }
                 });
             });
             dhxLayoutT2.attachEvent("onHeaderClick", function(ind,obj){
@@ -188,6 +188,24 @@ base.Layout2.Create = function (opt) {
                 break;
             case "addStr":{}
                 break;
+            case "import":{
+                isImport();
+                break;
+            }
+            case "printImg":{
+                var paramFiltrs=getParamForm();
+                iasufr.ajax({
+                    url: "personal.ImportDiploma.cls",
+                    data: {func: "initPrint",param:JSON.stringify(paramFiltrs),data:JSON.stringify(getParamGrid("T2",0,2))},
+                    success: function (data) {//alert(data);
+                        var json=JSON.parse(data);
+                        var t=iasufr.const.CACHE_URL+"doc/Diploms/2.jpg"
+                        var t1=json.data;
+                        iasufr.printDiploms(json.data, iasufr.const.CACHE_URL+"doc/Diploms/9.jpg", iasufr.const.CACHE_URL+"doc/Diploms/1.jpg", 248, 175);
+                    }
+                })
+                break;
+            }
             case "close": iasufr.close(_this); break;
             case "expand" : { if (expand==1) {dhxLayoutT2.collapseAll(); expand=0; return }
                 if (expand==0) { dhxLayoutT2.expandAll(); expand=1; return }
@@ -470,7 +488,7 @@ base.Layout2.Create = function (opt) {
 
          // а так можно удалить кукисы
          $.cookie('cookie_name', null);
-----------------------
+         ----------------------
          http://docs.dhtmlx.com/grid__basic_operations.html
          ------------------
          mygrid.sortRows(0,"str","des");
@@ -485,10 +503,10 @@ base.Layout2.Create = function (opt) {
          mygrid.setRowExcellType(mixed row_id,"ra_str");
          ------------------------
          mygrid.setRowId(0,"new_row_id");
----------------------
+         ---------------------
          mygrid.setDelimiter(";");
          mygrid.setHeader("First Column;Second Column;Third Column");
------------------------
+         -----------------------
          mygrid.setCustomSorting(sort_custom,1);
          ...
          function sort_custom(a,b,order){
@@ -498,7 +516,7 @@ base.Layout2.Create = function (opt) {
          return n>m?1:-1;
          else
          return n<m?1:-1;
---------------------------
+         --------------------------
          //set the min width of the first column
          mygrid.setColumnMinWidth(50,0);
          }
@@ -698,17 +716,17 @@ base.Layout2.Create = function (opt) {
         if (dhxFormInit.isChangeNow==1) return
         dhxFormInit.isChangeNow=1
         iasufr.ajax({
-                url: "base.Simple.cls",
-                data: {func: "init",idDoc:_this.idDoc,idLayout:idLayout,idRekv:idRekv,code:value,
-                    param:getParam(dhxFormInit.selector[idRekv].param,dhxFormInit.selector[idRekv].isParam),
-                    data:dhxFormInit.selector[idRekv].data
-                },
-                success: function (data) {
-                    isSelect(JSON.parse(data))
-                    dhxFormInit.isChangeNow=0;
-                }
-                //error:function{dhxFormInit.isChangeNow=0}
-            })
+            url: "base.Simple.cls",
+            data: {func: "init",idDoc:_this.idDoc,idLayout:idLayout,idRekv:idRekv,code:value,
+                param:getParam(dhxFormInit.selector[idRekv].param,dhxFormInit.selector[idRekv].isParam),
+                data:dhxFormInit.selector[idRekv].data
+            },
+            success: function (data) {
+                isSelect(JSON.parse(data))
+                dhxFormInit.isChangeNow=0;
+            }
+            //error:function{dhxFormInit.isChangeNow=0}
+        })
 
     }
 
@@ -767,7 +785,7 @@ base.Layout2.Create = function (opt) {
 
             jsoDATA[1].push(val);
         }
-    return jsoDATA
+        return jsoDATA
 
     }
     function getParamGrid(idLayout,isRow,isDel){
@@ -794,7 +812,7 @@ base.Layout2.Create = function (opt) {
         if (dhxGridInit.idCells.indexOf("isCHECK")>-1) {strCheck= dhxGridInit.getCheckedRows(dhxGridInit.idCells.indexOf("isCHECK"));}
         if (strCheck=="") strCheck=dhxGridInit.getSelectedRowId();
         strCheck=","+strCheck+",";
-         var t2=dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId());
+        var t2=dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId());
         var t=dhxGridInit.getSelectedRowId();
 
         if (isRow==1) {i1= dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId()),i2=i1; if ((i1==null)||(i1==-1)) {i1=0; i2=-1;};}

@@ -640,6 +640,80 @@
         var wnd = window.open("/print.html#"+data, "_blank");
     },
 
+    /**
+     * Print pdfs
+     * @param {Array.<object>|String} pdfs Array of pdfs to print or html string to print
+     */
+    printPdf: function(pdfs) {
+        if (!(pdfs instanceof Array)) pdfs = [{content: pdfs}];
+        for (var i = 0; i < pdfs.length; i++) {
+            if (!pdfs[i].orientation) pdfs[i].orientation = "portrait";
+            if (!pdfs[i].margins) pdfs[i].margins = "25 15 15 15";
+            if (!pdfs[i].colonFirst) pdfs[i].colonFirst = "";
+            if (!pdfs[i].colonOther) pdfs[i].colonOther = "";
+        }
+        iasufr.ajax({
+            url: "base.Print.cls", data: {
+                func: "Print",
+                pdfs: JSON.stringify(pdfs)
+            },
+            success: function (d, res) {
+                console.log("pdf generation time: " + res.json.time);
+                window.open("/base.Page.cls?&func=View&class=base.Print&iasu=1&pdfdownload=1&file=" + res.json.file);
+            }
+        });
+    },
+
+    //printDiploms: function(pdfs, image1, image2) {
+    //    if (!(pdfs instanceof Array)) pdfs = [{content: pdfs}];
+    //    for (var i = 0; i < pdfs.length; i++) {
+    //        if (!pdfs[i].orientation) pdfs[i].orientation = "portrait";
+    //        if (!pdfs[i].margins) pdfs[i].margins = "0 0 0 0";
+    //        if (!pdfs[i].pageWidth) pdfs[i].pageWidth = 250;
+    //        if (!pdfs[i].pageHeight) pdfs[i].pageHeight = 195;
+    //    }
+    //    iasufr.ajax({
+    //        url: "base.Print.cls", data: {
+    //            func: "PrintDiploms",
+    //            pdfs: JSON.stringify(pdfs),
+    //            image1: image1,
+    //            image2: image2
+    //        },
+    //        success: function (d, res) {
+    //            console.log("pdf generation time: " + res.json.time);
+    //            window.open("/base.Page.cls?&func=View&class=base.Print&iasu=1&pdfdownload=1&file=" + res.json.file);
+    //        }
+    //    });
+    //},
+
+    //printDiploms: function(htmls, image1, image2, width, height) {
+    //    width = width || 250;
+    //    height = height || 195;
+    //    var img1 = "<div style='z-index: 0; position: absolute; left: 0mm; top: 0mm; width: " + width + "mm; height: " + height + "mm; background-size: contain; background: url(" + image1 +") no-repeat;'>";
+    //    var img2 = "<div style='z-index: 0; position: absolute; left: 0mm; top: " + (height-1) + "mm; width: " + width + "mm; height: " + height + "mm; background-size: contain; background: url(" + image2 +") no-repeat;'>";
+    //    var pageBreak = "<div style='page-break-after:always'></div>";
+    //
+    //    var pdfs = [];
+    //    for (var i = 0; i < htmls.length; i++) {
+    //        pdfs.push({ margins: '0 0 0 0', pageWidth: width, pageHeight: height, content: img1 + "<div style='z-index: 100;width: " + width + "mm'>" + htmls[i] + "</div>" + img2});
+    //    }
+    //    iasufr.printPdf(pdfs);
+    //},
+
+    printDiploms: function(htmls, image1, image2, width, height) {
+        width = width || 250;
+        height = height || 195;
+        var img1 = "<div style='page-break-after:always; z-index: 0; width: " + width + "mm; height: " + (height-1).toString() + "mm; background-size: contain; background: url(" + image1 +") no-repeat;'>";
+        var html = "";
+        var pdfs = [];
+        for (var i = 0; i < htmls.length; i++) {
+            html += img1 + htmls[i] + "</div>";
+
+        }
+        pdfs.push({ margins: '0 0 0 0', pageWidth: width, pageHeight: height, content: html});
+        iasufr.printPdf(pdfs);
+    },
+
     getCurrentSprav: function() {
         var cur = "";
         var win = iasufr.wins.getTopmostWindow();

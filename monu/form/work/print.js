@@ -13,10 +13,13 @@ Frm.PrintForm.Create = function(opt) {
     l.progressOn();
     t.owner.progressOn();
 
+    var st;
+    var et;
+
     LoadData();
 
-
     function LoadData() {
+
         iasufr.ajax({url: "frm.Form.cls", data: {
             func: "LoadFormsPrintData",
             customDate: (iasufr.storeGet("print.customDate" + opt.code) || ""),
@@ -259,6 +262,9 @@ Frm.PrintForm.Create = function(opt) {
 
     function print2(d) {
         var o = JSON.parse(d);
+
+        st = performance.now();
+
         if (o.json[0].isText == "1") {
             iasufr.print(fillTextData(o.json[0].txtData, o.json[0].savedData));
             iasufr.close(tt);
@@ -535,10 +541,11 @@ Frm.PrintForm.Create = function(opt) {
         }
 
         addPdf( o.json[z-1].tables[t - 2] || o.json[z-1].tables[t-1]);
-
+        var et = performance.now();
+        console.log('Data load: ', et - st);
         iasufr.ajax({
             url: "base.Print.cls", data: {
-                func: "PrintParralel",
+                func: "Print",
                 pdfs: JSON.stringify(pdfs)
             },
             success: function(d, res) {

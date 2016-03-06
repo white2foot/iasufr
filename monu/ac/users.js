@@ -256,7 +256,7 @@ Usr.Form.Create = function(opt) {
         if (t.opt.selectUser) {
             var id = GetUserId();
             if (!id) return;
-            if (t.onSelect) t.onSelect({id: id, fio: $(getUsrCell(id, "fio")).text(), post: getUsrCell(id, "post"), orgName: getUsrCell(id, "orgCode")});
+            if (t.onSelect) t.onSelect({id: id, fio: getUsrCell(id, "fio"), post: getUsrCell(id, "post"), orgName: getUsrCell(id, "orgCode")});
             iasufr.close(t);
         }
         if (t.opt.selectUserMulti) {
@@ -291,7 +291,7 @@ Usr.Form.Create = function(opt) {
     function ReloadUsers(id) {
         iasufr.gridRowFocus(gUsers, id);
         frmFilter.hideItem("fltActive");
-        iasufr.ajax({url: "ac.Usr.cls", data:{func:"Select"},success: onAfterUsersLoad});
+        iasufr.ajax({url: "ac.Usr.cls", data:{func:"Select", showAll: t.opt.showAll},success: onAfterUsersLoad});
     }
 
     function GetUserId() {

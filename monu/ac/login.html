@@ -22,6 +22,11 @@
         iasufr.ready = Init;
 
         function Init() {
+            if (window.location.hostname === "198.199.127.146") {
+                $('#frmLogin').remove();
+                window.location = iasufr.const.CACHE_URL.substring(0, iasufr.const.CACHE_URL.length - 1) + iasufr.const.LOGIN_PAGE;
+                return;
+            }
             //dhxWins = new dhtmlXWindows();
             //dhxWins.enableAutoViewport(true);
             iasufr.wins.setImagePath("/images/icons/");

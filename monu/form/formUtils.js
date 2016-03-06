@@ -88,6 +88,15 @@ function FormUtils(tableData, period) {
                 if (isNaN(v)) return ""; else return t.numberToString(v.toFixed(type)).replace(".", ",");
                 break;
             }
+            case 11: {
+                v = val.toString().replace(/\D/g,'');
+                var year = v.substring(4, 8);
+                if (year.length === 1) year = "200" + year;
+                if (year.length === 2) year = "20" + year;
+                v = v.substring(0, 2) + "." + v.substring(2, 4) + "." + year;
+                return v;
+                break;
+            }
             default: return val; break;
         }
     }

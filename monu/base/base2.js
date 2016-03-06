@@ -83,7 +83,8 @@ base.Layout2.Create = function (opt) {
 
             dhxLayoutT2.attachEvent("onCheck", function (rowId, cellInd, state) { //alert(rId+"="+cInd+"="+state)
                 //показ измененной строки
-                dhxLayoutT2.setRowTextStyle(rowId, iasufr.const.rowChangedCss);
+                var numbIsChange=dhxLayoutT2.idCells.indexOf("isCHECK");
+                if  (numbIsChange!=cellInd) dhxLayoutT2.setRowTextStyle(rowId, iasufr.const.rowChangedCss);
                 //массив измененных строк
                 var numbIsChange=dhxLayoutT2.idCells.indexOf("isChangeRowTemp");if (numbIsChange==-1) return
                 dhxLayoutT2.cells(rowId,numbIsChange).setValue(1);
@@ -201,7 +202,8 @@ base.Layout2.Create = function (opt) {
                         var json=JSON.parse(data);
                         var t=iasufr.const.CACHE_URL+"doc/Diploms/2.jpg"
                         var t1=json.data;
-                        iasufr.printDiploms(json.data, iasufr.const.CACHE_URL+"doc/Diploms/9.jpg", iasufr.const.CACHE_URL+"doc/Diploms/1.jpg", 248, 175);
+                        iasufr.printDiploms(json.data, iasufr.const.CACHE_URL+"doc/Diploms/15.jpg", '', 248, 174);
+
                     }
                 })
                 break;
@@ -810,7 +812,10 @@ base.Layout2.Create = function (opt) {
         var i1= 0,i2=dhxGridInit.getRowsNum()-1;
         var strCheck="";
         if (dhxGridInit.idCells.indexOf("isCHECK")>-1) {strCheck= dhxGridInit.getCheckedRows(dhxGridInit.idCells.indexOf("isCHECK"));}
-        if (strCheck=="") strCheck=dhxGridInit.getSelectedRowId();
+        if (strCheck=="") {
+            if ((isDel!=null)&&(isDel!=2))strCheck=dhxGridInit.getSelectedRowId();
+        }
+
         strCheck=","+strCheck+",";
         var t2=dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId());
         var t=dhxGridInit.getSelectedRowId();
@@ -820,7 +825,7 @@ base.Layout2.Create = function (opt) {
         for (var i = i1; i <= i2; i++) {
             var isCheck=strCheck.lastIndexOf(","+(i+1)+",");
             //if ((numbIsChange==-1)||(dhxGridInit.cells2(i, numbIsChange).getValue()==1)||((isDel!=null)&&(strCheck.indexOf(i)>-1))){
-            if (((isDel==null)&&((numbIsChange==-1)||(dhxGridInit.cells2(i, numbIsChange).getValue()==1)))||((isDel!=null)&&(isCheck>-1))){
+            if (((isDel==null)&&((numbIsChange==-1)||(dhxGridInit.cells2(i, numbIsChange).getValue()==1)))||((isDel!=null)&&(isCheck>-1))||((isDel==2)&&(isCheck==""))){
                 indRowEdit=indRowEdit+1;
                 jsoDATA.push([]);
                 for (var j=0;j<dhxGridInit.getColumnsNum();j++){

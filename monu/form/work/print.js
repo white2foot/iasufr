@@ -23,7 +23,7 @@ Frm.PrintForm.Create = function(opt) {
         iasufr.ajax({url: "frm.Form.cls", data: {
             func: "LoadFormsPrintData",
             customDate: (iasufr.storeGet("print.customDate" + opt.code) || ""),
-            customFooter: (iasufr.storeGet("print.customFooter" + opt.code) || ""),
+            customFooter: iasufr.replaceAll((iasufr.storeGet("print.customFooter" + opt.code) || ""), "\n", "<br>"),
             customDateFormat: (iasufr.storeGet("print.customDateFormat" + opt.code) || ""),
             ids: ids.join(","),
             isKazn: isKazn
@@ -90,6 +90,21 @@ Frm.PrintForm.Create = function(opt) {
             }
             default: return val; break;
         }
+    }
+
+    function addRow(c, savedData) {
+        var ra = c.find(".row-adder");
+        var clone = ra.clone();
+        ra.removeClass("row-adder");
+
+        var inputs = clone.find(".txtform-input");
+        inputs.each(function(idx, input) {
+            var newAttr = $(input).attr("datafield").replace(/\d+/g, function(n){ return ++n });
+            $(input).attr("datafield", newAttr);
+            if (savedData[newAttr] !== undefined) $(input).text(savedData[newAttr]);
+        });
+
+        clone.insertAfter(ra);
     }
 
     function fillTextData(str, savedData) {
@@ -260,6 +275,40 @@ Frm.PrintForm.Create = function(opt) {
         }
     }
 
+    function printTemplate(template, tdesc) {
+        var str = "<div>" + template + "</div>";
+        var adder = $(str).find(".row-adder");
+
+        tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
+        extendTableWithDynamicData(tdesc);
+        for (var r = 0; r < tdesc.rows.length; r++) {
+            if (tdesc.rows[r].header) continue;
+            for (var c = 0; c < tdesc.cols.length; c++) {
+                var idx = GetCellIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
+                var inputIdx = GetInputDataIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
+                var v = "";
+
+                if (str.indexOf("%CELL%") === -1) {
+                    // Кончились блоки для заполнения надо добавить новый
+                    var html =  $(str);
+                    var lastAdder = html.find(".row-adder");
+                    lastAdder = lastAdder.get(lastAdder.size() - 1);
+                    adder.clone().insertAfter(lastAdder);
+                    str = html.get(0).outerHTML;
+                }
+
+                if (inputIdx != -1) {
+                    if (tdesc.inputData[inputIdx].value) {
+                        v = FormatValue(tdesc.inputData[inputIdx].value, tdesc.cells[idx].type);
+                    }
+                }
+                str = str.replace("%CELL%", v);
+            }
+        }
+
+        return iasufr.replaceAll(str, "%CELL%", "");
+    }
+
     function print2(d) {
         var o = JSON.parse(d);
 
@@ -387,6 +436,13 @@ Frm.PrintForm.Create = function(opt) {
                 pageMargins = getMargins(tdesc);
                 PAGE_WIDTH = (210 - getLeftMargin() - getRightMargin());
                 if (orientation === "landscape") PAGE_WIDTH = (297 - getLeftMargin() - getRightMargin());
+
+
+                if (tdesc.printData.template) {
+                    res += printTemplate(tdesc.printData.template, tdesc);
+                    continue;
+                }
+
                 var widths = calcWidths(tdesc);
 
 
@@ -558,330 +614,6 @@ Frm.PrintForm.Create = function(opt) {
 
     function onDataLoaded(d) {
         print2(d);
-        return;
-        var o = JSON.parse(d);
-        var content  = [];
-        var isPortrait = false;
-        var pageMargins = "";
-        var emptyChar = iasufr.storeGet("print.emptyChar") || "-";
-        var fontSize = iasufr.storeGet("print.customFontSize" + opt.code) || 7;
-
-        if (o.json[0].isText == "1") {
-            iasufr.print(fillTextData(o.json[0].txtData, o.json[0].savedData));
-            iasufr.close(tt);
-            return;
-        }
-
-        var pu = new PrintUtils();
-
-
-        function indexOfRow(tdesc, rid) {
-            for (var i = 0; i < tdesc.rows.length; i++) if (tdesc.rows[i].id == rid) return i;
-            return -1;
-        }
-
-        for (var z = 0 ; z < o.json.length; z++) {
-            for (var t = 0; t < o.json[z].tables.length; t++) {
-                var tdesc = o.json[z].tables[t];
-                if (!pageMargins) if (tdesc.printData.margins) pageMargins = tdesc.printData.margins;
-                if (tdesc.printData) {
-                    if (t != 0) if (tdesc.printData.fromNewPage == 1) content.push({text: "", pageBreak: 'after', pageOrientation: tdesc.printData.portrait == 1 ? 'portrait' : 'landscape'});
-
-                    if (tdesc.printData.caption) {
-                        pu.parseHtml(content, tdesc.printData.caption);
-                    }
-                    if ((z == 0) && (tdesc.printData.portrait == 1)) isPortrait = true;
-
-
-                }
-
-                var table = {
-                    table: {
-                        dontBreakRows: true,
-                        headerRows: 0,
-                        body: []
-                    },
-                    layout:
-                    {
-                        hLineWidth: function(i, node)
-                        {
-                            return (i === 0 || i === node.table.body.length) ? 0.5 : 0.5;
-                        }
-                    }
-                };
-
-                var hasCustomWidths = false;
-                if (tdesc.printData.customWidths) hasCustomWidths = tdesc.printData.customWidths.replace(/,/g, "").trim() != "";
-                if (hasCustomWidths) {
-                    if (iasufr.replaceAll(tdesc.printData.customWidths, ",", "") != "") {
-                        var parts = tdesc.printData.customWidths.split(",");
-                        table.table.widths = [];
-                        for (var ttt = 0; ttt < parts.length; ttt++) {
-                            if (parts[ttt] == "") table.table.widths.push("auto");
-                            else
-                                table.table.widths.push(parts[ttt] + "%");
-                        }
-                    }
-                } else {
-                    table.table.widths = [];
-                    for (var c = 0; c < tdesc.cols.length; c++) {
-                        if (tdesc.cols[c].printWidth) table.table.widths.push(tdesc.cols[c].printWidth + "%");
-                        else table.table.widths.push("auto");
-                    }
-                }
-                tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
-
-                // Add dynamic rows from input data
-                tdesc.inputData.sort(function (a,b) {
-                    if (a.createdFromId !== undefined && b.createdFromId !== undefined) {
-                        return a.idx < b.idx ? 1: -1;
-                    } else {
-                        return a.idRow < b.idRow ? 1: -1;
-                    }
-                });
-                for (var m = 0; m < tdesc.inputData.length - 1; m++) {
-                    if (tdesc.inputData[m].createdFromId !== undefined) {
-                        var ridx = indexOfRow(tdesc, tdesc.inputData[m].idRow);
-                        if (ridx == -1) {
-                            var ridx = indexOfRow(tdesc, tdesc.inputData[m].createdFromId);
-                            var rd = $.extend({}, tdesc.rows[ridx]);
-                            rd.id = tdesc.inputData[m].idRow;
-                            tdesc.rows.splice(ridx + 1, 0, rd);
-
-                            // copy cell data
-                            var newCells = [];
-                            for (var n = 0; n < tdesc.cells.length; n++) if (tdesc.cells[n].row == tdesc.inputData[m].createdFromId) {
-                                var nc = $.extend({}, tdesc.cells[n]);
-                                nc.row = rd.id;
-                                newCells.push(nc);
-                            }
-                            for (var n = 0; n < newCells.length; n++) tdesc.cells.push(newCells[n]);
-                        }
-                    }
-                    var idx = GetCellIdx(tdesc, tdesc.inputData[m].idRow, tdesc.inputData[m].idCol);
-                    if (idx == -1) {
-                        tdesc.cells.push({row: tdesc.inputData[m].idRow, col: tdesc.inputData[m].idCol});
-                    }
-                    delete tdesc.inputData[m].createdFromId;
-                }
-
-                // Only one subtotal column supported
-                var subIdx = -1;
-                var subPrevIdx = 0;
-                var subVal = null;
-                var subColumns = [];
-                var subDoInsert = false;
-                var subTitle = "";
-                var newRowDescs = [];
-                for (var c = 0; c < tdesc.cols.length; c++) {
-                    if (tdesc.cols[c].subtotal) {
-                        subTitle = tdesc.cols[c].subtotalTitle;
-                        subIdx = c;
-                        subColumns = tdesc.cols[c].subtotal.replace(/ /g, "").split(",")
-                        subColumns = subColumns.map(function(el) {return parseInt(el)});
-                    }
-                }
-                if (subIdx != -1) {
-                    // find max row id to generate new ones
-                    var maxid = 0;
-                    tdesc.rows.map(function(obj){ if (obj.id > maxid) maxid = obj.id; });
-                    maxid++;
-
-                    for (var r = 0; r < tdesc.rows.length; r++) {
-                        for (var c = 0; c < tdesc.cols.length; c++) {
-                            // check for subtotal
-                            if ((subIdx == c) && !tdesc.rows[r].header) {
-                                var ct = "";
-                                var idx = GetCellIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
-                                if (idx != -1) ct = tdesc.cells[idx].value || "";
-                                var inputIdx = GetInputDataIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
-                                if (inputIdx != -1) {
-                                    if (tdesc.inputData[inputIdx].value) {
-                                        ct = tdesc.inputData[inputIdx].value || "";
-                                    }
-                                }
-                                ct = ct.trim();
-                                if (subVal != null && ct != "") {
-                                    if (subVal != ct) {
-                                        subDoInsert = true;
-                                    }
-                                }
-                                if (ct != "") subVal = ct;
-                            }
-                        }
-
-                        if (subDoInsert) {
-                            console.log("=================");
-                            subDoInsert = false;
-                            // create new row desc for subtotal row
-                            var newDesc = $.extend({}, tdesc.rows[r - 1]);
-                            newDesc.id = maxid++;
-                            newDesc.insertBefore = r;
-                            newRowDescs.push(newDesc);
-
-                            var subRow = [];
-                            for (var c = 0; c < tdesc.cols.length; c++) {
-                                var cd = {};
-                                var idx = GetCellIdx(tdesc, tdesc.rows[r - 1].id, tdesc.cols[c].id);
-                                if (idx != -1) cd = $.extend({}, tdesc.cells[idx]);
-                                cd.row = newDesc.id;
-
-                                if (cd.formula) {
-                                    // TODO: formulas support
-                                }
-
-                                if (c == subIdx) {
-                                    cd.value = subTitle.toString();
-                                } else if (subColumns.indexOf(c + 1) != -1) {
-                                    // calc total sub from subPrevIdx to r
-                                    var total = 0;
-                                    for (var p = subPrevIdx; p < r; p++) {
-                                        if (tdesc.rows[p].header) continue;
-                                        var inputIdx = GetInputDataIdx(tdesc, tdesc.rows[p].id, tdesc.cols[c].id);
-                                        if (inputIdx != -1) {
-                                            var v = tdesc.inputData[inputIdx].value;
-                                            if (v != undefined) v = parseInt(v);
-                                            if (c == 6) {
-                                                console.log(v);
-                                            }
-                                            if (!isNaN(v)) total += v;
-                                        }
-                                    }
-                                    console.log("Total: ", total);
-                                    cd.value = FormatValue(total, cd.type);
-                                } else cd.value = "";
-
-                                tdesc.cells.push(cd);
-                            }
-                            subPrevIdx = r;
-                        }
-                    }
-
-                    for (var r = 0; r < newRowDescs.length; r++) {
-                        tdesc.rows.splice(parseInt(newRowDescs[r].insertBefore) + r, 0, newRowDescs[r]);
-                    }
-                    //tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
-                }
-
-
-                for (var r = 0; r < tdesc.rows.length; r++) {
-                    if (tdesc.rows[r].header) table.table.headerRows++;
-
-                    //if (tdesc.rows[r].header) table.table.headerRows++;
-                    var row = [];
-                    var skipCols = 0;
-                    for (var c = 0; c < tdesc.cols.length; c++) {
-                        if (skipCols != 0) {
-                            row.push("");
-                            skipCols--;
-                            continue;
-                        }
-
-
-
-                        var idx = GetCellIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
-                        var cell = { text: '', fontSize: fontSize };
-                        if (idx != -1) {
-                            if (tdesc.cells[idx].value == "#COL_NUM#") tdesc.cells[idx].value = (c+1).toString();
-                            if (tdesc.cells[idx].value) cell.text = tdesc.cells[idx].value.replace(/\\u0027/g, "'");
-                            //cell.text = "test";
-                            if (tdesc.cells[idx].rspan) cell.rowSpan = tdesc.cells[idx].rspan;
-                            if (tdesc.cells[idx].cspan) {
-                                cell.colSpan = tdesc.cells[idx].cspan;
-                                skipCols = cell.colSpan - 1;
-                            }
-                            if (tdesc.cells[idx].indent) cell.margin = [tdesc.cells[idx].indent * 5, 0];
-                            if (tdesc.cells[idx].font) {
-                                var fnt = parseInt(tdesc.cells[idx].font);
-                                if ((fnt & 2) != 0) cell.bold = true;
-                                if ((fnt & 4) != 0) cell.decoration = "underline";
-                                if ((fnt & 8) != 0) cell.italics = true;
-                            }
-                            if (tdesc.cells[idx].align != undefined) {
-                                switch (tdesc.cells[idx].align) {
-                                    case 1: cell.alignment = "center"; break;
-                                    case 2: cell.alignment = "right"; break;
-                                }
-                            }
-                            if (!cell.text) cell.text = " ";
-                            var inputIdx = GetInputDataIdx(tdesc, tdesc.rows[r].id, tdesc.cols[c].id);
-                            if (inputIdx != -1) {
-                                if (tdesc.inputData[inputIdx].value) {
-                                    cell.text = FormatValue(tdesc.inputData[inputIdx].value, tdesc.cells[idx].type);
-                                }
-                            }
-                        }
-
-                        /*delete cell.alignment;
-                        delete cell.bold;
-                        delete cell.decoration;
-                        delete cell.italics;
-                        delete cell.margin;*/
-                        if (cell.text == " " || cell.text == "") {
-                            if (idx !== -1 && tdesc.cells[idx].readonly == 1)
-                                row.push(" ");
-                            else {
-                                if (!cell.alignment) cell.alignment = "right";
-                                cell.text = emptyChar;
-                                row.push(cell);
-                            }
-                        } else row.push(cell);
-                    }
-                    table.table.body.push(row);
-                }
-                content.push(table);
-                if (tdesc.printData.note) {
-                    pu.parseHtml(content, tdesc.printData.note);
-                }
-                if (tdesc.printData) {
-                    if (tdesc.printData.footer) {
-                        pu.parseHtml(content, tdesc.printData.footer);
-                    }
-                }
-            }
-            if (z != o.json.length - 1) content.push({text:"", pageBreak: 'after'});
-        }
-
-        var pm = pageMargins.replace(/,/g, "").trim().split(" ");
-        if (pm.length !== 4) pm = [50, 15, 15, 15]; else pm = pm.map(function(el) {return parseInt(el)});
-
-        pdfMake.createPdf({
-            content:content,
-            pageSize: 'A4',
-            pageOrientation: isPortrait ? 'portrait' : 'landscape',
-            // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
-            pageMargins: pm,
-            header: function(page) {
-                if (page != 1) return {text: page.toString(), alignment: 'center', fontSize: 8, margin: [0, 11, 0, 0]};
-                return "";
-            },
-            background: function(currentPage) {
-                if (o.json[0]) if (o.json[0].tables[0]) if (o.json[0].tables[0].printData) {
-                    var pd = o.json[0].tables[0].printData;
-                    if (currentPage == 1) {
-                        if (pd.colonFirst) {
-                            var ccc = [];
-                            pu.parseHtml(ccc, pd.colonFirst);
-                            return ccc;
-                        }
-                    } else {
-                        if (pd.colonOther) {
-                            var ccc = [];
-                            pu.parseHtml(ccc, pd.colonOther);
-                            return ccc;
-                        }
-                    }
-                }
-            }
-        }).open();/*getDataUrl(function(outDoc) {
-            dhxLayout.cells("a").attachURL(outDoc);
-        });*/
-
-        //.download();
-         iasufr.close(tt);
-
-
-
     }
 
     return this;

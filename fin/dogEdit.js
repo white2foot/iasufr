@@ -6,12 +6,12 @@ if (!Fin.DogEdit) Fin.DogEdit = {};
 Fin.DogEdit.Create = function (opt) {
     var t = iasufr.initForm(this, opt);
     //t.owner.setModal(true);
-    t.owner.maximize();
+    //t.owner.maximize();
     t.owner.button("park").disable();
     var idOrg=opt.idOrg;
     var orgName="";  if (opt.orgName) orgName=opt.orgName;
     var idDog=opt.idDog;
-
+    
     var user=iasufr.user;
     var idOrgUser=user.orgId;
     var dost=iasufr.pFunc("dogEdit");
@@ -66,6 +66,7 @@ Fin.DogEdit.Create = function (opt) {
     if (idDog>0) {
 	   tolb.addSeparator("sep1", 11);
        tolb.addButton("printd", 12, "Друк договору ", "32/printer_empty.png", "");
+       tolb.addButton("printdd", 12, "Друк дод.угоди ", "32/printer_empty.png", "");
 	   
        tolb.addSeparator("sep1", 13);
        tolb.addButton("print", 14, "Друк акту звiрки на дату ", "32/printer_empty.png", "");
@@ -85,6 +86,8 @@ Fin.DogEdit.Create = function (opt) {
 
     function onToolbarClick(name) {
         if (name=='print')        {   DocToPrint(0,'acz');     }
+        if (name=='printdd')        {   DocToPrint(0,'dd');     }
+
         if (name=='printd')        {   ToPrint();     }
         if (name == "save")  { Save(); }
         if (name == "reload"){ Reload(); }
@@ -95,7 +98,7 @@ Fin.DogEdit.Create = function (opt) {
     function ToPrint() {
         main.progressOn();
         var pu = new PrintUtils();
-        iasufr.ajax({url:'fin.Dog.cls', data: {func: "TextForPrint", json: JSON.stringify( {idDog:idDog, idOrg:selOrgK.id}) }, success: function (data) {
+        iasufr.ajax({url:'fin.Dog.cls', data: {func: "TextForPrint", json: JSON.stringify( {idDog:idDog, idOrg:selOrgK.id, idOrgOsnCode:form.getItemValue('idOrgOsnCode')}) }, success: function (data) {
             var jso = JSON.parse(data);
             var txt =jso.txt;
             iasufr.print( txt );
@@ -792,7 +795,7 @@ Fin.DogEdit.Create = function (opt) {
         LoadData();
         main.progressOff();
     }
-    function DocToPrint(idRow,doc) {   // doc:  "akt", "acc",  "acz"(акт сверки)
+    function DocToPrint(idRow,doc) {   // doc:  "akt", "acc",  "acz"(акт сверки) "dd"дод.угода
         var pu = new PrintUtils();
         var idOrgK=selOrgK.id;
         

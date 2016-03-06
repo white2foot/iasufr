@@ -152,7 +152,7 @@ Frm.WorkWithForms.Create = function(opt) {
             actionsList.push(['exp_2_2', 'obj', 'ДКСУ - вiдправленi', '']);
             actionsList.push(['exp_3_2', 'obj', 'ДКСУ - пiдтвердженi', '']);
         }
-        toolbar.addButtonSelect("actions2", null, "Ехпорт", actionsList, "", "", "", true);
+        toolbar.addButtonSelect("actions2", null, "Експорт", actionsList, "", "", "", true);
         toolbar.addSeparator("sep3", null);
     }
 
@@ -165,6 +165,7 @@ Frm.WorkWithForms.Create = function(opt) {
     actionsList.push(['delete', 'obj', iasufr.lang.ui.delete, '']);
     if (iasufr.pFunc("zvCanRestore")) actionsList.push(['undelete', 'obj', "Востановити", '']);
     if (iasufr.pFunc("zvCanEdit"))    actionsList.push(['editTitle', 'obj', "Змiнити реквизити", '']);
+    if (iasufr.pFunc("zvCanCopy"))    actionsList.push(['copy', 'obj', "Копiювати", '']);
 
     if (iasufr.pFunc("zvCanViewLog")) actionsList.push(['viewLog', 'obj', "Перегляд iсторії", '']);
     actionsList.push(['seporator']);
@@ -486,7 +487,36 @@ Frm.WorkWithForms.Create = function(opt) {
         })
 
     }
+    function copy(paramCopy){
+        // 1)спросить на какую дату
+        if (paramCopy==undefined){
+            var mess=[{type: "settings", position: "label-right"},{type: "label", label:"Задати дату"}];
+            mess.push({type: "calendar", name:"date1ZvitNew",value:'', label: "Обранi звiти копiювати на дату"});
 
+            iasufr.loadForm("Confirm", {title: "Задати дату",mess:mess,onSelect:copy,param:{date1ZvitNew:""},modal:true,width:560,height:150});
+        }
+        else {
+            //2)selRow
+            var selRow = grid.getCheckedRows(grid.getColIndexById("sel"));
+            if (!selRow) {selRow = selRow=""}
+
+            var m = toolbar.getListOptionSelected("month"); if (m.length==1)m="0"+m;
+            var y=toolbar.getValue("year");
+            var date1Zvit=y+m+"01";
+
+            iasufr.ajax({
+                url: "frm.TitleZvitForm.cls",
+                data: {func: "setCopy",idOrg:ID_ORG,date1Zvit:date1Zvit,date1ZvitNew:paramCopy.param.date1ZvitNew,idZvit:selRow},
+                success: function (data) {
+                    var json = JSON.parse(data);
+                    iasufr.messageSuccess("Скопiювано звiтiв "+json.count);
+                    RefreshGrid();
+                }
+            })
+
+        }
+
+    }
     function exportDbf(idStatus,typeExpZvit){
         var m = toolbar.getListOptionSelected("month"); if (m.length==1)m="0"+m;
         var y=toolbar.getValue("year");
@@ -498,7 +528,7 @@ Frm.WorkWithForms.Create = function(opt) {
             data: {func: "export",idOrg:ID_ORG,date1Zvit:date1Zvit,idStatus:idStatus,typeExpZvit:typeExpZvit,idZvit:selRow},
             success: function (data) {
                 var json = JSON.parse(data);
-                iasufr.downloadDbf(json.nameFile, json.data);
+                iasufr.downloadDbf(json.nameFile, json.data,json.type);
             }
         })
 
@@ -521,7 +551,7 @@ Frm.WorkWithForms.Create = function(opt) {
 
         function readSingleFile(evt) {
             var f = evt.target.files[0];
-            var countCell=27;
+            var countCell=30;
             var jsoDATA = [];
             jsoDATA.push([]);
             if (f) {
@@ -546,7 +576,7 @@ Frm.WorkWithForms.Create = function(opt) {
                     k=k+2
                     //-----2)данные
                     jsoDATA.push([]);
-                    var widthCell=new Array((5+1),3,4,3,4,2,3,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15);
+                    var widthCell=new Array((20+1),6,6,6,8,8,6,6,6,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16);
                     var countRow=0
                     var t=dv.byteLength;
                     for (var r = 0; r < 1000; r++) {
@@ -748,6 +778,11 @@ Frm.WorkWithForms.Create = function(opt) {
                 exportDbf(nameList[1],nameList[2]);
                 break;
             }
+            case "copy":
+            {
+                copy();
+                break;
+            }
             case "1":case "2":case "3":case "4":case "5":case "6":
             case "7":case "8":case "9":case "10":case "11":case "12":{
             iasufr.storeSet("wwfMonth", name);
@@ -766,4 +801,4 @@ Frm.WorkWithForms.Create = function(opt) {
 }
 
 
-//@ sourceURL=http://12-monu03.donnu.edu.ua:57772/monu/form/work/workWithForms.js
+//@ sourceURL=http://monu/form/work/workWithForms.js

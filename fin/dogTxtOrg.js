@@ -108,7 +108,7 @@ Fin.DogTxtOrg.Create = function (opt) {
            }
             if ((id == "edit")||(id == "add")) {
                  if (id == "add") idDog=0;
-                 iasufr.loadForm("DogTxtEdit", {onSave: Reload, width: 830, height: 830, idOrg:selOrg.id, idDog:idDog});
+                 iasufr.loadForm("DogTxtEdit", {onSave: Reload, width: 830, height: 730, idOrg:selOrg.id, idDog:idDog});
             }
             if (id == 'print')  {  gD.printView();        }
             if (id == 'reload') {  Reload(); }

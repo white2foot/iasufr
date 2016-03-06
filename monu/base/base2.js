@@ -83,7 +83,8 @@ base.Layout2.Create = function (opt) {
 
             dhxLayoutT2.attachEvent("onCheck", function (rowId, cellInd, state) { //alert(rId+"="+cInd+"="+state)
                 //показ измененной строки
-                dhxLayoutT2.setRowTextStyle(rowId, iasufr.const.rowChangedCss);
+                var numbIsChange=dhxLayoutT2.idCells.indexOf("isCHECK");
+                if  (numbIsChange!=cellInd) dhxLayoutT2.setRowTextStyle(rowId, iasufr.const.rowChangedCss);
                 //массив измененных строк
                 var numbIsChange=dhxLayoutT2.idCells.indexOf("isChangeRowTemp");if (numbIsChange==-1) return
                 dhxLayoutT2.cells(rowId,numbIsChange).setValue(1);
@@ -95,7 +96,7 @@ base.Layout2.Create = function (opt) {
                     var numbIsChange=dhxLayoutT2.idCells.indexOf("isChangeRowTemp");if (numbIsChange==-1) return
                     dhxLayoutT2.cells(rowId,numbIsChange).setValue(1);
                 }
-                    // iasufr.enableAskBeforClose(t);  return true
+                // iasufr.enableAskBeforClose(t);  return true
                 return true
             });
             dhxLayoutT2.attachEvent("onRowDblClicked", function(rowId,cellInd){
@@ -128,8 +129,8 @@ base.Layout2.Create = function (opt) {
                         if (result) {
                             onToolbarClick("changePos");
                             initGrid("T2");
-                            }
                         }
+                    }
                 });
             });
             dhxLayoutT2.attachEvent("onHeaderClick", function(ind,obj){
@@ -188,6 +189,25 @@ base.Layout2.Create = function (opt) {
                 break;
             case "addStr":{}
                 break;
+            case "import":{
+                isImport();
+                break;
+            }
+            case "printImg":{
+                var paramFiltrs=getParamForm();
+                iasufr.ajax({
+                    url: "personal.ImportDiploma.cls",
+                    data: {func: "initPrint",param:JSON.stringify(paramFiltrs),data:JSON.stringify(getParamGrid("T2",0,2))},
+                    success: function (data) {//alert(data);
+                        var json=JSON.parse(data);
+                        var t=iasufr.const.CACHE_URL+"doc/Diploms/2.jpg"
+                        var t1=json.data;
+                        iasufr.printDiploms(json.data, iasufr.const.CACHE_URL+"doc/Diploms/15.jpg", '', 248, 174);
+
+                    }
+                })
+                break;
+            }
             case "close": iasufr.close(_this); break;
             case "expand" : { if (expand==1) {dhxLayoutT2.collapseAll(); expand=0; return }
                 if (expand==0) { dhxLayoutT2.expandAll(); expand=1; return }
@@ -470,7 +490,7 @@ base.Layout2.Create = function (opt) {
 
          // а так можно удалить кукисы
          $.cookie('cookie_name', null);
-----------------------
+         ----------------------
          http://docs.dhtmlx.com/grid__basic_operations.html
          ------------------
          mygrid.sortRows(0,"str","des");
@@ -485,10 +505,10 @@ base.Layout2.Create = function (opt) {
          mygrid.setRowExcellType(mixed row_id,"ra_str");
          ------------------------
          mygrid.setRowId(0,"new_row_id");
----------------------
+         ---------------------
          mygrid.setDelimiter(";");
          mygrid.setHeader("First Column;Second Column;Third Column");
------------------------
+         -----------------------
          mygrid.setCustomSorting(sort_custom,1);
          ...
          function sort_custom(a,b,order){
@@ -498,7 +518,7 @@ base.Layout2.Create = function (opt) {
          return n>m?1:-1;
          else
          return n<m?1:-1;
---------------------------
+         --------------------------
          //set the min width of the first column
          mygrid.setColumnMinWidth(50,0);
          }
@@ -698,17 +718,17 @@ base.Layout2.Create = function (opt) {
         if (dhxFormInit.isChangeNow==1) return
         dhxFormInit.isChangeNow=1
         iasufr.ajax({
-                url: "base.Simple.cls",
-                data: {func: "init",idDoc:_this.idDoc,idLayout:idLayout,idRekv:idRekv,code:value,
-                    param:getParam(dhxFormInit.selector[idRekv].param,dhxFormInit.selector[idRekv].isParam),
-                    data:dhxFormInit.selector[idRekv].data
-                },
-                success: function (data) {
-                    isSelect(JSON.parse(data))
-                    dhxFormInit.isChangeNow=0;
-                }
-                //error:function{dhxFormInit.isChangeNow=0}
-            })
+            url: "base.Simple.cls",
+            data: {func: "init",idDoc:_this.idDoc,idLayout:idLayout,idRekv:idRekv,code:value,
+                param:getParam(dhxFormInit.selector[idRekv].param,dhxFormInit.selector[idRekv].isParam),
+                data:dhxFormInit.selector[idRekv].data
+            },
+            success: function (data) {
+                isSelect(JSON.parse(data))
+                dhxFormInit.isChangeNow=0;
+            }
+            //error:function{dhxFormInit.isChangeNow=0}
+        })
 
     }
 
@@ -767,7 +787,7 @@ base.Layout2.Create = function (opt) {
 
             jsoDATA[1].push(val);
         }
-    return jsoDATA
+        return jsoDATA
 
     }
     function getParamGrid(idLayout,isRow,isDel){
@@ -792,9 +812,12 @@ base.Layout2.Create = function (opt) {
         var i1= 0,i2=dhxGridInit.getRowsNum()-1;
         var strCheck="";
         if (dhxGridInit.idCells.indexOf("isCHECK")>-1) {strCheck= dhxGridInit.getCheckedRows(dhxGridInit.idCells.indexOf("isCHECK"));}
-        if (strCheck=="") strCheck=dhxGridInit.getSelectedRowId();
+        if (strCheck=="") {
+            if ((isDel!=null)&&(isDel!=2))strCheck=dhxGridInit.getSelectedRowId();
+        }
+
         strCheck=","+strCheck+",";
-         var t2=dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId());
+        var t2=dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId());
         var t=dhxGridInit.getSelectedRowId();
 
         if (isRow==1) {i1= dhxGridInit.getRowIndex(dhxGridInit.getSelectedRowId()),i2=i1; if ((i1==null)||(i1==-1)) {i1=0; i2=-1;};}
@@ -802,7 +825,7 @@ base.Layout2.Create = function (opt) {
         for (var i = i1; i <= i2; i++) {
             var isCheck=strCheck.lastIndexOf(","+(i+1)+",");
             //if ((numbIsChange==-1)||(dhxGridInit.cells2(i, numbIsChange).getValue()==1)||((isDel!=null)&&(strCheck.indexOf(i)>-1))){
-            if (((isDel==null)&&((numbIsChange==-1)||(dhxGridInit.cells2(i, numbIsChange).getValue()==1)))||((isDel!=null)&&(isCheck>-1))){
+            if (((isDel==null)&&((numbIsChange==-1)||(dhxGridInit.cells2(i, numbIsChange).getValue()==1)))||((isDel!=null)&&(isCheck>-1))||((isDel==2)&&(isCheck==""))){
                 indRowEdit=indRowEdit+1;
                 jsoDATA.push([]);
                 for (var j=0;j<dhxGridInit.getColumnsNum();j++){
@@ -910,6 +933,58 @@ base.Layout2.Create = function (opt) {
                 }
             }
         });
+
+    }
+    function isImport(){
+        var wnd = iasufr.wins.createWindow("up" + new Date().valueOf(), 0, 0, 320, 120);
+        wnd.setModal(true);
+        wnd.centerOnScreen();
+        wnd.denyPark();
+        wnd.denyResize();
+        wnd.setText("Завантажити файл");
+        var idUploaderBlock = "frm-uploader-block" + new Date().valueOf().toString();
+        var idUploader      = "uploader" + new Date().valueOf().toString();
+
+        $(document.body).append('<div id="'+idUploaderBlock+'"><input id="'+idUploader+'" class="fm-uploader" type="file" /></div>');
+        wnd.attachObject(idUploaderBlock);
+        document.getElementById(idUploader).addEventListener('change', readSingleFile, false);
+        document.getElementById(idUploader).addEventListener('dragover', function(){$("#"+idUploader).addClass("fm-uploader-over")}, false);
+        document.getElementById(idUploader).addEventListener('dragleave', function(){$("#"+idUploader).removeClass("fm-uploader-over")}, false);
+
+        function readSingleFile(evt) {
+            var f = evt.target.files[0];
+            if (f) {
+                var r = new FileReader();
+                r.onload = function(e) {
+                    var contents = e.target.result;
+
+                    try {
+                        var idOrg=dhxLayoutT1.selector["idOrg"].id;
+
+                        var xotree = new XML.ObjTree();
+                        var tree = xotree.parseXML(contents);
+                        var t=tree;
+                        iasufr.ajax({
+                            url: "personal.ImportDiploma.cls",
+                            data: {func: "import",content:JSON.stringify(tree),idOrg:idOrg},
+                            success:  function(data) {
+                                var json = JSON.parse(data);
+                                if (json!="")setParam(json.param);
+                                initGrid("T2");
+                            }
+
+                        });
+                    } catch (exp) {
+                        iasufr.alert(exp.message);
+                    }
+                    $("#frm-uploader-block").remove();
+                    wnd.close();
+                }
+                r.readAsText(f);
+            } else {
+                iasufr.alert("Помилка завантаження файла")
+            }
+        }
 
     }
 

@@ -8,7 +8,7 @@ Fin.HomeAskEdit.Create = function (opt) {
     var addZ=t.opt.addZ;  // заявка
 	if (idOrg=="") idOrg=iasufr.user.orgId;
     var home=t.opt.home;
-    t.owner.setModal(true);
+    //t.owner.setModal(true);
     t.owner.button("park").disable();
 
     var toolbar;

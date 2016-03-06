@@ -143,6 +143,8 @@ Fin.DogPrint.Create = function (opt) {
         var idOrg  = selOrg.id;
         var idOrgP = selOrgP.id;
         var dateN=iasufr.formatDateStr(form.getCalendar("DateN").getDate(true));
+        
+        if (dateN.substr(6,2)!="01") { iasufr.message('Перевiрте початок договору - може бути тiльки початок мiсяця  !'); return -1; }
         var dateK=iasufr.formatDateStr(form.getCalendar("DateK").getDate(true));
         jsoData = form.getFormData();
         jsoData = $.extend(jsoData, {idOrg:idOrg, idOrgP:idOrgP, DateN:dateN, DateK:dateK, idOrgOsn:idOrgOsn} );
@@ -162,7 +164,8 @@ Fin.DogPrint.Create = function (opt) {
     function ZapSave() { Zap(1);  }
 
     function SaveBefPrint() {
-        jsoData=getJso();
+        jsoData=getJso(); 
+        if (jsoData==-1) return;
         //alert(JSON.stringify(jsoData));
         iasufr.ajax({
             url:'fin.Dog.cls',
@@ -177,6 +180,7 @@ Fin.DogPrint.Create = function (opt) {
 
     function ToPrint1(idDog) {
         jsoData=getJso();
+        if (jsoData==-1) return;
         var pu = new PrintUtils();
         iasufr.ajax({url:'fin.Dog.cls', data: {func: "TextForPrint", json: JSON.stringify( {idOrgOsn:idOrgOsn, idDog:idDog, idOrg:selOrg.id, jsoData:jsoData}) }, success: function (data) {
             var jso = JSON.parse(data);
@@ -188,11 +192,13 @@ Fin.DogPrint.Create = function (opt) {
     }
 
     function Zap(result) { if (result==null) result=1;
-       var DogNum=form.getItemValue('DogNum');
-        var dateN=iasufr.formatDateStr(form.getCalendar("DateN").getDate(true));
+       var DogNum = form.getItemValue('DogNum');
+       var dateN=iasufr.formatDateStr(form.getCalendar("DateN").getDate(true));
+       var dateK=iasufr.formatDateStr(form.getCalendar("DateK").getDate(true));
+
        if ( (DogNum == '') && (result==1) ) {
          var idOrg  = selOrg.id;
-         var json={ idOrg:idOrgOsn, idOrgK:idOrg, idGrp:idGrup, Date:dateN };
+         var json={ idOrg:idOrgOsn, idOrgK:idOrg, idGrp:idGrup, Date:dateN, checkDogExist:1,   DateK:dateK, Sum:form.getItemValue('sumD') };
          iasufr.ajax({url:'fin.Dog.cls', data: {func: "getDogNum", json: JSON.stringify(json) },
          success:   function (data) {
                              jso=JSON.parse(data);
@@ -201,10 +207,12 @@ Fin.DogPrint.Create = function (opt) {
                               form.setItemValue('DogNum',DogNum);
                              //jsoData = $.extend(jsoData, {DogNum:DogNum} );
                              SaveBefPrint();
-                    }
+                    },
+         error: function() { t.owner.progressOff(); }
          })
        }
         jsoData=getJso();
+        if (jsoData==-1) return;
         jsoData = $.extend(jsoData, {DogNum:DogNum} );
         if ( (DogNum !='') && (result==1) )   SaveBefPrint();
         if (result==0)  ToPrint1(0);

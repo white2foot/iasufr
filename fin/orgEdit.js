@@ -11,7 +11,7 @@ Fin.OrgEdit.Create = function (opt) {
     //iasufr.formatDate(new Date()));
 
     var main = new dhtmlXLayoutObject(win.owner, '2E');
-    main.cells('b').setHeight('110'); 	main.cells("a").hideHeader();
+    main.cells('b').setHeight('200'); 	main.cells("a").hideHeader();
     var zag="рег N "+idOrg; if (idOrg==0) zag="Нова органiзацiя";
     win.owner.setText(zag);
     main.progressOn();
@@ -98,7 +98,7 @@ Fin.OrgEdit.Create = function (opt) {
         tb.addTab("a5", "Журнал обліку порушень", "150px");
         //tb.addTab("a5", "Висновки про гол.бухг.", "200px");
         if (!iasufr.pFunc("orgEdit")) { tb.disableTab("a3"); tb.disableTab("a4"); tb.disableTab("a5"); }
-        tb.setTabActive("a1");
+        tb.setTabActive("a2");
         tb.enableAutoReSize();
         $("<div id='infoToolbar'><div>").insertBefore($(tb._tabs["a1"]));
 
@@ -197,7 +197,7 @@ Fin.OrgEdit.Create = function (opt) {
                 grid2.parse(json2, 'json');
                 var pp=$(tb._tabs["a2"]).find("span");
                 var i = 0; var zn7=0;
-                while ( i < grid2.getRowsNum() ) {
+                while ( i < grid2.getRowsNum() ) {  // отметить цветом банк, если мфо и банк указаны в заявке на кодирование
                         zn7=grid2.cells2(i,7).getValue();
                         if (zn7>0) grid2.setCellTextStyle(grid2.getRowId(i),3,"color:#cc0000");
                         i++;
@@ -269,9 +269,9 @@ Fin.OrgEdit.Create = function (opt) {
         });
 
         grid2 = tb.cells("a2").attachGrid();
-        hdr="Р/рахунок,Код банку,,МФО / Найменування банку,Вiдкрито,Закрито,Коментар,1";
-        wid="120,80,25,300,80,80,*,10";  typ="ed,ed,img,ro,dhxCalendarA,dhxCalendarA,ed,ro";
-        align="right,right,center,left,left,left,left,left";
+        hdr="Р/рахунок,Код банку,МФО / Найменування банку,,Вiдкрито,Закрито,Коментар,1";
+        wid="120,80,300,25,80,80,*,10";  typ="ed,ed,ro,img,dhxCalendarA,dhxCalendarA,ed,ro";
+        align="right,right,left,left,center,center,left,left";
         grid2.setHeader(hdr);
         grid2.setInitWidths(wid);
         grid2.setColAlign(align);
@@ -279,7 +279,8 @@ Fin.OrgEdit.Create = function (opt) {
         grid2.setImagePath(iasufr.const.IMG_PATH);
         grid2.setIconsPath(iasufr.const.ICO_PATH);
         grid2.init();
-        grid2.setColumnHidden(1,true);
+        grid2.setColumnHidden(1,true); grid2.setColumnHidden(7,true);
+
         //grid2.enableMarkedCells(true);
         grid2.enableTooltips("false,false,false,false,false");
         grid2.enableEditTabOnly(true);
@@ -291,8 +292,8 @@ Fin.OrgEdit.Create = function (opt) {
 
         grid2.attachEvent("onRowSelect", function (id) {
             var ind = grid2.getSelectedCellIndex();
-            if (ind == 2) {
-                 var bnk = 1;  var name = 3;
+            if (ind == 3) {
+                 var bnk = 1;  var name = 2;
                  iasufr.loadForm('OrgSelector',{width:1200,height:600,codeAdd:false,accountAdd:true,bankOnly:true,onSelect:function(p) {
                     grid2.cells(id,bnk).setValue(p.id);
                     grid2.cells(id,name).setValue(p.mfo+'/'+p.name);
@@ -412,7 +413,7 @@ Fin.OrgEdit.Create = function (opt) {
             CountRow = CountRow +1;
             var newid = CountRow;
             if (grid == grid1) { grid.addRow(newid, ['', '', ''], 0);   }
-            if (grid == grid2) { grid.addRow(newid, ['', '',imgHELP, '', '', '', ''], 0); }
+            if (grid == grid2) { grid.addRow(newid, ['', '','',imgHELP, '', '', ''], 0); }
             if (grid == grid3) { grid.addRow(newid, ['', '','','','','','',''], 0); }
             if (grid == grid4) { grid.addRow(newid, ['','','','','','',''], 0); }
             if (grid == grid5) { grid.addRow(newid, ['','',imgHELP,'','','',''], 0); }

@@ -36,6 +36,31 @@
         dhtmlx.confirm({text: msg.replace(/</g, "").replace(/>/g, ""), cancel: "Нi", ok: "Так", callback: function(r){if (r && callback) callback()}});
     },
 
+    prompt: function(title, text, callback) {
+        var wnd = iasufr.wins.createWindow("prompt" + new Date().valueOf(), 0, 0, 320, 160);
+        wnd.denyPark();
+        wnd.denyResize();
+        wnd.setText(title);
+        wnd.setModal(true);
+        wnd.centerOnScreen();
+
+        var frmData = [
+            { type:"settings", inputWidth: 285, labelWidth:285, position:"absolute" },
+            { type:"input", name:"input", label: text, labelLeft:10, labelTop:10, inputLeft:10, inputTop:30, rows: 3 },
+            { type: "button", name: "ok", value:"Прийняти", inputLeft:40, inputTop: 90 },
+            { type: "button", name: "close", value:"Закрити", inputLeft:165, inputTop: 90 }
+        ];
+        var frm = wnd.attachForm(frmData);
+        frm.getInput("input").focus();
+        frm.attachEvent("onButtonClick", function(name) {
+            if (name === "ok") {
+                var value = frm.getItemValue("input");
+                if (callback) callback(value);
+            }
+            wnd.close();
+        });
+    },
+
     logError: function (e, txt) {
         if (!txt) console.log("[IASUFR]"); else console.log("[IASUFR] " + txt + ":");
         if (e) console.log(e.stack);

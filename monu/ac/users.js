@@ -123,6 +123,8 @@ Usr.Form.Create = function(opt) {
         actionsList.push(['sep']);
         actionsList.push(['block', 'obj', iasufr.lang.ui.block, '32/disable_enable_demo_mode.png'])
         actionsList.push(['resetp', 'obj', iasufr.lang.ui.resetPassword, '32/textfield_delete.png']);
+        actionsList.push(['sep']);
+        actionsList.push(['setmsg', 'obj', 'Задати повiдомлення', '32/address_block.png']);
     }
     toolbar.addButtonSelect("actions", 6, "Дії", actionsList, "32/lightning.png", "", "disabled", true);
     toolbar.attachEvent("onClick", onUserToolbarClick);
@@ -238,6 +240,7 @@ Usr.Form.Create = function(opt) {
             case "print": gUsers.printView(); break;
             case "select": SelectUser(); break;
             case "block": if (id) iasufr.loadForm("UserBlock", {id: id, onRefresh: ReloadUsers}); break;
+            case "setmsg": setMessage(); break;
             case "resetp": {
                 if (!id) return;
                 dhtmlx.confirm({ text: iasufr.lang.msg.resetPassword + ": " +  $(getUsrCell(id, "fio")).text() + "?", callback: function(r) {
@@ -246,6 +249,19 @@ Usr.Form.Create = function(opt) {
                 break;
             }
         }
+    }
+
+    function setMessage() {
+        var id = GetUserId();
+        var ids = [];
+        var cnt = gUsers.getRowsNum();
+        for (var i = 0; i < cnt; i++) if (getUsrCell2(i, "sel")) ids.push(gUsers.getRowId(i));
+        if (ids.indexOf(id) === -1) ids.push(id);
+        if (ids.length == 0) return;
+
+        iasufr.prompt("Сообщение пользователям", "Текст", function(v) {
+            console.log(v);
+        });
     }
 
     function ResetPassword(id) {

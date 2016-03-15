@@ -23,7 +23,7 @@ Usr.Form.Create = function(opt) {
         dhxLayout.cells("c").setHeight(300);
         dhxLayout.cells("c").setText(iasufr.lang.ui.groups);
     }
-
+    var odata;
     var formData = [
         {
             type: "settings",
@@ -124,23 +124,23 @@ Usr.Form.Create = function(opt) {
         actionsList.push(['block', 'obj', iasufr.lang.ui.block, '32/disable_enable_demo_mode.png'])
         actionsList.push(['resetp', 'obj', iasufr.lang.ui.resetPassword, '32/textfield_delete.png']);
         actionsList.push(['sep']);
-        actionsList.push(['setmsg', 'obj', 'Задати повiдомлення', '32/address_block.png']);
+        actionsList.push(['setmsg', 'obj', 'Задати повiдомлення', '32/mail_green.png']);
     }
     toolbar.addButtonSelect("actions", 6, "Дії", actionsList, "32/lightning.png", "", "disabled", true);
     toolbar.attachEvent("onClick", onUserToolbarClick);
 
     gUsers = dhxLayout.cells("b").attachGrid();
-    gUsers.colDef =["sel", "ico","login","orgCode","depCode","fio","post","isSign","comment"];
-    gUsers.setHeader(",," + iasufr.lang.headers.login + "," + iasufr.lang.headers.orgCode + "," + iasufr.lang.headers.depCode + "," + iasufr.lang.headers.fio + "," + iasufr.lang.headers.post + "," + iasufr.lang.headers.isSign + "," + iasufr.lang.headers.comment);
+    gUsers.colDef =["sel", "ico","login","orgCode","depCode","fio","post","isSign","comment","message"];
+    gUsers.setHeader(",," + iasufr.lang.headers.login + "," + iasufr.lang.headers.orgCode + "," + iasufr.lang.headers.depCode + "," + iasufr.lang.headers.fio + "," + iasufr.lang.headers.post + "," + iasufr.lang.headers.isSign + "," + iasufr.lang.headers.comment + "," + "Повiдомлення");
     var selW = "0";
     if (t.opt.selectUserMulti) selW = 24;
-    gUsers.setInitWidths(selW + ",24,72,120,64,260,260,64,*");
-    gUsers.setColAlign("center,center,left,left,center,left,left,center,left");
-    gUsers.setColTypes("ch,ro,ro,ro,ro,ro,ro,ch,ro");
-    gUsers.setColSorting('str,str,str,str,str,str,str,str,str');
+    gUsers.setInitWidths(selW + ",24,72,120,64,260,260,64,*,0");
+    gUsers.setColAlign("center,center,left,left,center,left,left,center,left,left");
+    gUsers.setColTypes("ch,ro,ro,ro,ro,ro,ro,ch,ro,ro");
+    gUsers.setColSorting('str,str,str,str,str,str,str,str,str,str');
     gUsers.setImagePath(iasufr.const.IMG_PATH);
     gUsers.init();
-    gUsers.enableHeaderMenu("false,false,true,true,true,true,true,true,true");
+    gUsers.enableHeaderMenu("false,false,true,true,true,true,true,true,true,tru");
     gUsers.enableAutoHiddenColumnsSaving("gUsers");
     gUsers.loadHiddenColumnsFromCookie("gUsers");
     iasufr.enableRowselectMode(gUsers);
@@ -203,27 +203,57 @@ Usr.Form.Create = function(opt) {
     function setUsrCell(i, column, v) { return gUsers.cells(i, gUsers.colDef.indexOf(column)).setValue(v) };
     function setUsrCell2(i, column, v) { return gUsers.cells2(i, gUsers.colDef.indexOf(column)).setValue(v) };
 
+    function applyFilter() {
+        var d = odata.rows.slice();
+        //if (frmFilter.getItemValue("IsOnline")) d = d.filter(function(el) { return el[gUsers.colDef.indexOf("ico")] == 1});
+        //if (frmFilter.getItemValue("IsBlocked")) d = d.filter(function(el) { return el[gUsers.colDef.indexOf("ico")] == 1});
+        var login = frmFilter.getItemValue("Login").toLocaleLowerCase();
+        var orgCode = frmFilter.getItemValue("OrgCode").toLocaleLowerCase();
+        var depCode = frmFilter.getItemValue("DepCode").toLocaleLowerCase();
+        var post = frmFilter.getItemValue("Post").toLocaleLowerCase();
+        var fio = frmFilter.getItemValue("FIO").toLocaleLowerCase();
+        var comment = frmFilter.getItemValue("Comment").toLocaleLowerCase();
+        if (frmFilter.getItemValue("IsOnline")) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("ico")] === "1"});
+        if (frmFilter.getItemValue("IsBlocked")) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("ico")] === "2"});
+        if (login) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("login")].toLocaleLowerCase().indexOf(login) !== -1});
+        if (orgCode) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("orgCode")].toLocaleLowerCase().indexOf(orgCode) !== -1});
+        if (depCode) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("depCode")].toLocaleLowerCase().indexOf(depCode) !== -1});
+        if (fio) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("fio")].toLocaleLowerCase().indexOf(fio) !== -1});
+        if (post) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("post")].toLocaleLowerCase().indexOf(post) !== -1});
+        if (comment) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("comment")].toLocaleLowerCase().indexOf(comment) !== -1});
+
+        onAfterUsersLoad('', {rows: d});
+    }
+
     function Filter(name) {
         switch (name) {
             case "btnApplyFilter": {
-                if (frmFilter.getItemValue("IsOnline")) gUsers.filterBy(gUsers.colDef.indexOf("ico"), function (d) {
-                    return d.indexOf("bullet_green.png") != -1;
-                });
-                if (frmFilter.getItemValue("IsBlocked")) gUsers.filterBy(gUsers.colDef.indexOf("ico"), function (d) {
-                    return d.indexOf("bullet_delete.png") != -1;
-                });
-                gUsers.filterBy(gUsers.colDef.indexOf("login"), frmFilter.getItemValue("Login"), frmFilter.getItemValue("IsOnline") || frmFilter.getItemValue("IsBlocked"));
-                gUsers.filterBy(gUsers.colDef.indexOf("orgCode"), frmFilter.getItemValue("OrgCode"), true);
-                gUsers.filterBy(gUsers.colDef.indexOf("depCode"), frmFilter.getItemValue("DepCode"), true);
-                gUsers.filterBy(gUsers.colDef.indexOf("fio"), frmFilter.getItemValue("FIO"), true);
-                gUsers.filterBy(gUsers.colDef.indexOf("post"), frmFilter.getItemValue("Post"), true);
-                gUsers.filterBy(gUsers.colDef.indexOf("comment"), frmFilter.getItemValue("Comment"), true);
-                frmFilter.showItem("fltActive");
+                //if (frmFilter.getItemValue("IsOnline")) gUsers.filterBy(gUsers.colDef.indexOf("ico"), function (d) {
+                //    return d.indexOf("bullet_green.png") != -1;
+                //});
+                //if (frmFilter.getItemValue("IsBlocked")) gUsers.filterBy(gUsers.colDef.indexOf("ico"), function (d) {
+                //    return d.indexOf("bullet_delete.png") != -1;
+                //});
+                //gUsers.filterBy(gUsers.colDef.indexOf("login"), frmFilter.getItemValue("Login"), frmFilter.getItemValue("IsOnline") || frmFilter.getItemValue("IsBlocked"));
+                //gUsers.filterBy(gUsers.colDef.indexOf("orgCode"), frmFilter.getItemValue("OrgCode"), true);
+                //gUsers.filterBy(gUsers.colDef.indexOf("depCode"), frmFilter.getItemValue("DepCode"), true);
+                //gUsers.filterBy(gUsers.colDef.indexOf("fio"), frmFilter.getItemValue("FIO"), true);
+                //gUsers.filterBy(gUsers.colDef.indexOf("post"), frmFilter.getItemValue("Post"), true);
+                //gUsers.filterBy(gUsers.colDef.indexOf("comment"), frmFilter.getItemValue("Comment"), true);
+                dhxLayout.cells("b").progressOn();
+                setTimeout(function() {
+                    applyFilter();
+                    frmFilter.showItem("fltActive");
+                }, 0);
                 break;
             }
             case "btnCancelFilter": {
-                for (var i = 0; i < 8; i++) gUsers.filterBy(i, "");
-                frmFilter.hideItem("fltActive");
+                //for (var i = 0; i < 8; i++) gUsers.filterBy(i, "");
+                dhxLayout.cells("b").progressOn();
+                setTimeout(function() {
+                    onAfterUsersLoad('', odata);
+                    frmFilter.hideItem("fltActive");
+                }, 0);
                 break;
             }
         }
@@ -255,13 +285,13 @@ Usr.Form.Create = function(opt) {
         var id = GetUserId();
         var ids = [];
         var cnt = gUsers.getRowsNum();
-        for (var i = 0; i < cnt; i++) if (getUsrCell2(i, "sel")) ids.push(gUsers.getRowId(i));
+        for (var i = 0; i < cnt; i++) if (getUsrCell2(i, "sel") == 1) ids.push(gUsers.getRowId(i));
         if (ids.indexOf(id) === -1) ids.push(id);
         if (ids.length == 0) return;
 
-        iasufr.prompt("Сообщение пользователям", "Текст", function(v) {
-            console.log(v);
-        });
+        iasufr.prompt("Повiдомлення користувачам", "Текст", function(v) {
+            iasufr.ajax({url: "ac.Usr.cls", success: ReloadUsers, data: {func: "SetMessage", message: v, ids: JSON.stringify(ids) }});
+        }, ids.length === 1 ? getUsrCell(id, "message") : undefined);
     }
 
     function ResetPassword(id) {
@@ -285,6 +315,18 @@ Usr.Form.Create = function(opt) {
         }
     }
 
+    dhtmlXGridObject.prototype.resetFilters = function(){
+        if (!!this.filters){
+            for(var i=0;i<this.filters.length;i++){
+                if (!!this.filters[i][0]) {
+                    this.filters[i][0].old_value="";
+                    this.filters[i][0].value="";
+                }
+            }
+            this.filterBy(0,"");
+        }
+    };
+
     function onAfterUsersLoad(txt, o) {
         gUsers.clearAll();
         gUsers.parse(o,'json');
@@ -299,15 +341,20 @@ Usr.Form.Create = function(opt) {
             firstRun = false;
             ReloadGroups();
         }
-
+        dhxLayout.cells("b").progressOff();
         UpdateUserFuncs();
         //gUsers.groupBy(3);
     }
 
     function ReloadUsers(id) {
+        if (!isNaN(parseInt(id))) id = undefined;
         iasufr.gridRowFocus(gUsers, id);
-        frmFilter.hideItem("fltActive");
-        iasufr.ajax({url: "ac.Usr.cls", data:{func:"Select", showAll: t.opt.showAll},success: onAfterUsersLoad});
+        dhxLayout.cells("b").progressOn();
+        iasufr.ajax({url: "ac.Usr.cls", data:{func:"Select", showAll: t.opt.showAll},success: function(a, b) {
+            odata = b;
+            if (!frmFilter.isItemHidden("fltActive")) applyFilter();
+                else onAfterUsersLoad(a, b)
+        }});
     }
 
     function GetUserId() {
@@ -360,6 +407,12 @@ Usr.Form.Create = function(opt) {
                         break;
                     }
                     default: setUsrCell2(i, "ico", "");
+                }
+
+                var msg = getUsrCell2(i, "message");
+                if (msg) {
+                    var fio = getUsrCell2(i, "fio");
+                    setUsrCell2(i, "fio", '<img title="У системi" src="/images/icons/16/mail_green.png" style="margin-right: 2px; vertical-align: middle; float: left">' + fio);
                 }
             }
         }

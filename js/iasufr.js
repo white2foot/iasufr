@@ -36,7 +36,7 @@
         dhtmlx.confirm({text: msg.replace(/</g, "").replace(/>/g, ""), cancel: "Нi", ok: "Так", callback: function(r){if (r && callback) callback()}});
     },
 
-    prompt: function(title, text, callback) {
+    prompt: function(title, text, callback, defaultValue) {
         var wnd = iasufr.wins.createWindow("prompt" + new Date().valueOf(), 0, 0, 320, 160);
         wnd.denyPark();
         wnd.denyResize();
@@ -51,6 +51,7 @@
             { type: "button", name: "close", value:"Закрити", inputLeft:165, inputTop: 90 }
         ];
         var frm = wnd.attachForm(frmData);
+        if (defaultValue) frm.setItemValue("input", defaultValue);
         frm.getInput("input").focus();
         frm.attachEvent("onButtonClick", function(name) {
             if (name === "ok") {
@@ -257,6 +258,7 @@
                         if (data.user) iasufr.user = JSON.parse(data.user);
                         iasufr.internalInit();
                         if (iasufr.ready) iasufr.ready();
+                        if (iasufr.user .message) iasufr.alert(iasufr.user.message);
                     }
                 } catch(e) {
                     console.log("[IASUFR] error during check login");

@@ -83,6 +83,13 @@ Usr.Form.Create = function(opt) {
             name: "IsBlocked"
         },
         {
+            type: "checkbox",
+            labelWidth: 90,
+            position: "label-right",
+            label: "Повiдомлення",
+            name: "IsMsg"
+        },
+        {
             type: "button",
             value: iasufr.lang.ui.accept,
             name: "btnApplyFilter",
@@ -215,6 +222,7 @@ Usr.Form.Create = function(opt) {
         var comment = frmFilter.getItemValue("Comment").toLocaleLowerCase();
         if (frmFilter.getItemValue("IsOnline")) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("ico")] === "1"});
         if (frmFilter.getItemValue("IsBlocked")) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("ico")] === "2"});
+        if (frmFilter.getItemValue("IsMsg")) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("message")] !== ""});
         if (login) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("login")].toLocaleLowerCase().indexOf(login) !== -1});
         if (orgCode) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("orgCode")].toLocaleLowerCase().indexOf(orgCode) !== -1});
         if (depCode) d = d.filter(function(el) { return el.data[gUsers.colDef.indexOf("depCode")].toLocaleLowerCase().indexOf(depCode) !== -1});
@@ -281,11 +289,15 @@ Usr.Form.Create = function(opt) {
         }
     }
 
-    function setMessage() {
+    function setMessage(idx) {
         var id = GetUserId();
         var ids = [];
-        var cnt = gUsers.getRowsNum();
-        for (var i = 0; i < cnt; i++) if (getUsrCell2(i, "sel") == 1) ids.push(gUsers.getRowId(i));
+        if (idx !== undefined) {
+            id = gUsers.getRowId(idx);
+        } else {
+            var cnt = gUsers.getRowsNum();
+            for (var i = 0; i < cnt; i++) if (getUsrCell2(i, "sel") == 1) ids.push(gUsers.getRowId(i));
+        }
         if (ids.indexOf(id) === -1) ids.push(id);
         if (ids.length == 0) return;
 
@@ -328,8 +340,16 @@ Usr.Form.Create = function(opt) {
     };
 
     function onAfterUsersLoad(txt, o) {
+        var onlineCnt = 0;
+        o.rows.forEach(function(el) {
+            if (el.data[gUsers.colDef.indexOf("ico")] === "1") onlineCnt++;
+        });
+        dhxLayout.cells("b").setText(iasufr.lang.ui.users + ": " + o.rows.length.toString() + ", " + iasufr.lang.ui.online + ": " + onlineCnt + " - Показано першi 100");
+
         gUsers.clearAll();
-        gUsers.parse(o,'json');
+        var obj = { rows: o.rows.filter(function(e, n) { return n < 100})}
+        //var obj = o;
+        gUsers.parse(obj,'json');
        /* for (var i = 0; i < gUsers.getRowsNum(); i++) if (gUsers.cells2(i,0).getValue() == 0) {
             $(gUsers.cells2(i,7).cell).children().hide();
         }*/
@@ -412,11 +432,12 @@ Usr.Form.Create = function(opt) {
                 var msg = getUsrCell2(i, "message");
                 if (msg) {
                     var fio = getUsrCell2(i, "fio");
-                    setUsrCell2(i, "fio", '<img title="У системi" src="/images/icons/16/mail_green.png" style="margin-right: 2px; vertical-align: middle; float: left">' + fio);
+                    setUsrCell2(i, "fio", '<img data-idx="' + i.toString() + '" class="setmsg" title="У системi" src="/images/icons/16/mail_green.png" style="cursor: pointer; margin-right: 2px; vertical-align: middle; float: left">' + fio);
                 }
             }
         }
-        dhxLayout.cells("b").setText(iasufr.lang.ui.users + ": " + gUsers.getRowsNum() + ", " + iasufr.lang.ui.online + ": " + onlineCnt);
+        $(".setmsg").click(function(e) { setMessage($(e.target).attr("data-idx")) });
+        //dhxLayout.cells("b").setText(iasufr.lang.ui.users + ": " + gUsers.getRowsNum() + ", " + iasufr.lang.ui.online + ": " + onlineCnt);
     }
 
     function ShowUserHistory() {

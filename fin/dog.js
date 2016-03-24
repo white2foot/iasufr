@@ -7,7 +7,7 @@ Fin.Dog.Create = function (opt) {
     var t = iasufr.initForm(this, opt);
     var user=iasufr.user;
     var idOrgUser=user.orgId;
-    var bodyhei=$('body').height()-100;
+    var bodyhei=$('body').height()-30;
     dhtmlx.image_path = iasufr.const.IMG_PATH;
 
     var main = new dhtmlXLayoutObject(t.owner, '2U');

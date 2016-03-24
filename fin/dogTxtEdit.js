@@ -3,7 +3,7 @@ if (!Fin.DogTxtEdit) Fin.DogTxtEdit = {};
 
 Fin.DogTxtEdit.Create = function (opt) {
     var t = iasufr.initForm(this, opt);
-    t.owner.setModal(true);
+    //t.owner.setModal(true);
     t.owner.button("park").disable();
 
     var idDog=t.opt.idDog;

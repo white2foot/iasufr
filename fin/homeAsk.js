@@ -120,7 +120,7 @@ Fin.HomeAsk.Create = function (opt) {
         toolbar.addButton("edit", 4,iasufr.lang.ui.edit, "32/toolbar_edit.png", "32/toolbar_edit.png");
         toolbar.addButton("del", 5, iasufr.lang.ui.delete, "32/toolbar_delete.png", "32/toolbar_delete.png");
         //if (iasufr.pGrp(1))  { toolbar.addButton("sel", 5, "Oрганiзацii з запитаннями", "32/application_view_detail.png", "");
-        toolbar.addButton("sel1", 6, "Усi питання", "32/manage_sources.png", "");
+        if (iasufr.pGrp(1)) toolbar.addButton("sel1", 6, "Усi питання", "32/manage_sources.png", "");
 
         toolbar.addButton("reload", 7, iasufr.lang.ui.reload, "32/arrow_rotate_anticlockwise.png", "");
         toolbar.addButton("close", 8, iasufr.lang.ui.close, "32/door.png", "");
@@ -130,7 +130,7 @@ Fin.HomeAsk.Create = function (opt) {
 
            if (id == 'del') { if  (!idRow) { iasufr.message('Вкажiть строку !'); return; }
                 var ind=gD.getRowIndex(gD.getSelectedId());
-               if ( (!iasufr.pGrp(1)) && ( gD.cells2(ind,6).getValue()!="" ) ) { iasufr.message('Не можна видалити строку з вiдповiддю !'); return; }
+               //if ( (!iasufr.pGrp(1)) && ( gD.cells2(ind,6).getValue()!="" ) ) { iasufr.message('Не можна видалити строку з вiдповiддю !'); return; }
                 iasufr.confirm(iasufr.lang.msg.delete, Del);
            }
             if ((id == "edit")||(id == "add")) {

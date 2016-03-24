@@ -379,7 +379,6 @@ Fin.DogEdit.Create = function (opt) {
 
 
         $(form.getInput("Kosht")).keydown(function(e){if (e.keyCode == 13) { $(form.getInput("Kom")).focus();}  });
-        //$(form.getInput("Date")).keydown(function(e){if (e.keyCode == 13) { $(form.getInput("Num")).focus();}  });
 
         selOrgK=null; selOrgP=null; selKosht=null; selGrp=null; selPersK=null;  selPersP=null;
         selOrgK={};   selOrgP={};   selKosht={};   selGrp={};   selPersK={};    selPersP={};
@@ -445,14 +444,15 @@ Fin.DogEdit.Create = function (opt) {
         else form.setItemValue("RRpl", "");
         TitleWrite(); TitleWriteRR();
     }
-    function PersSelectK(o, $txt)  { //selOrgK = o;
-        if ( o ) { $txt.val("(" + o.code + ") " + o.name);
+
+    function PersSelectK(o, $txt)  { selPersK = o;
+        if ( o ) { $txt.val( o.name +"(" + o.inn + ") " );
             iasufr.enableAskBeforClose(t);
         }
     }
 
-    function PersSelectP(o, $txt)  { //selOrgK = o;
-        if ( o ) { $txt.val("(" + o.code + ") " + o.name);
+    function PersSelectP(o, $txt)  { selPersP = o;
+        if ( o ) { $txt.val( o.name +"(" + o.inn + ") " );
             iasufr.enableAskBeforClose(t);
         }
     }
@@ -716,6 +716,7 @@ Fin.DogEdit.Create = function (opt) {
         var json = {idOrg: idOrg, idDog: idDog, Num:form.getItemValue("Num"), Kom:form.getItemValue("Kom"), Val:form.getItemValue("Val") };
         json = $.extend(json, { idOrgK: idOrgK, idOrgP: idOrgP, idGrp: idGrp, idKosht: idKosht, Date:date, DateN:dateN, DateK:dateK} );
         json = $.extend(json, { RRosn: form.getItemValue("RRosn"), RRkor: form.getItemValue("RRkor"), RRpl: form.getItemValue("RRpl"), Period: form.getItemValue("Period"), Sum: form.getItemValue("Sum"), FormAkt:fAkt  } );
+        json = $.extend(json, { idPersK: idPersK, idPersP:idPersP} );
 
         // ------------------  финансы
         var f= null; f = [];

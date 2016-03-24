@@ -141,7 +141,7 @@ Frm.PrintForm.Create = function(opt) {
 
     // Add dynamic rows from input data
     function extendTableWithDynamicData(tdesc) {
-        tdesc.inputData.sort(function (a,b) {
+        tdesc.inputData = tdesc.inputData.sort(function (a,b) {
             if (a.createdFromId !== undefined && b.createdFromId !== undefined) {
                 return a.idx < b.idx ? 1: -1;
             } else {

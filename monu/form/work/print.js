@@ -464,8 +464,9 @@ Frm.PrintForm.Create = function(opt) {
 
 
 
-                extendTableWithDynamicData(tdesc);
+
                 tdesc.rows = tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
+                extendTableWithDynamicData(tdesc);
                 calcSubtotals(tdesc);
 
                 var tableInitial = '<table border="1" style="font-size: ' + fontSize + 'px;" cellpadding="2" cellspacing="0">';

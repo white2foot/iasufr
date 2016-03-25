@@ -404,7 +404,7 @@ Frm.Input.Create = function(opt) {
                                         var ce = g.cells(cell.idRow, g.getColIndexById(cell.idCol));
                                         if (ce) ce.setValue(fd.formatValue(cell.value, ctype));
                                     }
-                                } else
+                                }/* else
                                 if (cell.createdFromId) {
                                     fd.addDynRow(null, cell.createdFromId, cell.idRow);
                                     if (g.isItemExists(cell.idRow)) {
@@ -414,7 +414,7 @@ Frm.Input.Create = function(opt) {
                                             if (ce) ce.setValue(fd.formatValue(cell.value, ctype));
                                         }
                                     }
-                                }
+                                }*/
                             }
                         }
                     }

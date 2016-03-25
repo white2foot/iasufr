@@ -380,8 +380,8 @@ div.dhtmlxMenu_dhx_skyblue_TopLevel_Item_Normal, div.dhtmlxMenu_dhx_skyblue_TopL
     /* bottom: 0px; */
     /* right: 40px; */
     z-index: 10;
-    background-color: #B9B9B9;
-    border-color: #828282;
+    background-color: #2882b9;
+    border-color:#004096;
     border-radius: 0px 0px 8px 8px;
     color: white;
     font-family: Arial;
@@ -395,12 +395,10 @@ div.dhtmlxMenu_dhx_skyblue_TopLevel_Item_Normal, div.dhtmlxMenu_dhx_skyblue_TopL
     -webkit-box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.4);
     -moz-box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.4);
     box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.4);
-    top: opx;
+    top: 0px;
     /* transform: rotateZ(-90deg); */
     right: 60px;
-    width: 36px;
     height: 32px;
-    background-image: url('/images/icons/32/ffh.png');
     background-repeat: no-repeat;
     background-position-x: 2px;
     z-index: 1000;
@@ -408,6 +406,13 @@ div.dhtmlxMenu_dhx_skyblue_TopLevel_Item_Normal, div.dhtmlxMenu_dhx_skyblue_TopL
 
 .btn-instruct:hover {
     padding-top:3px;
+}
+
+.btn-instruct > span {
+    margin-top: 6px;
+    display: block;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 .row-adder {

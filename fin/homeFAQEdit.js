@@ -7,7 +7,7 @@ Fin.HomeFAQEdit.Create = function (opt) {
     var idOrg=t.opt.idOrg;
 	if (idOrg=="") idOrg=iasufr.user.orgId;
     var home=t.opt.home;
-   t.owner.setModal(true);
+   //t.owner.setModal(true);
    t.owner.button("park").disable();
 
     var toolbar;

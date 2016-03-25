@@ -5,7 +5,7 @@ Fin.HomeNewsEdit.Create = function (opt) {
     var t = iasufr.initForm(this, opt);
     var idRow=t.opt.idRow;
     var idOrg=t.opt.idOrg;
-    t.owner.setModal(true);
+    //t.owner.setModal(true);
     t.owner.button("park").disable();
 
     var toolbar;

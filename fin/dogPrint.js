@@ -34,7 +34,7 @@ Fin.DogPrint.Create = function (opt) {
         toolbar.setIconSize(32);
         toolbar.addButton("new", 1, "Новий договiр", "32/toolbar_add.png", "");
         toolbar.addSeparator("sep1", 2);
-        toolbar.addButton("save", 2, "Зареєструвати договiр", "32/database_go.png", "");  //
+        toolbar.addButton("save", 2, "Зареєструвати договiр на сайтi", "32/database_go.png", "");  //
         toolbar.addSeparator("sep11", 3);
         toolbar.disableItem("save");
         toolbar.addButton("print", 4, "Друк договору", "32/printer_empty.png", "");
@@ -111,7 +111,7 @@ Fin.DogPrint.Create = function (opt) {
 
                 var id="";  if (!iasufr.pGrp(1)) { id=selOrg.id; form.setReadonly("idOrg", true);     }
                 iasufr.attachSelector(form.getInput("idOrg"), "OrgSelector",  { idOrg: id, onSelect: OrgSelect});
-                iasufr.attachSelector(form.getInput("idOrgP"), "OrgSelector",  { idOrg: id, onSelect: OrgSelectP});
+                iasufr.attachSelector(form.getInput("idOrgP"), "OrgSelector",  {  onSelect: OrgSelectP});
                 var idOrgP=0;   if (selOrgP) idOrgP=selOrgP.id;
                 iasufr.attachSelector(form.getInput("Rah"), "OrgSelector", { width:1100,height:600,accountAdd:true,bankOnly:false, idOrg:idOrgP, onSelect: OrgSelectR} );
 

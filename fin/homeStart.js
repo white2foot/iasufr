@@ -208,7 +208,7 @@ Fin.HomeStart.Create = function (opt) {
         tb5.attachEvent("onClick", function (id) {
             var idRow = gF.getSelectedId();
             if (id != "print") {
-                var hei=300;
+                var hei=500;
                 if ( (idRow==null) && ( (id == 'edit')||(id == 'del')) ) {  iasufr.message('Вкажiть строку !'); return; }
                 if (id == 'add') idRow=0;
                 if (id != 'del') iasufr.loadForm("HomeFAQEdit", {onSave: ReloadF, width: 700, height: hei, idOrg:orgUser, idRow:idRow});
@@ -236,7 +236,7 @@ Fin.HomeStart.Create = function (opt) {
 
         gF.attachEvent("onRowSelect", function (id) {
             var idRow = gF.getSelectedId();
-            iasufr.loadForm("HomeFAQEdit", {onSave: ReloadF, width: 700, height: 300, idOrg:orgUser, idRow:idRow});
+            iasufr.loadForm("HomeFAQEdit", {onSave: ReloadF, width: 700, height: 500, idOrg:orgUser, idRow:idRow});
         });
 
 

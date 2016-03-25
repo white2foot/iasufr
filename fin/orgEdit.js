@@ -7,7 +7,6 @@ Fin.OrgEdit.Create = function (opt) {
     var idOrg=opt.json.idOrg;
     var Date=opt.json.Date;    //alert(idOrg+'---'+Date);
     dhtmlx.image_path = iasufr.const.IMG_PATH;
-
     //iasufr.formatDate(new Date()));
 
     var main = new dhtmlXLayoutObject(win.owner, '2E');
@@ -38,15 +37,11 @@ Fin.OrgEdit.Create = function (opt) {
     tolb.setIconSize(32);
     tolb.addButton("save", 1, iasufr.lang.ui.save, "32/database_save.png", "");
 
-    if (iasufr.pFunc("orgEdit")) { tolb.addButton("copy", 2, "Зробити копiю опису", "32/database_go.png", "");  //
+    if (iasufr.pFunc("orgEdit")) { tolb.addButton("copy", 2, "Клонувати на дату", "32/database_go.png", "");  //
                                   tolb.setItemToolTip("copy", "Можна вказати нову дату,з якоi органiзацiя змiнюе свiй опис та отримати копiю опису организацii");
     }
-
-    //----------------------------
-    //tolb.addSeparator("sep1", 3);
-    tolb.addText("dateT", 4, "Нова дата опису органiзацii ");
+  tolb.addText("dateT", 4, "Нова дата опису органiзацii ");
     tolb.addInput("dateNew", 5, "");
-    //tolb.addSeparator("sep1", 6);
 
     tolb.hideItem("dateT"); tolb.hideItem("dateNew");
     var cnd = new dhtmlXCalendarObject({input: tolb.getInput("dateNew")});
@@ -96,7 +91,6 @@ Fin.OrgEdit.Create = function (opt) {
         tb.addTab("a3", "Висновки про гол.бухг.", "150px");
         tb.addTab("a4", "Журнал надання дозволiв", "150px");
         tb.addTab("a5", "Журнал обліку порушень", "150px");
-        //tb.addTab("a5", "Висновки про гол.бухг.", "200px");
         if (!iasufr.pFunc("orgEdit")) { tb.disableTab("a3"); tb.disableTab("a4"); tb.disableTab("a5"); }
         tb.setTabActive("a2");
         tb.enableAutoReSize();
@@ -128,7 +122,7 @@ Fin.OrgEdit.Create = function (opt) {
         }
 
     function AddData(d) {
-        main.progressOff(); //alert(d);
+        main.progressOff();
         var jso=JSON.parse(d);
         form = main.cells("a").attachForm(jso);
         //form.setFontSize('11px');
@@ -185,7 +179,7 @@ Fin.OrgEdit.Create = function (opt) {
 
         iasufr.ajax({url:'fin.Org.cls', data: {func: "OrgGetCont", Sel: "cont", idOrg: idOrg , Date: Date}, success: function (data) {
             var json1 = JSON.parse(data);
-            console.log(data);
+            //console.log(data);
             var user =JSON.parse(data);
             if (user.Cnts) {
                 grid1.clearAll();
@@ -435,9 +429,15 @@ Fin.OrgEdit.Create = function (opt) {
 
             var dateN =0;
             if (idOrg==0) { dateN=iasufr.formatDateStr(form.getCalendar("ob0").getDate(true));  }
-            var date=iasufr.formatDateStr(form.getCalendar("ob32").getDate(true));
+
+           //---------------------------------------
+            var type=form.getItemType('ob32');
+            if (type!="calendar") var date=form.getItemValue("ob32");
+            else  var date=iasufr.formatDateStr(form.getCalendar("ob32").getDate(true));
+            //var date=iasufr.formatDateStr(form.getCalendar("ob32").getDate(true));
 
             //----------------------------------------------------
+            console.log('date='+date);
             if ((idOrg>0)&&(tolb.isVisible("dateNew"))) { var dt=iasufr.formatDateStr(tolb.getValue("dateNew"));
                                                           if (!dt) return;
                                                           if (!confirm("Пiдтвердiть: Зробити копiю опису органiзацii на вибрану дату ?")) return;

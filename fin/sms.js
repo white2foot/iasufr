@@ -60,8 +60,10 @@ Fin.ReqSms.Create = function (opt) {
         toolbar = main.attachToolbar();
         toolbar.setIconsPath(iasufr.const.ICO_PATH);
         toolbar.setIconSize(32);
-        toolbar.addButton("sms", 1, "Вiдправити", "32/webmail.png", "");
+
         toolbar.addButton("komu", 3, cntKomu , "32/edit_group.png", "");
+        toolbar.addButton("sms", 1, "Вiдправити", "32/webmail.png", "");
+
         toolbar.setItemToolTip("komu", "Подивитися список користувачiв, яким було вiдправлено вибраний текст повiдомлення");
         toolbar.addButton("print", 2, "Друк", "32/printer_empty.png", "");
         // toolbar.addButton("edit", 3, "Редагувати договiр", "32/toolbar_edit.png", "");
@@ -71,21 +73,35 @@ Fin.ReqSms.Create = function (opt) {
         toolbar.attachEvent("onClick", function(id){
             switch (id) {
                 case "print": gD.printView(); break;
-                case "rel":   pKomu=0; if (selUser.id>0) pKomu=1;
+                case "rel":
+                             $(form.getInput("User")).blur();
+                             $(form.getInput("Text")).blur();
+                              pKomu=0; //if (selUser.id>0) pKomu=1;
                               SelTable();
                 break;
                 case "close":   iasufr.close(t); break;
                 case "sms":
                     if (form.getItemValue('Text')=="") { iasufr.message("Перевiрте текст повiдомлення !"); return }
                     var cnt=gD.getCheckedRows(1);
-                    if ( cnt=="" ) { iasufr.message("Вкажiть строки для вiдправлення повiдомлення !"); return }
+                    if ( cnt=="" ) { iasufr.message("Вкажiть строки з користувачами для вiдправлення повiдомлення !"); return }
                     var len=cnt.split(",");
+
+                    var cntRow = gD.getRowsNum(); var koli=0; var zn;
+                    for (var i = 0; i < cntRow; i++)  {
+                        zn=gD.cells2(i,4).getValue();
+                        if ( (gD.cells2(i,1).getValue()==1) && (zn.indexOf('-')==-1) )  koli=koli+1;
+                    }
+
                     var txt=form.getItemValue('Text');
-                    iasufr.confirm('Пiдтвердiть вiдправлення для  ' + len.length +' користувачiв: '+txt, Send);
+                    pKomu=0;                                      // len.length
+                    iasufr.confirm('Пiдтвердiть вiдправлення для  ' + koli +' користувачiв: '+txt, Send);
                 break;
                 case "komu":
+                    $(form.getInput("User")).blur();
+                    $(form.getInput("Text")).blur();
                     var idUser=0; if (selUser) idUser=selUser.id;
-                    if ((form.getItemValue('Text')=="") && (idUser==0)) { iasufr.message("Виберiть текст повiдомлення !"); return }
+                    var idSMS=0; if (selSMS) idSMS=selSMS.id;
+                    if (idSMS==0) { iasufr.message("Виберiть текст повiдомлення iз довiдника!"); return }
                     pKomu=1;
                     SelTable();
                 break;
@@ -99,7 +115,6 @@ Fin.ReqSms.Create = function (opt) {
     function Send() { mainB.progressOn();
         var cnt = gD.getRowsNum(); var list="";
         for (var i = 0; i < cnt; i++)  { if ( (gD.cells2(i,1).getValue()==1) && (gD.cells2(i,4).getValue()!="---") )  list+= gD.cells2(i,0).getValue() + '^' + gD.cells2(i,4).getValue() +',';  }
-        //alert(list);
         var idSMS=0; if (selSMS) idSMS=selSMS.id;
         var json={idOrg:selOrg.id, list:list, text:form.getItemValue('Text'), idSMS:idSMS};
 
@@ -107,10 +122,12 @@ Fin.ReqSms.Create = function (opt) {
             url:'fin.Sms.cls',
             data:{func:'SmsSend', json: JSON.stringify(json) },
             success: function (data) {
-                //var obj=JSON.parse(data);
-                //var jso=obj.form;
+                var d = JSON.parse(data);
+                selSMS.id = d.Id;
+
                 mainB.progressOff();
                 iasufr.messageSuccess("Вiдправлено !");
+                pKomu=1;
                 SelTable();
             }
         });
@@ -119,19 +136,20 @@ Fin.ReqSms.Create = function (opt) {
     function InitTable() {
         gD=main.cells('b').attachGrid();
         gD.setImagePath(iasufr.const.IMG_PATH);
-        //            0  1          2          3                   4         5
-        gD.setHeader(",Отм.,Логiн корист..,П I Б користувача., Моб.телефон,Органiзацiя,Дата_час,Текст");
+        //            0  1                  2             3                   4         5
+        gD.setHeader(",#master_checkbox,Логiн корист..,П I Б користувача., Моб.телефон,Органiзацiя,Дата_час,Текст");
         gD.setInitWidths("10,40,70,180,120,350,120,300");
-        gD.setColAlign("center,center,center,left,left,left,center,left");
-        gD.setColTypes("ro,ch,ro,ro,ro,ro,ro,ro");
-        gD.setColSorting("str,str,str,str,str,str,str,str");
+        gD.setColAlign("center,center,center,left,center,left,center,left");
+        gD.setColTypes("ro,ch,ro,ro,ed,ro,ro,ro");
+        gD.setColSorting("str,ch,str,str,str,str,str,str");
         //                0   1     2    3    4    5
         gD.setColumnIds("sKOD,sOTM,sLOG,sFIO,sTEL,sORG,sDAT,sTXT");
         gD.init();
         gD.setColumnHidden(gD.getColIndexById('sKOD'),true);
         if (pKomu!=1) { gD.setColumnHidden(gD.getColIndexById('sDAT'),true); gD.setColumnHidden(gD.getColIndexById('sTXT'),true); }
         //gD.enableTooltips("false,false,true");
-        gD.sortRows(2,"str","asc");
+        //gD.sortRows(2,"str","asc");
+        gD.sortRows(4);
         gD.setColSorting("int,ch,str,str,str,str,str,str")
         cellNumDog=gD.getColIndexById("sKOD");
         //gD.splitAt(4);
@@ -158,7 +176,7 @@ Fin.ReqSms.Create = function (opt) {
             if (tel=='---') gD.cells(rId,1).setValue(0);
         });
 
-
+        /*
         gD.attachEvent("onHeaderClick", function(ind,obj){
             if (ind!=1) return true
             var list=gD.getCheckedRows(1);
@@ -168,8 +186,10 @@ Fin.ReqSms.Create = function (opt) {
                   }
 
             //gD.setCheckedRows(1,0)
+            gD.sortRows(4);
             return true
         });
+        */
     }  // InitTable()
 
     // ------------------------------------------------------- фильтр слева
@@ -188,6 +208,7 @@ Fin.ReqSms.Create = function (opt) {
 
             form.attachEvent("onChange", function(name, value, is_checked) {
                 if (name=="Text") selSMS.id=0;
+                if ((name=="User") && (value=="")) selUser.id=0;
                 return true;
 
             });
@@ -195,14 +216,25 @@ Fin.ReqSms.Create = function (opt) {
             var pDog=1; if (iasufr.pGrp(1)) pDog=0;  //pDog=1 - показать тодько огранич.список организаций для выбора
             iasufr.attachSelector(form.getInput("idOrg"), "OrgSelector",  { pDog:pDog,  onSelect: OrgSelect});
             iasufr.attachSelector(form.getInput("Text1"), "SMS",  { select:true,  onSelect: Txt});
-            iasufr.attachSelector(form.getInput("User"), "Users",  { width:1100,height:600, ignoreReadonly:true, selectUser:true, onSelect: UserSelect});
-            SelTable();
+            iasufr.attachSelector(form.getInput("User1"), "UserSelector",  { ignoreReadonly:true, multiSelect:true, onSelect: UserSelect});
+            if ( (listDog!="")||(listOrg!='') ) SelTable();
             mainB.setText(' ');
         }
     });
 
-    function UserSelect(o, $txt)  { selUser = o;
-        if ( o )  $txt.val(o.fio); //+'/' + o.orgName);
+    function UserSelect(o, $txt)  {
+        selUser=null; selUser= {};
+        var list=""; var ListFio="";
+        for (var r = 0; r < o.length; r++) {
+            list=list + o[r].id + ",";
+            ListFio=ListFio + o[r].fio;
+            if (r<(o.length-1))  ListFio=ListFio + ", ";
+        }
+        selUser.id=list;
+        //selUser = o;
+        form.setItemValue('User',ListFio);
+        //selSMS.id=obj[0];
+        //if ( o )  $txt.val(o.fio); //+'/' + o.orgName);
     }
 
     //----------------------------------------------------------
@@ -232,8 +264,8 @@ Fin.ReqSms.Create = function (opt) {
         //var speak=0; if (form.isItemChecked('Speak')) speak=1;
         var idSMS=0; if (selSMS) idSMS=selSMS.id;
         var idUser=0; if (selUser) idUser=selUser.id;
-        var json={idOrg:idOrg, selDog:listDog, komu:pKomu, idSMS:idSMS, idUser:idUser}; // form.getItemValue('Real')
-
+        var json={idOrg:idOrg, selDog:listDog, selOrg:listOrg, komu:pKomu, idSMS:idSMS, idUser:idUser}; // form.getItemValue('Real')
+        
         iasufr.ajax({
             url:'fin.Sms.cls',
             data:{func:'SmsSel', json: JSON.stringify(json) },
@@ -241,7 +273,8 @@ Fin.ReqSms.Create = function (opt) {
                 var p   = JSON.parse(data);
                 var jso = p.table;
                 gD.parse(jso,'json');
-                gD.sortRows(3,"str","asc");
+                //gD.sortRows(3,"str","asc");
+                gD.sortRows(4);
                 iasufr.gridRowFocusApply(gD);
                 //--------------------------------------------
                 if ((gD.getRowsNum() > 0) && (pHeader == 0)) {
@@ -256,8 +289,8 @@ Fin.ReqSms.Create = function (opt) {
                 if (pHeader==1) { for (i = 0; i < gD.getColumnsNum(); i++) $(gD.getFilterElement(i)).val("");  }
                 var cntTel=0;
                 if (cnt>0) { for (i = 0; i < cnt; i++) {
-                                  gD.cells2(i, 3).setValue("<a href='#'>"+gD.cells2(i, 3).getValue()+"</a>");
-                                  $(gD.cells2(i, 3).cell).click(onCellClick);
+                                  //gD.cells2(i, 3).setValue("<a href='#'>"+gD.cells2(i, 3).getValue()+"</a>");
+                                  //$(gD.cells2(i, 3).cell).click(onCellClick);
                                   if (gD.cells2(i, 4).getValue()!="---") cntTel++;
 
                 }}

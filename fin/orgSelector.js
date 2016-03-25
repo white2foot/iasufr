@@ -14,12 +14,13 @@ Fin.OrgSelector.Create = function (opt) {
     var isType=0; //if (_this.opt.isType) isType=1;        //показать типы орг - сейчас типы указаны в списке для общего поиска ^Org("OB",ob,"SELH")
     var pDog=0;  if (_this.opt.pDog) { pDog=1; }      // показать только организацию пользователя и те, где эта организация явл. контрагентом в договорах ^Dog
     var idOrg=""; if (_this.opt.idOrg) idOrg=_this.opt.idOrg;
+    var tip="";   if (_this.opt.Tip)   tip=_this.opt.Tip;
     var HomeCont=""; if (_this.opt.HomeCont) HomeCont=_this.opt.HomeCont;  // показать только те орган., у к-рых есть контактные данные ^Home("I",idOrg,"K"
     var HomeNews=""; if (_this.opt.HomeNews) HomeNews=_this.opt.HomeNews;  // показать только те орган., у к-рых есть новости           ^Home("I",idOrg,"N"
     var HomeComment=""; if (_this.opt.HomeComment) HomeComment=_this.opt.HomeComment;  // показать только те орган., у к-рых есть отзывы   ^Home("I",idOrg,"V"
     
     var json=$.extend( {accountAdd: account },{pBNK: pBNK, idOrg:idOrg, pDog:pDog, HomeCont: HomeCont, HomeNews: HomeNews , HomeComment: HomeComment } ,{isType: isType });
-    json=$.extend( json, {pHelp:1 } );
+    json=$.extend( json, {pHelp:1, Tip:tip } );
 	var json1={Par:'zag', pHelp:1, accountAdd: account,isType: isType };
 	//--------------------------
 

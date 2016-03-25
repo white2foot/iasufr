@@ -128,7 +128,7 @@ Fin.DogGrp.Create = function (opt) {
 
             if ((id == 'edit')) { if ( (!idGrp) ) { iasufr.message('Вкажiть строку !'); return; }
               var w=$( document ).width()-30;
-              iasufr.loadForm("DogGrpEdit", {idGrp:idGrp,idOrg:selOrg.id, idOrgName:$(tbOrg.getInput("Org")).val(), modal:true, width:w, height:470,onSave: Reload});
+              iasufr.loadForm("DogGrpEdit", {idGrp:idGrp,idOrg:selOrg.id, idOrgName:$(tbOrg.getInput("Org")).val(), width:w, height:470,onSave: Reload});
             }
 
             if (id == 'add') {

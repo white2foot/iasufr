@@ -49,8 +49,8 @@ Fin.HomeAskEdit.Create = function (opt) {
              if ( iasufr.pGrp(1) ) $(form.getInput("TextV")).focus();
              //else $(form.getInput("Text")).focus();
              $(form.getInput("Komu")).css('color','gray');
-             //console.log(edit+'---'+JSON.stringify(iasufr.user));
-             if ( (komuI != iasufr.user.idUser) && (edit==1) ) iasufr.attachSelector(form.getInput("Komu"), "Users",  { width:1100,height:600, ignoreReadonly:true, selectUser:true, onSelect: UserSelect});
+             //if ( (komuI != iasufr.user.idUser) && (edit==1) ) iasufr.attachSelector(form.getInput("Komu"), "Users",  { width:1100,height:600, showAll: 1,ignoreReadonly:true, selectUser:true, onSelect: UserSelect});
+             if ( (komuI != iasufr.user.idUser) && (edit==1) ) iasufr.attachSelector(form.getInput("Komu"), "UserSelector",  {ignoreReadonly:true, onSelect: UserSelect});
              form.setNote("Komu", { text:'тут можна при необхiдностi вказати користувача, якому буде вiдправлено ваше питання або повiдомлення' , width:650 });
              t.owner.progressOff();
              if (edit==0)  toolbar.disableItem("save");
@@ -59,7 +59,7 @@ Fin.HomeAskEdit.Create = function (opt) {
     }
 
     function UserSelect(o, $txt)  { selUser = o;
-        if ( o ) { $txt.val(o.fio+' /'+ o.post+' /' + o.orgName);
+        if ( o ) { $txt.val(o.fio+' /'+ o.posada+' /' + o.orgName);
             //iasufr.enableAskBeforClose(t);
         }
 

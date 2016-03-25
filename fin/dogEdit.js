@@ -48,16 +48,19 @@ Fin.DogEdit.Create = function (opt) {
     var selKosht = null;
     var selGrp = null;
 
+    var selPersK = null;
+    var selPersP = null;
+
     var tolb = main.attachToolbar();
     tolb.setIconPath(iasufr.const.ICO_PATH);
     tolb.setIconSize(32);
 
 
-    if (iasufr.pFunc("dogEdit")) {
+    //if (iasufr.pFunc("dogEdit")) {
         tolb.addButton("save", 7, iasufr.lang.ui.save, "32/database_save.png", "");
         tolb.addButton("del", 8, "Видалити договiр", "32/toolbar_delete.png", "");
-    }
-    if  (!dost)  {
+    //}
+    if (!iasufr.pFunc("dogEdit"))  {
         if (tolb.objPull[tolb.idPrefix + "save"]) tolb.disableItem("save");
         if (tolb.objPull[tolb.idPrefix + "del"]) tolb.disableItem("del");
     }
@@ -321,8 +324,9 @@ Fin.DogEdit.Create = function (opt) {
         //form.setTooltip ('idOrgOsn', '', '555');
 		form.setNote("idOrgK", { text:form.getItemValue('idOrgKcity') , width:300 });
 		form.setNote("idOrgOsn", { text:form.getItemValue('idOrgCity') , width:300 });
-		$(form.getInput('idOrgOsn')).css('font-size','10px');
-		$(form.getInput('idOrgOsn')).css('font-weight','bold');
+        var arr = ["idOrgOsn","Grp","idOrgK","idOrgP", "idPersK" , "idPersP"];
+        for (var a in arr) $(form.getInput(arr[a])).css('color','#0000cc');
+
         tlbb.addText("txt", 1, "Зобов`язання органiзацii:&nbsp;&nbsp;&nbsp;<b>" + form.getItemValue("idOrgOsn") + "</b>");
 		// AddPlus();
 				
@@ -375,20 +379,24 @@ Fin.DogEdit.Create = function (opt) {
 
 
         $(form.getInput("Kosht")).keydown(function(e){if (e.keyCode == 13) { $(form.getInput("Kom")).focus();}  });
-        //$(form.getInput("Date")).keydown(function(e){if (e.keyCode == 13) { $(form.getInput("Num")).focus();}  });
 
-        selOrgK=null; selOrgP=null; selKosht=null; selGrp=null;
-        selOrgK={}; selOrgP={}; selKosht={};selGrp={};
+        selOrgK=null; selOrgP=null; selKosht=null; selGrp=null; selPersK=null;  selPersP=null;
+        selOrgK={};   selOrgP={};   selKosht={};   selGrp={};   selPersK={};    selPersP={};
         selOrgK.id= form.getItemValue("idOrgKcode"); selOrgK.name = form.getItemValue("idOrgK");
         selOrgP.id= form.getItemValue("idOrgPcode"); selOrgP.name = form.getItemValue("idOrgP");
         selKosht.id= form.getItemValue("KoshtCode");
-        selGrp.id= form.getItemValue("GrpCode");
+        selGrp.id = form.getItemValue("GrpCode");
+        selPersK.id = form.getItemValue("idPersKcode");
+        selPersP.id = form.getItemValue("idPersPcode");
         //form.setReadonly("idOrgK", true);
         //form.setReadonly("idOrgP", true);
 
         if (dost) {
           iasufr.attachSelector(form.getInput("idOrgK"), "OrgSelector",  { width:1100,height:600, AddCode:true, accountAdd:true, bankOnly:false, isType:true, AddCode:true, onSelect: OrgSelectK});
           iasufr.attachSelector(form.getInput("idOrgP"), "OrgSelector",  { width:1100,height:600,AddCode:true,accountAdd:true,bankOnly:false,onSelect: OrgSelectP});
+          if (admin) { iasufr.attachSelector(form.getInput("idPersK"), "Pers",  { onSelect: PersSelectK});
+                       iasufr.attachSelector(form.getInput("idPersP"), "Pers",  { onSelect: PersSelectP});
+          }
 
           iasufr.attachSelector(form.getInput("RRosn"), "OrgSelector", { width:1100,height:600,accountAdd:true,bankOnly:false, idOrg:idOrg, onSelect: OrgSelectR} );
           iasufr.attachSelector(form.getInput("RRkor"), "OrgSelector", { width:1100,height:600,accountAdd:true,bankOnly:false, idOrg:selOrgK.id,  ChangeOrg:true,  onSelect: OrgSelectRRkor} );
@@ -436,6 +444,19 @@ Fin.DogEdit.Create = function (opt) {
         else form.setItemValue("RRpl", "");
         TitleWrite(); TitleWriteRR();
     }
+
+    function PersSelectK(o, $txt)  { selPersK = o;
+        if ( o ) { $txt.val( o.name +"(" + o.inn + ") " );
+            iasufr.enableAskBeforClose(t);
+        }
+    }
+
+    function PersSelectP(o, $txt)  { selPersP = o;
+        if ( o ) { $txt.val( o.name +"(" + o.inn + ") " );
+            iasufr.enableAskBeforClose(t);
+        }
+    }
+
     function OrgSelectR(o, $txt)  {  if ( o ) {
         iasufr.enableAskBeforClose(t);
         form.setItemValue("RRosn", o.account);  TitleWriteRR(); }
@@ -685,14 +706,17 @@ Fin.DogEdit.Create = function (opt) {
         var idOrgP="";   if (selOrgP) { idOrgP=selOrgP.id; }
         var idGrp="";    if (selGrp)   { idGrp=selGrp.id; }
         var idKosht="";  if (selKosht) { idKosht=selKosht.id; }
+        var idPersK="";   if (selPersK) { idPersK=selPersK.id; }
+        var idPersP="";   if (selPersP) { idPersP=selPersP.id; }
         var date=iasufr.formatDateStr(form.getCalendar("Date").getDate(true));
         var dateN=iasufr.formatDateStr(form.getCalendar("DateN").getDate(true));
         var dateK=iasufr.formatDateStr(form.getCalendar("DateK").getDate(true));
         var fAkt=0; if (form.isItemChecked('FormAkt')) fAkt=1;
 
-        var json = {idOrg: idOrg, idDog: idDog, Num:form.getItemValue("Num"), Kom:form.getItemValue("Kom") };
+        var json = {idOrg: idOrg, idDog: idDog, Num:form.getItemValue("Num"), Kom:form.getItemValue("Kom"), Val:form.getItemValue("Val") };
         json = $.extend(json, { idOrgK: idOrgK, idOrgP: idOrgP, idGrp: idGrp, idKosht: idKosht, Date:date, DateN:dateN, DateK:dateK} );
         json = $.extend(json, { RRosn: form.getItemValue("RRosn"), RRkor: form.getItemValue("RRkor"), RRpl: form.getItemValue("RRpl"), Period: form.getItemValue("Period"), Sum: form.getItemValue("Sum"), FormAkt:fAkt  } );
+        json = $.extend(json, { idPersK: idPersK, idPersP:idPersP} );
 
         // ------------------  финансы
         var f= null; f = [];
@@ -788,6 +812,8 @@ Fin.DogEdit.Create = function (opt) {
         selOrgP = null; selOrgP = [];
         selKosht = null; selKosht = [];
         selGrp = null; selGrp = [];
+        selPersK = null; selPersK = {};
+        selPersP = null; selPersP = {};
         form.unload(); form=null;
         gR_F.clearAll(); gK_F.clearAll();
         gR_P.clearAll(); gK_P.clearAll();

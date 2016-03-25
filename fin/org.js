@@ -16,6 +16,7 @@ Fin.Org.Create = function (opt) {
     var gridOB;
     var Accord;
     var email='';
+    var admin=iasufr.pGrp(1);
     ToolB();
     initAcc();
 
@@ -24,6 +25,9 @@ Fin.Org.Create = function (opt) {
         var toolbar = main.attachToolbar();
         toolbar.setIconsPath(iasufr.const.ICO_PATH);
         toolbar.setIconSize(32);
+        if (admin) { toolbar.addButton("sms", 1, "Смс-повiдомлення", "32/webmail.png", "");
+            toolbar.setItemToolTip("sms", "Надiслати смс-повiдомлення користувачам вибраних органiзацiй");
+        }
         toolbar.addButton("print", 1, "Друк", "32/printer_empty.png", "");
         if (iasufr.pFunc("orgAdd")) {
             toolbar.addButton("new", 3, "Додати органiзацiю", "32/toolbar_add.png", "");
@@ -63,6 +67,18 @@ Fin.Org.Create = function (opt) {
                     iasufr.loadForm("OrgEmail", { Email:email, height:500, width:700});  break;
                 case "rel":   SelTable(1); break;
                 case "close": iasufr.close(ths); break;
+                case "sms":
+                    var cnt = grOrg.getRowsNum(); stroka="";
+                    if ( cnt==0 ) { iasufr.message("Сформуйте список органiзацiй !"); return }
+                    if (cnt>0) {
+                        for (var i = 0; i < cnt; i++) {
+                            var idRow=grOrg.cells2(i, 0).getValue();
+                            stroka+=idRow+",";
+                        }
+                    }
+                    var hei=$( document ).height()-50;
+                    iasufr.loadForm("ReqSms", { width: 1200, height: hei, idOrg:0, orgName:"",  listOrg:stroka } );
+                    break;
             }
         });
     }   //------------------------ ToolB()
@@ -160,7 +176,7 @@ Fin.Org.Create = function (opt) {
         json=$.extend(json, {Frm:"", Tip:tip, Obl:obl, Cont:cont } );
         json=$.extend(json, {accountAdd: form.getItemValue('Bank'), addDate:1, ATO: form.getItemValue('ATO'), Real:form.getItemValue('Real')} );
         json=$.extend(json, {Level:form.getItemValue('Level'), Date:date} );
-        json=$.extend(json, {Par:'org',pHelp:0, ReqOnly: form.getItemValue('Req'), Dog: form.getItemValue('Dog')} );  //Req - только заявки
+        json=$.extend(json, {Par:'org',pHelp:0, ReqOnly: form.getItemValue('Req'), Dog: form.getItemValue('Dog'), DogNo: form.getItemValue('DogNo')} );  //Req - только заявки
 
         var json1=$.extend({accountAdd: form.getItemValue('Bank'),  Cont: cont, pHelp:0}, {Par:'zag'} );
         var jsOrg={Date:date};
@@ -231,6 +247,7 @@ Fin.Org.Create = function (opt) {
         iasufr.gridRowFocus(grOrg, idRow);
         var idKP=grOrg.cells2(ind,0).getValue();
         var jsOrg={Date:date,idOrg:idKP};
+
         iasufr.loadForm("OrgEdit", {onSave: SelTable, width: WID, height: HEI, json: jsOrg});
     }
 

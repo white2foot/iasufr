@@ -174,7 +174,7 @@ Frm.Input.Create = function(opt) {
 
                         if (rd) if (rd.createdFromId) {
                             item.createdFromId = rd.createdFromId;
-                            item.idx = r;
+                            item.pos = r;
                         }
                         if ((item.value) || (item.createdFromId !== undefined)) {
                             o.cells.push(item);
@@ -380,13 +380,7 @@ Frm.Input.Create = function(opt) {
                     var fd = new FormUtils(t.tableData.tables[i], o.json.period);
                     fd.buildGrid(g, t.isKazn == 1);
                     g.tableData = fd;
-                    t.tableData.tables[i].inputData.sort(function (a,b) {
-                       if (a.createdFromId !== undefined && b.createdFromId !== undefined) {
-                           return a.idx < b.idx ? 1: -1;
-                       } else {
-                           return a.idRow < b.idRow ? 1: -1;
-                       }
-                    });
+
                     if (t.tableData.tables[i].inputData.length != 0) {
                         for (var k = 0; k < t.tableData.tables[i].inputData.length; k++) {
                             var cell = t.tableData.tables[i].inputData[k];
@@ -406,14 +400,14 @@ Frm.Input.Create = function(opt) {
                                     }
                                 } else
                                 if (cell.createdFromId) {
-                                    fd.addDynRow(null, cell.createdFromId, cell.idRow);
+                                    /*fd.addDynRow(null, cell.createdFromId, cell.idRow);
                                     if (g.isItemExists(cell.idRow)) {
                                         var colIdx = g.getColIndexById(cell.idCol);
                                         if (colIdx != undefined) {
                                             var ce = g.cells(cell.idRow, colIdx);
                                             if (ce) ce.setValue(fd.formatValue(cell.value, ctype));
                                         }
-                                    }
+                                    }*/
                                 }
                             }
                         }

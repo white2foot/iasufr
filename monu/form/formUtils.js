@@ -4,7 +4,10 @@
 
 function FormUtils(tableData, period) {
     var t = this;
+    t.getRowData = getRowData;
+
     t.data = tableData;
+    extendTableWithDynamicInputData();
     if (t.data) t.data.rows = t.data.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
     t.grid = undefined;
     t.fd = {};//formula dependientes
@@ -16,16 +19,16 @@ function FormUtils(tableData, period) {
     t.getColIndex = function(colId) {
         for (var j = 0; j < t.data.cols.length; j++) if (t.data.cols[j].id == colId) return j;
         return -1;
-    }
+    };
 
-    t.getRowData = function(rowId) {
+    function getRowData(rowId) {
         for (var i = 0; i < t.data.rows.length; i++) if (t.data.rows[i].id == rowId) return t.data.rows[i];
         return undefined;
-    }
+    };
 
     t.getCellData = function(rowId, colId) {
         for (var i = 0; i < t.data.cells.length; i++) if (t.data.cells[i].row == rowId & t.data.cells[i].col == colId) return t.data.cells[i];
-    }
+    };
 
     t.onEditCell = function(stage,rId,cInd,nValue,oValue)  {
         var type = 2;
@@ -55,11 +58,11 @@ function FormUtils(tableData, period) {
             return t.formatValue(nValue, type);
         }
         return true;
-    }
+    };
 
     t.numberToString = function(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-    }
+    };
 
     t.unformatValue = function(val, type) {
         if (!val) return val;
@@ -67,7 +70,7 @@ function FormUtils(tableData, period) {
         if (type === "") type = 2;
         if (type >= 1 && type <= 4) return val.replace(/ /g, "");
         return val;
-    }
+    };
 
     t.formatValue = function(val, type) {
         var v;
@@ -99,7 +102,7 @@ function FormUtils(tableData, period) {
             }
             default: return val; break;
         }
-    }
+    };
 
     t.buildGrid = function(grid, notUseFormulas, buildOnlyHeader) {
         t.alerts = [];
@@ -183,7 +186,7 @@ function FormUtils(tableData, period) {
 
         if (buildOnlyHeader != true) {
             for (i = 0; i < t.data.cells.length; i++) {
-               initCell(i);
+                initCell(i);
             }
             if (notUseFormulas != true) BuildFormulaData();
         }
@@ -197,18 +200,49 @@ function FormUtils(tableData, period) {
 
 
         // auto generate dynamic rows
-        for (i = 0; i < t.data.rows.length; i++) {
-            rowId = t.data.rows[i].id;
-            rd = t.getRowData(rowId);
-            if (rd.canAdd > 1) {
-                var cnt = rd.canAdd;
-                var id = rowId;
-                for (var m = 0; m < cnt-1; m++) {
-                    var ce = grid.cells(id, 0);
-                    if (ce) if (ce.cell.children.length != 0) id = addDynRow({target: ce.cell.children[0]});
-                }
+        /*for (i = 0; i < t.data.rows.length; i++) {
+         rowId = t.data.rows[i].id;
+         rd = t.getRowData(rowId);
+         if (rd.canAdd > 1) {
+         var cnt = rd.canAdd;
+         var id = rowId;
+         for (var m = 0; m < cnt-1; m++) {
+         var ce = grid.cells(id, 0);
+         if (ce) if (ce.cell.children.length != 0) id = addDynRow({target: ce.cell.children[0]});
+         }
+         }
+         }*/
+    };
+
+    function extendTableWithDynamicInputData() {
+        var tdesc = t.data;
+        tdesc.inputData = tdesc.inputData.sort(function (a,b) {
+            if (a.createdFromId !== undefined && b.createdFromId !== undefined) {
+                return a.pos < b.pos ? 1: -1;
+            } else {
+                return a.idRow > b.idRow ? 1: -1;
             }
-        }
+        });
+
+        //tdesc.rows = tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
+
+        tdesc.inputData.forEach(function(dyn) {
+            if (dyn.createdFromId === undefined) return;
+            var rd = t.getRowData(dyn.idRow);
+            // Row already exists - skip it
+            if (rd) return;
+
+            var parent = t.getRowData(dyn.createdFromId);
+            rd = $.extend({}, parent);
+            rd.id = dyn.idRow;
+            rd.createdFromId = parent.id;
+            //rd.pos = parent.pos + 1;
+            rd.pos = dyn.pos;
+            tdesc.rows.forEach(function (r) { if (r.pos > parent.pos) r.pos++;})
+            tdesc.rows.push(rd);
+        });
+
+
     };
 
     t.recalcFormulas = function() {
@@ -436,7 +470,7 @@ function FormUtils(tableData, period) {
                         t.fd[parseInt(c[0])] = {};
                         t.fd[parseInt(c[0])][parseInt(c[1])] = [];
                     } else
-                        if (!t.fd[parseInt(c[0])][parseInt(c[1])]) t.fd[parseInt(c[0])][parseInt(c[1])] = [];
+                    if (!t.fd[parseInt(c[0])][parseInt(c[1])]) t.fd[parseInt(c[0])][parseInt(c[1])] = [];
                     t.fd[parseInt(c[0])][parseInt(c[1])].push({row: row, col: col });
                 }
             }
@@ -553,4 +587,24 @@ function eXcell_addBtn(cell){ //the eXcell name is defined here
 }
 eXcell_addBtn.prototype = new eXcell;
 
+
 //@ sourceURL=http://12-monu03.donnu.edu.ua:57772/monu/form/formUtils.js
+
+/*
+k ^Zvit("Z",356370,"O",339,"DYN")
+k ^Zvit("Z",356370,"O",339,"R")
+
+s ^Zvit("Z",356370,"O",339,"DYN",2000)	= "1000•1"
+s ^Zvit("Z",356370,"O",339,"DYN",3000)	= "1000•2"
+
+s ^Zvit("Z",356370,"O",339,"R",1000,3163)=35212001011359
+s ^Zvit("Z",356370,"O",339,"R",1000,3164)="0,00 грн."
+s ^Zvit("Z",356370,"O",339,"R",1000,3165)="Нуль гривен, 00 копійок"
+s ^Zvit("Z",356370,"O",339,"R",2000,3163)=35227201011359
+s ^Zvit("Z",356370,"O",339,"R",2000,3164)="423222,24  грн."
+s ^Zvit("Z",356370,"O",339,"R",2000,3165)="Чотириста двадцять три тисячі двісті двадцять дві грн., 24 коп."
+s ^Zvit("Z",356370,"O",339,"R",3000,3163)=35224301011359
+s ^Zvit("Z",356370,"O",339,"R",3000,3164)="13196,22"
+s ^Zvit("Z",356370,"O",339,"R",3000,3165)="Тринадцять тисяч сто дев""яносто шість"s
+
+*/

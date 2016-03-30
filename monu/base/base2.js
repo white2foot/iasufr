@@ -134,7 +134,8 @@ base.Layout2.Create = function (opt) {
                 });
             });
             dhxLayoutT2.attachEvent("onHeaderClick", function(ind,obj){
-                if (dhxLayoutT2.idCells[ind]=="isCHECK") {
+                var strId=dhxLayoutT2.idCells[ind]
+                if (strId.lastIndexOf("CHECK")>-1) {
                     if (isCheck==0){isCheck=1;dhxLayoutT2.setColLabel(ind,"img:[/images/imgs/iconCheckGray.gif]");}
                     else {isCheck=0;dhxLayoutT2.setColLabel(ind,"img:[/images/imgs/iconUncheckAll.gif]");}
                     for (var i = 0; i <= dhxLayoutT2.getRowsNum()-1; i++){

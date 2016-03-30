@@ -5,7 +5,7 @@
 function FormUtils(tableData, period) {
     var t = this;
     t.getRowData = getRowData;
-    
+
     t.data = tableData;
     extendTableWithDynamicInputData();
     if (t.data) t.data.rows = t.data.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
@@ -186,7 +186,7 @@ function FormUtils(tableData, period) {
 
         if (buildOnlyHeader != true) {
             for (i = 0; i < t.data.cells.length; i++) {
-               initCell(i);
+                initCell(i);
             }
             if (notUseFormulas != true) BuildFormulaData();
         }
@@ -201,24 +201,24 @@ function FormUtils(tableData, period) {
 
         // auto generate dynamic rows
         /*for (i = 0; i < t.data.rows.length; i++) {
-            rowId = t.data.rows[i].id;
-            rd = t.getRowData(rowId);
-            if (rd.canAdd > 1) {
-                var cnt = rd.canAdd;
-                var id = rowId;
-                for (var m = 0; m < cnt-1; m++) {
-                    var ce = grid.cells(id, 0);
-                    if (ce) if (ce.cell.children.length != 0) id = addDynRow({target: ce.cell.children[0]});
-                }
-            }
-        }*/
+         rowId = t.data.rows[i].id;
+         rd = t.getRowData(rowId);
+         if (rd.canAdd > 1) {
+         var cnt = rd.canAdd;
+         var id = rowId;
+         for (var m = 0; m < cnt-1; m++) {
+         var ce = grid.cells(id, 0);
+         if (ce) if (ce.cell.children.length != 0) id = addDynRow({target: ce.cell.children[0]});
+         }
+         }
+         }*/
     };
 
     function extendTableWithDynamicInputData() {
         var tdesc = t.data;
         tdesc.inputData = tdesc.inputData.sort(function (a,b) {
             if (a.createdFromId !== undefined && b.createdFromId !== undefined) {
-                return a.pos > b.pos ? 1: -1;
+                return a.pos < b.pos ? 1: -1;
             } else {
                 return a.idRow > b.idRow ? 1: -1;
             }
@@ -228,17 +228,21 @@ function FormUtils(tableData, period) {
 
         tdesc.inputData.forEach(function(dyn) {
             if (dyn.createdFromId === undefined) return;
-            var rd = t.getRowData(dyn.createdFromId);
+            var rd = t.getRowData(dyn.idRow);
             // Row already exists - skip it
             if (rd) return;
 
-            var parent = t.getRowData(dyn.idRow);
+            var parent = t.getRowData(dyn.createdFromId);
             rd = $.extend({}, parent);
             rd.id = dyn.idRow;
-            rd.pos = parent.pos + 1;
+            rd.createdFromId = parent.id;
+            //rd.pos = parent.pos + 1;
+            rd.pos = dyn.pos;
             tdesc.rows.forEach(function (r) { if (r.pos > parent.pos) r.pos++;})
             tdesc.rows.push(rd);
         });
+
+
     };
 
     t.recalcFormulas = function() {
@@ -466,7 +470,7 @@ function FormUtils(tableData, period) {
                         t.fd[parseInt(c[0])] = {};
                         t.fd[parseInt(c[0])][parseInt(c[1])] = [];
                     } else
-                        if (!t.fd[parseInt(c[0])][parseInt(c[1])]) t.fd[parseInt(c[0])][parseInt(c[1])] = [];
+                    if (!t.fd[parseInt(c[0])][parseInt(c[1])]) t.fd[parseInt(c[0])][parseInt(c[1])] = [];
                     t.fd[parseInt(c[0])][parseInt(c[1])].push({row: row, col: col });
                 }
             }
@@ -583,4 +587,24 @@ function eXcell_addBtn(cell){ //the eXcell name is defined here
 }
 eXcell_addBtn.prototype = new eXcell;
 
+
 //@ sourceURL=http://12-monu03.donnu.edu.ua:57772/monu/form/formUtils.js
+
+/*
+k ^Zvit("Z",356370,"O",339,"DYN")
+k ^Zvit("Z",356370,"O",339,"R")
+
+s ^Zvit("Z",356370,"O",339,"DYN",2000)	= "1000•1"
+s ^Zvit("Z",356370,"O",339,"DYN",3000)	= "1000•2"
+
+s ^Zvit("Z",356370,"O",339,"R",1000,3163)=35212001011359
+s ^Zvit("Z",356370,"O",339,"R",1000,3164)="0,00 грн."
+s ^Zvit("Z",356370,"O",339,"R",1000,3165)="Нуль гривен, 00 копійок"
+s ^Zvit("Z",356370,"O",339,"R",2000,3163)=35227201011359
+s ^Zvit("Z",356370,"O",339,"R",2000,3164)="423222,24  грн."
+s ^Zvit("Z",356370,"O",339,"R",2000,3165)="Чотириста двадцять три тисячі двісті двадцять дві грн., 24 коп."
+s ^Zvit("Z",356370,"O",339,"R",3000,3163)=35224301011359
+s ^Zvit("Z",356370,"O",339,"R",3000,3164)="13196,22"
+s ^Zvit("Z",356370,"O",339,"R",3000,3165)="Тринадцять тисяч сто дев""яносто шість"s
+
+*/

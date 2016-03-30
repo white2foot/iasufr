@@ -139,8 +139,69 @@ Frm.PrintForm.Create = function(opt) {
         return -1;
     }
 
+    function posSort(a, b) {
+        return parseInt(a.pos) < parseInt(b.pos) ? 1: -1;
+    }
+
+
+
+    function getRowData(tdesc, rowId) {
+        for (var i = 0; i < tdesc.rows.length; i++) if (tdesc.rows[i].id == rowId) return tdesc.rows[i];
+        return undefined;
+    }
+
+
     // Add dynamic rows from input data
-    function extendTableWithDynamicData(tdesc) {
+    function extendTableWithDynamicInputData(tdesc) {
+        tdesc.rows.forEach(function(r) { if (r.pos !== undefined) r.pos = parseInt(r.pos); });
+
+        // Sort dun rows by position
+        tdesc.dynrows = tdesc.dynrows.sort(posSort);
+
+        // Add dynamic rows
+        tdesc.dynrows.forEach(function(dyn) {
+            var rd = getRowData(tdesc, dyn.idRow);
+            // Row already exists - skip it
+            if (rd) return;
+
+            var parent = getRowData(tdesc, dyn.createdFromId);
+            rd = $.extend({}, parent);
+            rd.id = dyn.idRow;
+            rd.createdFromId = parent.id;
+            rd.pos = parseInt(parent.pos) + 1;
+            //rd.pos = dyn.pos;
+            tdesc.rows.forEach(function (r) { if (r.pos > parent.pos) r.pos = parseInt(r.pos) + 1;});
+            tdesc.rows.push(rd);
+
+
+
+        });
+
+        // Create cells
+        tdesc.dynrows.forEach(function(dyn) {
+            tdesc.cols.forEach(function (col) {
+                var idx = GetCellIdx(tdesc, dyn.createdFromId, col.id);
+                var obj = null;
+                if (idx !== -1) {
+                    obj = tdesc.cells[idx];
+                }
+                var idx = GetCellIdx(tdesc, dyn.idRow, col.id);
+                if (idx == -1) {
+                    if (obj) {
+                        var newcell = $.extend({}, obj);
+                        newcell.row = dyn.idRow;
+                        newcell.col = col.id;
+                        tdesc.cells.push(newcell);
+                    } else
+                        tdesc.cells.push({row: dyn.idRow, col: col.id});
+                }
+            });
+        });
+
+        // Sort rows
+        tdesc.rows = tdesc.rows.sort(function(a,b) { if (a.pos > b.pos) return 1; else return -1 });
+    };
+    /*function extendTableWithDynamicData(tdesc) {
         tdesc.inputData = tdesc.inputData.sort(function (a,b) {
             if (a.createdFromId !== undefined && b.createdFromId !== undefined) {
                 return a.idx < b.idx ? 1: -1;
@@ -173,7 +234,7 @@ Frm.PrintForm.Create = function(opt) {
             }
             delete tdesc.inputData[m].createdFromId;
         }
-    }
+    }*/
 
     function calcSubtotals(tdesc) {
         // Only one subtotal column supported
@@ -279,8 +340,9 @@ Frm.PrintForm.Create = function(opt) {
         var str = "<div>" + template + "</div>";
         var adder = $(str).find(".row-adder");
 
-        tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
-        extendTableWithDynamicData(tdesc);
+        //tdesc.rows.sort(function(a, b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
+        extendTableWithDynamicInputData(tdesc);
+        //extendTableWithDynamicData(tdesc);
         for (var r = 0; r < tdesc.rows.length; r++) {
             if (tdesc.rows[r].header) continue;
             for (var c = 0; c < tdesc.cols.length; c++) {
@@ -465,8 +527,9 @@ Frm.PrintForm.Create = function(opt) {
 
 
 
-                tdesc.rows = tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
-                extendTableWithDynamicData(tdesc);
+                //tdesc.rows = tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
+                //extendTableWithDynamicData(tdesc);
+                extendTableWithDynamicInputData(tdesc);
                 calcSubtotals(tdesc);
 
                 var tableInitial = '<table border="1" style="font-size: ' + fontSize + 'px;" cellpadding="2" cellspacing="0">';
@@ -619,4 +682,4 @@ Frm.PrintForm.Create = function(opt) {
 
     return this;
 }
-//@ sourceURL=/monu/form/print.js
+//@ sourceURL=/monu/form/work/print.js

@@ -5,10 +5,11 @@
 function FormUtils(tableData, period) {
     var t = this;
     t.getRowData = getRowData;
-
+    t.getCellData = getCellData;
     t.data = tableData;
+    // convert pos to int
+    t.data.rows.forEach(function(r) { if (r.pos !== undefined) r.pos = parseInt(r.pos); });
     extendTableWithDynamicInputData();
-    if (t.data) t.data.rows = t.data.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
     t.grid = undefined;
     t.fd = {};//formula dependientes
     t.recursionCheck = 0;
@@ -26,9 +27,9 @@ function FormUtils(tableData, period) {
         return undefined;
     };
 
-    t.getCellData = function(rowId, colId) {
+    function getCellData(rowId, colId) {
         for (var i = 0; i < t.data.cells.length; i++) if (t.data.cells[i].row == rowId & t.data.cells[i].col == colId) return t.data.cells[i];
-    };
+    }
 
     t.onEditCell = function(stage,rId,cInd,nValue,oValue)  {
         var type = 2;
@@ -214,20 +215,26 @@ function FormUtils(tableData, period) {
          }*/
     };
 
+    function posSort(a, b) {
+        return parseInt(a.pos) < parseInt(b.pos) ? 1: -1;
+    }
+
+    function extendTableWidthDinamicFormulas() {
+        var tdesc = t.data;
+        tdesc.dynrows.forEach(function(dyn) {
+            tdesc.cols.forEach(function (col) {
+                extendFormulasForNewCell(dyn.idRow, col.id, dyn.createdFromId);
+            });
+        });
+    }
+
     function extendTableWithDynamicInputData() {
         var tdesc = t.data;
-        tdesc.inputData = tdesc.inputData.sort(function (a,b) {
-            if (a.createdFromId !== undefined && b.createdFromId !== undefined) {
-                return a.pos < b.pos ? 1: -1;
-            } else {
-                return a.idRow > b.idRow ? 1: -1;
-            }
-        });
+        // Sort dun rows by position
+        tdesc.dynrows = tdesc.dynrows.sort(posSort);
 
-        //tdesc.rows = tdesc.rows.sort(function(a,b) { if (parseInt(a.pos) > parseInt(b.pos)) return 1; else return -1 });
-
-        tdesc.inputData.forEach(function(dyn) {
-            if (dyn.createdFromId === undefined) return;
+        // Add dynamic rows
+        tdesc.dynrows.forEach(function(dyn) {
             var rd = t.getRowData(dyn.idRow);
             // Row already exists - skip it
             if (rd) return;
@@ -236,13 +243,31 @@ function FormUtils(tableData, period) {
             rd = $.extend({}, parent);
             rd.id = dyn.idRow;
             rd.createdFromId = parent.id;
-            //rd.pos = parent.pos + 1;
-            rd.pos = dyn.pos;
-            tdesc.rows.forEach(function (r) { if (r.pos > parent.pos) r.pos++;})
+            rd.pos = parseInt(parent.pos) + 1;
+            //rd.pos = dyn.pos;
+            tdesc.rows.forEach(function (r) { if (r.pos > parent.pos) r.pos = parseInt(r.pos) + 1;});
             tdesc.rows.push(rd);
         });
 
+        // Create cells
+        tdesc.dynrows.forEach(function(dyn) {
+            tdesc.cols.forEach(function (col) {
+                var parendCd = t.getCellData(dyn.createdFromId, col.id);
+                var cd =  t.getCellData(dyn.idRow, col.id);
+                if (!cd) {
+                    if (parendCd) {
+                        var newcell = $.extend({}, parendCd);
+                        newcell.row = dyn.idRow;
+                        newcell.col = col.id;
+                        tdesc.cells.push(newcell);
+                    } else
+                        tdesc.cells.push({row: dyn.idRow, col: col.id});
+                }
+            });
+        });
 
+        // Sort rows
+        tdesc.rows = tdesc.rows.sort(function(a,b) { if (a.pos > b.pos) return 1; else return -1 });
     };
 
     t.recalcFormulas = function() {
@@ -282,6 +307,7 @@ function FormUtils(tableData, period) {
     function addDynRow(e, existsRowId, customId) {
         var rowId;
         var newId
+        
         if (existsRowId === undefined) {
             if (!e.target) return;
             if (!e.target.tagName) return;
@@ -346,9 +372,9 @@ function FormUtils(tableData, period) {
                     if (c.length != 2) continue;
                     if (c[0] == oldId) {
                         s = iasufr.replaceAll(s, "[" + oldId + ";" + c[1] + "]", "[" + newId + ";" + c[1] + "]");
-                        if (!t.fd[newId]) t.fd[newId] = {};
+                        /*if (!t.fd[newId]) t.fd[newId] = {};
                         if (!t.fd[newId][c[1]]) t.fd[newId][c[1]] = [];
-                        t.fd[newId][c[1]].push({row: newId, col: cId});
+                        t.fd[newId][c[1]].push({row: newId, col: cId});*/
                     }
                 }
             }
@@ -364,7 +390,7 @@ function FormUtils(tableData, period) {
         for (var i = 0; i < f.length; i++) {
             var fRow = f[i].row;
             var fCol = f[i].col;
-            if (fRow == oldId) continue;
+            if (fRow === oldId) continue;
             var cd = t.getCellData(fRow, fCol);
             if (!cd) continue;
             if (!cd.formula) continue;
@@ -391,6 +417,9 @@ function FormUtils(tableData, period) {
         for (var i = 0; i < t.data.cells.length; i++) if (t.data.cells[i].formula != undefined && t.data.cells[i].formula != "") {
             CalcDependientes(t.data.cells[i].formula, t.data.cells[i].row, t.data.cells[i].col);
         }
+
+        extendTableWidthDinamicFormulas();
+
         // recalc formulas
         for (var i = 0; i < t.data.cells.length; i++) if (t.data.cells[i].formula != undefined && t.data.cells[i].formula != "") {
             t.recursionCheck = 0;

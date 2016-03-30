@@ -39,10 +39,12 @@ Frm.Input.Create = function(opt) {
     tb.addButton("download", 4, " Зберегти у файл", "16/download.png", "");
     if (!opt.status) if (File != undefined) tb.addButton("upload", 5, " Завантажити з файлу", "16/sql_server.png", "");
     tb.addButton("transfer", 6, "Перенести суми з попереднього перiоду", "16/arrow_rotate_clockwise.png", "");
-    tb.addButton("close", 7, iasufr.lang.ui.close, "16/door.png", "");
+    tb.addButton("deleteRow", 7, "Видалити рядок", "16/cross.png", "");
+    tb.addButton("close", 8, iasufr.lang.ui.close, "16/door.png", "");
     tb.attachEvent("onClick", onToolbarClick);
+    tb.hideItem("deleteRow");
 
-    var tabs;
+    t.tabs = null;
     var isText = false;
     LoadData();
 
@@ -56,6 +58,7 @@ Frm.Input.Create = function(opt) {
         if (name == "save") Save(false);
         if (name == "saveandquit") Save(true);
         if (name == "close") iasufr.close(t);
+        if (name == "deleteRow") deleteRow();
         if (name == "download") iasufr.downloadData("form.txt", JSON.stringify(SerializeTables()));
         if (name == "upload") {
             var wnd = iasufr.wins.createWindow("up" + new Date().valueOf(), 0, 0, 320, 120);
@@ -91,6 +94,61 @@ Frm.Input.Create = function(opt) {
                  }
             }
         }
+    }
+
+    /**
+     * Deletes current row if it dynamic
+     */
+    function deleteRow() {
+        var tab = t.tabs.cells(t.tabs.getActiveTab());
+        if (!tab) return;
+        var g = tab.getView().grid;
+        if (!g) return;
+        var rowId = g.getSelectedRowId();
+        if (rowId === undefined) return;
+        rowId = parseInt(rowId);
+        if (isNaN(rowId)) return;
+
+        var rd = g.tableData.getRowData(rowId);
+        // Can delete only dyn created rows
+        if (!rd || rd.createdFromId === undefined) return;
+
+        var tdesc = g.tableData.data;
+
+        // Delete all cells
+        tdesc.cells = tdesc.cells.filter(c => c.row !== rowId);
+
+        // Delete dyn row
+        tdesc.dynrows = tdesc.dynrows.filter(r => r.idRow !== rowId);
+
+        // Delete row
+        tdesc.rows = tdesc.rows.filter(r => r.id !== rowId);
+
+        // Delete input data
+        tdesc.inputData = tdesc.inputData.filter(r => r.idRow !== rowId);
+
+        // Delete from formulas
+        delete g.tableData.fd[rowId];
+        tdesc.cells.forEach(ce => {
+            if (!ce.formula) return;
+            var s = ce.formula;
+            var cells = s.match(/[^[\]]+(?=])/g);
+            if (cells) if (cells.length != 0) {
+                for (var i = 0; i < cells.length; i++) {
+                    var c = cells[i].split(";");
+                    if (!c || c.length != 2 || c[0] !== rowId.toString()) continue;
+                    var partToReplace = "[" + c[0] + ";" + c[1] + "]";
+                    var idx = s.indexOf(partToReplace);
+                    if (idx === -1) return;
+                    idx--;
+                    if (idx < 0) idx = 0;
+                    ce.formula = s.substring(0, idx - 1)+ce.formula.substring(idx + partToReplace.length, s.length);
+                }
+            }
+        });
+        // Delete from grid
+        g.deleteRow(rowId);
+        console.log(rd);
     }
 
     function Transfer() {
@@ -297,6 +355,27 @@ Frm.Input.Create = function(opt) {
         }
     }
 
+    /**
+     * Grid cell select handler
+     * @param {nubmer} ind Row index
+     * @param {nubmer} col Column index
+     */
+    function onCellSelect(ind, col) {
+        var g = this;
+        var rowId = g.getSelectedRowId();
+
+        // Hide deleting row button for dyn rows that was created
+        var rd = g.tableData.getRowData(rowId);
+        if (!rd) tb.hideItem("deleteRow");
+        else {
+            if (rd.createdFromId === undefined)
+                tb.hideItem("deleteRow");
+            else
+                tb.showItem("deleteRow");
+        }
+
+    }
+
     function FillData(txt, o) {
         t.owner.progressOff();
         var prg = o.json.prg;
@@ -356,13 +435,13 @@ Frm.Input.Create = function(opt) {
         t.tableData = o.json;
 
         if (t.tableData.tables) if (t.tableData.tables.length > 0) {
-            tabs = layout.cells("b").attachTabbar();
-            tabs.setImagePath(iasufr.const.IMG_PATH);
+            t.tabs = layout.cells("b").attachTabbar();
+            t.tabs.setImagePath(iasufr.const.IMG_PATH);
 
             for (var i = 0; i < t.tableData.tables.length; i++) {
-                tabs.addTab(t.tableData.tables[i].id, t.tableData.tables[i].name, 200);
+                t.tabs.addTab(t.tableData.tables[i].id, t.tableData.tables[i].name, 200);
 
-                var g = tabs.cells(t.tableData.tables[i].id).attachGrid();
+                var g = t.tabs.cells(t.tableData.tables[i].id).attachGrid();
                 g.setImagePath(iasufr.const.IMG_PATH);
                 g.setHeader("");
                 g.setInitWidths("*");
@@ -373,6 +452,7 @@ Frm.Input.Create = function(opt) {
                 g.init();
                 g.attachEvent("onEditCell", onEditCell);
                 g.attachEvent("onRowDblClicked", onGridClick);
+                g.attachEvent("onRowSelect", onCellSelect);
 
                 t.tableData.tables[i].grid = g;
 
@@ -426,7 +506,7 @@ Frm.Input.Create = function(opt) {
                  for (w = 0; w < g.getColumnsNum(); w++) if (widths[w]) g.setColWidth(w, widths[w]);
                  }*/
             }
-            tabs.setTabActive(t.tableData.tables[0].id);
+            t.tabs.setTabActive(t.tableData.tables[0].id);
         }
 
         iasufr.storeSet("myParam", { id:1, filter: "name"});

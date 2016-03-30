@@ -490,3 +490,22 @@ div.dhtmlx_window_active {
     -moz-box-shadow: 3px 3px 17px 0px rgba(0, 0, 0, 0.37);
     box-shadow: 3px 3px 17px 0px rgba(0, 0, 0, 0.37);
 }
+
+.menu-org {
+    width: 100px;
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
+    word-break: nobreak;
+    white-space: nowrap;
+}
+
+
+.dhtmlxMenu_dhx_skyblue_Middle {
+    display: flex;
+}
+
+.dhtmlxMenu_dhx_skyblue_Middle > .align_left {
+    z-index: 1;
+    background-color: #EBEBEB;
+}

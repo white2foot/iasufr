@@ -361,6 +361,7 @@ Frm.Input.Create = function(opt) {
      * @param {nubmer} col Column index
      */
     function onCellSelect(ind, col) {
+        return;
         var g = this;
         var rowId = g.getSelectedRowId();
 

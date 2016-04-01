@@ -312,7 +312,7 @@ Frm.PrintForm.Create = function(opt) {
                                 var inputIdx = GetInputDataIdx(tdesc, tdesc.rows[p].id, tdesc.cols[c].id);
                                 if (inputIdx != -1) {
                                     var v = tdesc.inputData[inputIdx].value;
-                                    if (v != undefined) v = parseInt(v);
+                                    if (v != undefined) v = parseFloat(v.replace(/ /, "").replace(/,/, "."));
                                     if (c == 6) {
                                         console.log(v);
                                     }
@@ -320,7 +320,7 @@ Frm.PrintForm.Create = function(opt) {
                                 }
                             }
                             console.log("Total: ", total);
-                            cd.value = FormatValue(total, cd.type);
+                            cd.value = FormatValue(total.toFixed(2), cd.type);
                         } else cd.value = "";
 
                         tdesc.cells.push(cd);

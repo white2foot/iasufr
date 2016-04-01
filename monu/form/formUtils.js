@@ -221,11 +221,17 @@ function FormUtils(tableData, period) {
 
     function extendTableWidthDinamicFormulas() {
         var tdesc = t.data;
-        tdesc.dynrows.forEach(function(dyn) {
-            tdesc.cols.forEach(function (col) {
-                extendFormulasForNewCell(dyn.idRow, col.id, dyn.createdFromId);
-            });
-        });
+        tdesc.dynrows.forEach(dyn =>
+            tdesc.cols.forEach(col =>
+                extendFormulaOfNewCell(dyn.idRow, col.id, dyn.createdFromId)
+            )
+        );
+
+        tdesc.dynrows.forEach(dyn =>
+            tdesc.cols.forEach(col =>
+                extendFormulasInWhichCellUsed(dyn.idRow, col.id, dyn.createdFromId)
+            )
+        );
     }
 
     function extendTableWithDynamicInputData() {
@@ -349,7 +355,8 @@ function FormUtils(tableData, period) {
             initCell(t.data.cells.length - 1);
         }
         for (var i = 0; i < t.grid.getColumnsNum(); i++) {
-            extendFormulasForNewCell(newId,  t.grid.getColumnId(i), rowId);
+            extendFormulaOfNewCell(newId,  t.grid.getColumnId(i), rowId);
+            extendFormulasInWhichCellUsed(newId,  t.grid.getColumnId(i), rowId);
         }
 
         //recalc only if added from button
@@ -358,28 +365,14 @@ function FormUtils(tableData, period) {
         return newId;
     }
 
-    function extendFormulasForNewCell(newId, cId, oldId) {
-        var cd = t.getCellData(newId, cId);
 
-        if (cd) if (cd.formula) {
-            // replace old row ids to new ids
-            var s = cd.formula;
-            var cells = s.match(/[^[\]]+(?=])/g);
-            if (cells) if (cells.length != 0) {
-                for (var i = 0; i < cells.length; i++) {
-                    var c = cells[i].split(";");
-                    if (!c) continue;
-                    if (c.length != 2) continue;
-                    if (c[0] == oldId) {
-                        s = iasufr.replaceAll(s, "[" + oldId + ";" + c[1] + "]", "[" + newId + ";" + c[1] + "]");
-                        /*if (!t.fd[newId]) t.fd[newId] = {};
-                        if (!t.fd[newId][c[1]]) t.fd[newId][c[1]] = [];
-                        t.fd[newId][c[1]].push({row: newId, col: cId});*/
-                    }
-                }
-            }
-            cd.formula = s;
-        }
+    /**
+     * Find formulas in which new cell is used and extend theirs formulas
+     * @param {number} newId New row id
+     * @param {number} cId Column id
+     * @param {number} oldId Old row id
+     */
+    function extendFormulasInWhichCellUsed(newId, cId, oldId) {
 
         var f = t.fd[oldId];
         if (!f) return;
@@ -390,7 +383,7 @@ function FormUtils(tableData, period) {
         for (var i = 0; i < f.length; i++) {
             var fRow = f[i].row;
             var fCol = f[i].col;
-            if (fRow === oldId) continue;
+            if (parseInt(fRow) === parseInt(oldId)) continue;
             var cd = t.getCellData(fRow, fCol);
             if (!cd) continue;
             if (!cd.formula) continue;
@@ -411,10 +404,49 @@ function FormUtils(tableData, period) {
         }
     }
 
+    /**
+     * Changes formula of new cell, replacing references to other cells in formula
+     * @param {number} newId New row id
+     * @param {number} cId Column id
+     * @param {number} oldId Old row id
+     */
+    function extendFormulaOfNewCell(newId, cId, oldId) {
+        var cd = t.getCellData(newId, cId);
+
+        if (cd) if (cd.formula) {
+            // replace old row ids to new ids
+            var s = cd.formula;
+            var cells = s.match(/[^[\]]+(?=])/g);
+            if (cells) if (cells.length != 0) {
+                for (var i = 0; i < cells.length; i++) {
+                    var c = cells[i].split(";");
+                    if (!c) continue;
+                    if (c.length != 2) continue;
+                    if (c[0] == oldId) {
+                        s = iasufr.replaceAll(s, "[" + oldId + ";" + c[1] + "]", "[" + newId + ";" + c[1] + "]");
+                        // Add new cell to formula map
+                        if (!t.fd[newId]) t.fd[newId] = {};
+                        if (!t.fd[newId][c[1]]) t.fd[newId][c[1]] = [];
+                        t.fd[newId][c[1]].push({row: newId, col: cId});
+                        // Remove this cell from parent formula map
+                        //if (t.fd[oldId] && t.fd[oldId][cId]) {
+                            ///if (parseInt(t.fd[oldId][cId].row) === parseInt(newId))
+                          //      delete t.fd[oldId][cId];
+                        //}
+                    }
+                }
+            }
+            cd.formula = s;
+        }
+    }
+
     function BuildFormulaData() {
         delete t.fd;
         t.fd = {};
-        for (var i = 0; i < t.data.cells.length; i++) if (t.data.cells[i].formula != undefined && t.data.cells[i].formula != "") {
+        for (var i = 0; i < t.data.cells.length; i++)
+            if (t.data.cells[i].formula != undefined && t.data.cells[i].formula != "") {
+                // Skip dependencies for dynamic rows
+                if (t.data.dynrows.filter(r => r.idRow === t.data.cells[i].row).length !== 0) continue;
             CalcDependientes(t.data.cells[i].formula, t.data.cells[i].row, t.data.cells[i].col);
         }
 

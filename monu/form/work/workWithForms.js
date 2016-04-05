@@ -491,9 +491,17 @@ Frm.WorkWithForms.Create = function(opt) {
         // 1)спросить на какую дату
         if (paramCopy==undefined){
             var mess=[{type: "settings", position: "label-right"},{type: "label", label:"Задати дату"}];
+            if (iasufr.pGrp(1)){
+                mess.push({type: "input", name:"codeOrg1",value:ORG_NAME, label: "З органiзацii",readonly:true});
+                mess.push({type: "input", name:"codeOrg2",value:'', label: "На органiзацiю (код мережi)"});
+            }
+            else{
+                mess.push({type: "hidden", name:"codeOrg1",value:'', label: "З органiзацii"});
+                mess.push({type: "hidden", name:"codeOrg2",value:'', label: "На органiзацiю"});
+            }
             mess.push({type: "calendar", name:"date1ZvitNew",value:'', label: "Обранi звiти копiювати на дату"});
 
-            iasufr.loadForm("Confirm", {title: "Задати дату",mess:mess,onSelect:copy,param:{date1ZvitNew:""},modal:true,width:560,height:150});
+            iasufr.loadForm("Confirm", {title: "Задати дату",mess:mess,onSelect:copy,param:{date1ZvitNew:"",codeOrg2:""},modal:true,width:560,height:150});
         }
         else {
             //2)selRow
@@ -506,7 +514,7 @@ Frm.WorkWithForms.Create = function(opt) {
 
             iasufr.ajax({
                 url: "frm.TitleZvitForm.cls",
-                data: {func: "setCopy",idOrg:ID_ORG,date1Zvit:date1Zvit,date1ZvitNew:paramCopy.param.date1ZvitNew,idZvit:selRow},
+                data: {func: "setCopy",idOrg:ID_ORG,date1Zvit:date1Zvit,date1ZvitNew:paramCopy.param.date1ZvitNew,codeOrg2:paramCopy.param.codeOrg2,idZvit:selRow},
                 success: function (data) {
                     var json = JSON.parse(data);
                     iasufr.messageSuccess("Скопiювано звiтiв "+json.count);

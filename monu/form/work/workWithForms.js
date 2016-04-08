@@ -89,8 +89,11 @@ Frm.WorkWithForms.Create = function(opt) {
     toolbar.setListOptionSelected("idRecip", iasufr.storeGet("wwfIdRecip") || "-1");
 
     toolbar.attachEvent("onClick", function(id){
-        if (id>12) iasufr.storeSet("wwfIdRecip", toolbar.getListOptionSelected("idRecip"));
-        RefreshGrid();
+        if ((id==-1)||(id==968)||(id==969)||(id==967)) {
+            iasufr.storeSet("wwfIdRecip", toolbar.getListOptionSelected("idRecip"));
+            RefreshGrid();
+        }
+
     });
     /*не работает
     toolbar.attachEvent("onValueChange", function(id, value){

@@ -312,7 +312,7 @@ Frm.PrintForm.Create = function(opt) {
                                 var inputIdx = GetInputDataIdx(tdesc, tdesc.rows[p].id, tdesc.cols[c].id);
                                 if (inputIdx != -1) {
                                     var v = tdesc.inputData[inputIdx].value;
-                                    if (v != undefined) v = parseFloat(v.replace(/ /, "").replace(/,/, "."));
+                                    if (v != undefined) v = parseFloat(v.replace(/ /g, "").replace(/,/g, "."));
                                     if (c == 6) {
                                         console.log(v);
                                     }
@@ -483,12 +483,13 @@ Frm.PrintForm.Create = function(opt) {
         var PAGE_WIDTH = (297 - getLeftMargin() - getRightMargin());
         var pu = new PrintUtils();
         var pdfs = [];
-
+        var addedIdx = 0;
         for (var z = 0 ; z < o.json.length; z++) {
             for (var t = 0; t < o.json[z].tables.length; t++) {
                 var tdesc = o.json[z].tables[t];
                 if (hasDifferentFormatting(tdesc)) {
-                    addPdf( o.json[z].tables[t - 1] || o.json[z].tables[t]);
+                    addPdf(o.json[z].tables[addedIdx]);
+                    addedIdx = t;
                 } else {
                     if (tdesc.printData.fromNewPage == 1) {
                         res += "<div style='page-break-after: always;'></div>";
@@ -660,7 +661,8 @@ Frm.PrintForm.Create = function(opt) {
             }
         }
 
-        addPdf( o.json[z-1].tables[t - 2] || o.json[z-1].tables[t-1]);
+        addPdf( o.json[z-1].tables[addedIdx]);
+        addedIdx = t;
         var et = performance.now();
         console.log('Data load: ', et - st);
         iasufr.ajax({

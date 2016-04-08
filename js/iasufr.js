@@ -149,6 +149,7 @@
 
     // ****************************** ajax запросы к Cahce *********************************
     ajax: function (options) {
+        if (options.sessionExpiredTried) return;
         if (!options.data) options.data={};
         if (options.url) {
             // Проверяем был ли это запрос к классу
@@ -195,6 +196,13 @@
                 //iasufr.decodeStrings(d);
 
                 if (d.error) {
+                    // Session expired error
+                    if (d.error === 17) {
+                        // Do ajax call again
+                        $.ajax(options);
+                        options.sessionExpiredTried = true;
+                        return;
+                    }
                     if (d.msg) iasufr.alert(d.msg);
                     if (d.redirectUrl) {
                         iasufr.removeCookies();
@@ -228,7 +236,7 @@
             dhtmlx.message({title: 'Помилка', text: msg, type: 'alert-error'});
 
             if (oldError) oldError(data, textStatus, jqXHR);
-        }
+        };
 
         // Добавляем время чтобы предотвратить кеширование запроса
         var etc = "etc=" + new Date().getTime().toString();
@@ -239,6 +247,13 @@
             dataType: "text"
         });
         $.ajax(options);
+    },
+
+    keepAlive: function() {
+        iasufr.ajax({
+            url: "basePage.cls",
+            data: {action: "keepAlive"}
+        });
     },
 
     checkLogin: function() {
@@ -833,7 +848,15 @@ $(document).ready(function () {
         }
     }
     // history.pushState({sprav:""}, "", "aaa");
-    if (window.location.pathname != iasufr.const.LOGIN_PAGE) iasufr.checkLogin(); else {
+    //iasufr.keepAlive();
+    //setInterval(iasufr.keepAlive.bind(iasufr), 1000 * 60 * 10);
+    //setInterval(iasufr.keepAlive.bind(iasufr), 3000);
+
+    if (window.location.pathname != iasufr.const.LOGIN_PAGE) {
+        iasufr.keepAlive();
+        setInterval(iasufr.keepAlive.bind(iasufr), 1000 * 60 * 10);
+        iasufr.checkLogin();
+    } else {
         if (iasufr.ready) iasufr.ready();
     }
 });

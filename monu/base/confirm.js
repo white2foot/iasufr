@@ -20,6 +20,10 @@ base.Confirm.Create = function(opt) {
     dhxLayoutT1= dhxLayout.cells("a").attachForm(_this.mess);
 
     dhxLayoutT1.attachEvent("onChange", function(idRekv, value, is_checked) {
+        if (idRekv.lastIndexOf("code")>-1) {
+            $.extend(_this.param, JSON.parse('{"'+idRekv+'":"'+value+'"}'));
+            return}
+
         if (_this.onSelect) {
             if (dhxLayoutT1.getItemType(idRekv)=='calendar') {value=iasufr.formatDateStr(dhxLayoutT1.getCalendar(idRekv).getDate(true));};
 

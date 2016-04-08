@@ -8,6 +8,7 @@ Frm.WorkWithForms.Create = function(opt) {
     var dhxLayout;
     var ID_ORG = iasufr.user.orgId;
     var ORG_NAME = "(" + iasufr.user.orgCode+") " + iasufr.user.orgName;
+    var idRecip="";
     var storedIdOrg = iasufr.storeGet("wwfIdOrg");
     var storedOrgName = iasufr.storeGet("wwfOrgName", ORG_NAME);
     if (storedIdOrg && storedOrgName) {
@@ -78,6 +79,15 @@ Frm.WorkWithForms.Create = function(opt) {
             RefreshGrid();
         }
     });
+
+    var actionsList = [];
+    actionsList.push(['-1',  'obj', "Усi департаменти"]);
+    actionsList.push(['968',  'obj', "Департамент економіки та фінансування"]);
+    actionsList.push(['969',  'obj', "Департамент управління справами"]);
+    actionsList.push(['967',  'obj', "Управління бух.обліку і звітності"]);
+    toolbar.addButtonSelect("idRecip", 4, "", actionsList, "", "", true, true, 13, "select");
+    toolbar.setListOptionSelected("idRecip", iasufr.storeGet("wwfIdRecip") || "-1");
+
     toolbar.addSeparator("sep1", null);
     if (iasufr.pFunc("zvCanViewDel")) toolbar.addButtonTwoState("showDeleted", null, "Видаленi");
     if (iasufr.pFunc("zvCanViewZved")) toolbar.addButtonTwoState("showZved", null, "Зведенi");
@@ -233,8 +243,6 @@ Frm.WorkWithForms.Create = function(opt) {
     RefreshGrid();
 
 
-
-
     /* var myContextMenu1 = new dhtmlXMenuObject({
      parent: "contextZone_A",
      icons_path: "../common/imgs/",
@@ -274,7 +282,8 @@ Frm.WorkWithForms.Create = function(opt) {
         var showZved = 0;
         if (toolbar.getType("showDeleted") != null) showDeleted = toolbar.getItemState("showDeleted") ? 1 : 0;
         if (toolbar.getType("showZved") != null) showZved = toolbar.getItemState("showZved") ? 1 : 0;
-        iasufr.ajax({url: "frm.Work.cls", data: {func: "Select", month: m, year: toolbar.getValue("year"), idOrg: ID_ORG, showDeleted: showDeleted, showZved: showZved }, success: onAfterLoad});
+        var idRecip=toolbar.getListOptionSelected("idRecip");
+        iasufr.ajax({url: "frm.Work.cls", data: {func: "Select", month: m, year: toolbar.getValue("year"), idOrg: ID_ORG,idRecip:idRecip, showDeleted: showDeleted, showZved: showZved }, success: onAfterLoad});
     }
 
     function onAfterLoad(d) {

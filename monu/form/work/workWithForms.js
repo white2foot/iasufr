@@ -88,6 +88,15 @@ Frm.WorkWithForms.Create = function(opt) {
     toolbar.addButtonSelect("idRecip", 4, "", actionsList, "", "", true, true, 13, "select");
     toolbar.setListOptionSelected("idRecip", iasufr.storeGet("wwfIdRecip") || "-1");
 
+    toolbar.attachEvent("onClick", function(id){
+        if (id>12) iasufr.storeSet("wwfIdRecip", toolbar.getListOptionSelected("idRecip"));
+        RefreshGrid();
+    });
+    /*не работает
+    toolbar.attachEvent("onValueChange", function(id, value){
+        alert(id+'='+value)
+    });*/
+
     toolbar.addSeparator("sep1", null);
     if (iasufr.pFunc("zvCanViewDel")) toolbar.addButtonTwoState("showDeleted", null, "Видаленi");
     if (iasufr.pFunc("zvCanViewZved")) toolbar.addButtonTwoState("showZved", null, "Зведенi");

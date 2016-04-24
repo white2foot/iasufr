@@ -166,6 +166,11 @@ Frm.WorkWithForms.Create = function(opt) {
             actionsList.push(['exp_4_3', 'obj','<span style="color:green">E-Data - прийнятi</span>', '']);
             actionsList.push(['exp_2_3', 'obj','<span style="color:green">E-Data - вiдправленi</span>', '']);
             actionsList.push(['exp_3_3', 'obj','<span style="color:green">E-Data - пiдтвердженi</span>', '']);
+            actionsList.push(['seporator']);
+            actionsList.push(['exp__4', 'obj', '<span style="color:green">E-Data (казн) - для всiх звiтiв </span>', '']);
+            actionsList.push(['exp_4_4', 'obj','<span style="color:green">E-Data (казн) - прийнятi </span>', '']);
+            actionsList.push(['exp_2_4', 'obj','<span style="color:green">E-Data (казн) - вiдправленi </span>', '']);
+            actionsList.push(['exp_3_4', 'obj','<span style="color:green">E-Data (казн) - пiдтвердженi </span>', '']);
         }
         if (iasufr.pFunc("zvCanExportDKSY")){
             actionsList.push(['seporator']);

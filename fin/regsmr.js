@@ -97,6 +97,7 @@ Seminar.Form.Create = function(opt) {
         var selId = g.getSelectedId();
         if (!isEdit) selId = 0; 
 
+
         var w = iasufr.wins.createWindow("smr" + new Date().getTime().toString(), 0, 0, 650, 500);
         w.setText("Додавання семінару");
         w.setModal(true);
